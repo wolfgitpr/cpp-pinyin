@@ -13,14 +13,12 @@ namespace Pinyin
         ~Jyutping() = default;
 
         PinyinResVector hanziToPinyin(const std::string &hans,
-                                      CanTone::Style style = CanTone::Style::TONE,
-                                      Error error = Error::Default, bool v_to_u = false,
-                                      bool neutral_tone_with_five = false) const;
+                                      CanTone::Style style = CanTone::Style::TONE3,
+                                      Error error = Error::Default) const;
 
         PinyinResVector hanziToPinyin(const std::vector<std::string> &hans,
-                                      CanTone::Style style = CanTone::Style::TONE,
-                                      Error error = Error::Default, bool v_to_u = false,
-                                      bool neutral_tone_with_five = false) const;
+                                      CanTone::Style style = CanTone::Style::TONE3,
+                                      Error error = Error::Default) const;
     };
 }
 #endif // DATASET_TOOLS_CANTONESE_H

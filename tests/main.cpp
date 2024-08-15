@@ -22,11 +22,11 @@ int main(int argc, char *argv[]) {
     // manTest.batchTest();
     std::cout << "--------------------\n" << std::endl;
 
-    // const JyuptingTest jyuptingTest;
-    // std::cout << "Cantonese G2P test:" << std::endl;
-    // std::cout << "--------------------" << std::endl;
-    // jyuptingTest.batchTest();
-    // std::cout << "--------------------\n" << std::endl;
+    const JyuptingTest jyuptingTest;
+    std::cout << "Cantonese G2P test:" << std::endl;
+    std::cout << "--------------------" << std::endl;
+    jyuptingTest.batchTest();
+    std::cout << "--------------------\n" << std::endl;
 
     std::cout << "G2P mix test:" << std::endl;
     std::cout << "--------------------" << std::endl;

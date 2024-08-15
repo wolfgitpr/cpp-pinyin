@@ -27,8 +27,8 @@ namespace Test
                 const std::string &hans = keyValuePair[0];
                 const std::string &pinyin = keyValuePair[1];
 
-                const auto result = g2p_can->hanziToPinyin(hans, Pinyin::CanTone::Style::NORMAL, Pinyin::Error::Ignore, false,
-                                                           true).toStdStr();
+                const auto result = g2p_can->hanziToPinyin(hans, Pinyin::CanTone::Style::NORMAL, Pinyin::Error::Ignore).
+                                             toStdStr();
 
                 auto words = Pinyin::split(pinyin, " ");
                 const auto wordSize = words.size();
@@ -50,8 +50,7 @@ namespace Test
                     std::cout << "raw: " << pinyin << std::endl;
                     std::cout << "res: " << result << std::endl;
                 }
-            }
-            else {
+            } else {
                 std::cerr << "Invalid line format: " << line << std::endl;
             }
         }
