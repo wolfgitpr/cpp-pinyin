@@ -6,6 +6,7 @@
 #include <unordered_set>
 
 #include "StringUtil.h"
+#include "../src/util/ManToneUtil.h"
 
 namespace Pinyin
 {
@@ -67,8 +68,7 @@ namespace Pinyin
             for (char c : s) {
                 tokens.emplace_back(1, c);
             }
-        }
-        else {
+        } else {
             std::string::size_type start = 0;
             std::string::size_type end = s.find(delimiter);
             while (end != std::string::npos) {
@@ -105,17 +105,14 @@ namespace Pinyin
                     pos++;
                 }
                 res.push_back(input.substr(start, pos - start));
-            }
-            else if (isHanzi(currentChar) || isDigit(currentChar) || !isSpace(currentChar)) {
+            } else if (isHanzi(currentChar) || isDigit(currentChar) || !isSpace(currentChar)) {
                 res.push_back(input.substr(pos, 1));
                 pos++;
-            }
-            else if (isKana(currentChar)) {
+            } else if (isKana(currentChar)) {
                 const int length = (pos + 1 < input.length() && isSpecialKana(input[pos + 1])) ? 2 : 1;
                 res.push_back(input.substr(pos, length));
                 pos += length;
-            }
-            else {
+            } else {
                 pos++;
             }
         }
@@ -206,6 +203,38 @@ namespace Pinyin
                 for (const auto &str : split(value, sep2)) {
                     if (!str.empty())
                         u8strlist.emplace_back(str);
+                }
+                resultMap[key] = u8strlist;
+            }
+        }
+        return true;
+    }
+
+    bool loadUserDict(const std::string &dict_dir, const std::string &fileName,
+                      std::unordered_map<u8string, u8stringlist> &resultMap, const char &sep1,
+                      const std::string &sep2) {
+#ifdef _WIN32
+        std::ifstream file(Pinyin::utf8ToWide(dict_dir + "/" + fileName));
+#else
+        std::ifstream file(dict_dir + "/" + fileName);
+#endif
+        if (!file.is_open()) {
+            std::cerr << fileName << " error: Unable to open file" << std::endl;
+            return false;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            line.erase(0, line.find_first_not_of(" \t\r\n"));
+            line.erase(line.find_last_not_of(" \t\r\n") + 1);
+
+            std::istringstream iss(line);
+            std::string key, value;
+            if (std::getline(iss, key, sep1) && std::getline(iss, value)) {
+                u8stringlist u8strlist;
+                for (const auto &str : split(value, sep2)) {
+                    if (!str.empty())
+                        u8strlist.emplace_back(tone3ToTone(str));
                 }
                 resultMap[key] = u8strlist;
             }

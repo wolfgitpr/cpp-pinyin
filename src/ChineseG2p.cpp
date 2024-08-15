@@ -63,7 +63,7 @@ namespace Pinyin
 
         initialized = loadDict(dict_dir, "phrases_map.txt", phrases_map) &&
             loadDict(dict_dir, "phrases_dict.txt", phrases_dict) &&
-            loadDict(dict_dir, "user_dict.txt", phrases_dict) &&
+            loadUserDict(dict_dir, "user_dict.txt", phrases_dict) &&
             loadDict(dict_dir, "word.txt", word_dict) &&
             loadDict(dict_dir, "trans_word.txt", trans_dict);
     }

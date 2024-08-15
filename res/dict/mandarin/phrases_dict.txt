@@ -20,11 +20,8 @@
 一溜烟:yī,liù,yān
 一甲子:yī,jiǎ,zǐ
 一目十行:yī,mù,shí,háng
-一矢中的:yī,shǐ,zhòng,dì
 一笑了之:yī,xiào,liǎo,zhī
 一觉醒来:yī,jiào,xǐng,lái
-一语中的:yī,yǔ,zhòng,dì
-一语破的:yī,yǔ,pò,dì
 一走了之:yī,zǒu,liǎo,zhī
 一蹴可几:yī,cù,kě,jī
 一蹶不振:yī,jué,bù,zhèn
@@ -689,6 +686,8 @@
 帕累托:pà,lèi,tuō
 帖木儿:tiē,mù,ér
 帝王切开:dì,wáng,qiē,kāi
+席地而坐:xí,dì,ér,zuò
+席地而睡:xí,dì,ér,shuì
 带电粒子:dài,diàn,lì,zǐ
 帮倒忙:bāng,dào,máng
 帮帮忙:bāng,bang,máng
@@ -1170,6 +1169,8 @@
 灭此朝食:miè,cǐ,zhāo,shí
 灭虫宁:miè,chóng,nìng
 滴答声:dī,da,shēng
+满地可:mǎn,dì,kě
+满地找牙:mǎn,dì,zhǎo,yá
 漏脯充饥:lòu,fǔ,chōng,jī
 汉藏语系:hàn,zàng,yǔ,xì
 洁身自好:jié,shēn,zì,hào
@@ -1179,7 +1180,6 @@
 激进分子:jī,jìn,fèn,zǐ
 浓墨重彩:nóng,mò,zhòng,cǎi
 湿答答:shī,dā,dā
-洒狗血:sǎ,gǒu,xiě
 火地群岛:huǒ,dì,qún,dǎo
 火箭弹:huǒ,jiàn,dàn
 灰不溜丢:huī,bu,liū,diū
@@ -1237,7 +1237,6 @@
 犯得上:fàn,de,shàng
 犯得着:fàn,de,zháo
 狂想曲:kuáng,xiǎng,qǔ
-狗血喷头:gǒu,xiě,pēn,tóu
 狗逮老鼠:gǒu,dǎi,lǎo,shǔ
 狼吞虎咽:láng,tūn,hǔ,yàn
 狼子野心:láng,zǐ,yě,xīn
@@ -1412,8 +1411,6 @@
 积极分子:jī,jí,fèn,zǐ
 积重难返:jī,zhòng,nán,fǎn
 空地导弹:kōng,dì,dǎo,dàn
-穿着打扮:chuān,zhuó,dǎ,bàn
-穿着讲究:chuān,zhuó,jiǎng,jiu
 窗明几净:chuāng,míng,jī,jìng
 窗玻璃:chuāng,bō,lí
 窝窝头:wō,wo,tóu
@@ -1603,7 +1600,6 @@
 万柏林区:wàn,bó,lín,qū
 落埋怨:lào,mán,yuàn
 叶公好龙:yè,gōng,hào,lóng
-着眼点:zhuó,yǎn,diǎn
 着着失败:zhuó,zhuó,shī,bài
 着道儿:zháo,dào,er
 葛洲坝:gé,zhōu,bà
@@ -1668,7 +1664,6 @@
 被子植物:bèi,zǐ,zhí,wù
 裁缝师:cái,féng,shī
 裁缝店:cái,féng,diàn
-装模作样:zhuāng,mú,zuò,yàng
 里急后重:lǐ,jí,hòu,zhòng
 里海地鸦:lǐ,hǎi,dì,yā
 裸子植物:luǒ,zǐ,zhí,wù
@@ -1747,6 +1742,7 @@
 跌跌撞撞:diē,die,zhuàng,zhuàng
 跑马地:pǎo,mǎ,dì
 跟不上:gēn,bu,shàng
+跪地求饶:guì,dì,qiú,ráo
 踏破门槛:tā,pò,mén,kǎn
 踏踏实实:tā,tā,shí,shí
 踟蹰不前:chí,chú,bu,qián
@@ -1810,7 +1806,6 @@
 都伯林:dū,bó,lín
 都安县:dū,ān,xiàn
 都更案:dū,gēng,àn
-都会传奇:dū,huì,chuán,qí
 都柏林:dū,bó,lín
 都江堰:dū,jiāng,yàn
 都江堰市:dū,jiāng,yàn,shì
@@ -1834,9 +1829,9 @@
 重武器:zhòng,wǔ,qì
 重男轻女:zhòng,nán,qīng,nǚ
 重义轻利:zhòng,yì,qīng,lì
+重色轻友:zhòng,sè,qīng,yǒu
 重身子:zhòng,shēn,zi
 重离子:zhòng,lí,zǐ
-重头戏:zhòng,tóu,xì
 野孩子:yě,hái,zǐ
 量尺寸:liáng,chǐ,cùn
 量油尺:liáng,yóu,chǐ
@@ -2011,21 +2006,10 @@
 鼎铛玉石:dǐng,chēng,yù,shí
 鼓鼓囊囊:gǔ,gu,nāng,nāng
 龙生九子:lóng,shēng,jiǔ,zǐ
-陟罚臧否:zhì,fá,záng,pǐ
-牵着手:qián,zhe,shǒu
-一行行:yì,háng,háng
-重感冒:zhòng,gǎn,mào
-地之角:dì,zhī,jiǎo
-天昏地暗:tiān,hūn,dì,àn
-了无音讯:liǎo,wú,yín,xùn
-情深意重:qíng,shēn,yì,zhòng
-了无牵挂:liǎo,wú,qiān,guà
-草长莺飞:cǎo,zhǎng,yīng,fēi
 一匙:yī,chí
 一应:yī,yīng
 一打:yī,dá
 一晃:yī,huǎng
-一行:yì,háng
 丁丁:zhēng,zhēng
 万俟:mò,qí
 丈夫:zhàng,fu
@@ -2090,6 +2074,7 @@
 中油:zhòng,yóu
 中牟:zhōng,mù
 中奖:zhòng,jiǎng
+中的:zhòng,dì
 中签:zhòng,qiān
 中肯:zhòng,kěn
 中举:zhòng,jǔ
@@ -2114,7 +2099,7 @@
 干哕:gān,yue
 干号:gān,háo
 干饭:gàn,fàn
-了了:liǎo,le
+了了:liǎo,liǎo
 了事:liǎo,shì
 了债:liǎo,zhài
 了却:liǎo,què
@@ -2147,7 +2132,7 @@
 什锦:shí,jǐn
 仁义:rén,yi
 仆街:pū,jiē
-今朝:jín,zhāo
+今朝:jīn,zhāo
 介子:jiè,zǐ
 介壳:jiè,qiào
 仔畜:zǐ,chù
@@ -2444,7 +2429,7 @@
 利害:lì,hai
 利索:lì,suo
 利落:lì,luo
-到了:dào,lē
+到了:dào,liǎo
 刺中:cì,zhòng
 削尖:xiāo,jiān
 削球:xiāo,qiú
@@ -4006,6 +3991,7 @@
 本地:běn,dì
 本应:běn,yīng
 本相:běn,xiàng
+本色:běn,shǎi
 本行:běn,háng
 朱子:zhū,zǐ
 朴子:pú,zǐ
@@ -4325,6 +4311,7 @@
 泼辣:pō,la
 潜没:qián,mò
 溃脓:huì,nóng
+澄清:dèng,qīng
 激子:jī,zǐ
 浓重:nóng,zhòng
 湿地:shī,dì
@@ -4435,6 +4422,7 @@
 狐狸:hú,li
 狗刨:gǒu,páo
 狗狗:gǒu,gōu
+狗血:gǒu,xiě
 狼藉:láng,jí
 狼头:láng,tou
 猛干:měng,gàn
@@ -4644,6 +4632,7 @@
 石鼓:dàn,gǔ
 砌末:qiè,mo
 砢碜:kē,chen
+破的:pò,dì
 破相:pò,xiàng
 破处:pò,chǔ
 硅脂:guī,zhǐ
@@ -4741,6 +4730,7 @@
 空额:kòng,é
 空余:kòng,yú
 穿上:chuān,shang
+穿着:chuān,zhuó
 窗户:chuāng,hu
 窟窿:kū,long
 窝囊:wō,nang
@@ -4750,6 +4740,7 @@
 站长:zhàn,zhǎng
 童儿:tóng,ér
 童子:tóng,zǐ
+端的:duān,dì
 端详:duān,xiang
 笆斗:bā,dǒu
 笊篱:zhào,li
@@ -4880,6 +4871,7 @@
 罗唆:luō,suō
 罗嗦:luō,suo
 美差:měi,chāi
+美的:měi,dí
 美眄:měi,miǎn
 美发:měi,fà
 义子:yì,zǐ
@@ -5101,7 +5093,7 @@
 落难:luò,nàn
 着力:zhuó,lì
 着劲:zhuó,jìn
-着地:zhuó,de
+着地:zháo,dì
 着墨:zhuó,mò
 着实:zhuó,shí
 着床:zhuó,chuáng
@@ -5118,6 +5110,7 @@
 着凉:zháo,liáng
 着火:zháo,huǒ
 着然:zhuó,rán
+着眼:zhuó,yǎn
 着笔:zhuó,bǐ
 着紧:zháo,jǐn
 着色:zhuó,sè
@@ -5668,6 +5661,7 @@
 都尉:dū,wèi
 都市:dū,shì
 都昌:dū,chāng
+都会:dū,huì
 都督:dū,dū
 都兰:dū,lán
 都护:dū,hù
@@ -5762,6 +5756,7 @@
 重金:zhòng,jīn
 重镇:zhòng,zhèn
 重音:zhòng,yīn
+重头:zhòng,tóu
 重点:zhòng,diǎn
 野地:yě,dì
 量具:liáng,jù
@@ -6116,6 +6111,7 @@
 盐都:yán,dū
 麇集:qún,jí
 丽水:lí,shuǐ
+面的:miàn,dī
 面糊:miàn,hù
 麻俐:má,li
 麻利:má,li
@@ -6137,25 +6133,3 @@
 齿嵴:chǐ,jǐ
 龟兹:qiū,cí
 龟裂:jūn,liè
-汤汤:shāng,shāng
-重场:zhòng,chǎng
-很重:hěn,zhòng
-跪地:guì,dì
-席地:xí,dì
-一地:yí,dì
-朝霞:zhāo,xiá
-盛满:chéng,mǎn
-纶巾:guān,jīn
-一朝:yì,zhāo
-两行:liǎng,háng
-没入:mò,rù
-还重:hái,zhòng
-情重:qíng,zhòng
-重色:zhòng,sè
-几行:jǐ,háng
-好重:hǎo,zhòng
-屏住:bǐng,zhù
-满地:mǎn,dì
-彷佛:fǎng,fú
-诗行:shī,háng
-朝暮:zhāo,mù

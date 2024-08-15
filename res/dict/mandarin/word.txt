@@ -16,7 +16,7 @@
 鹮:huán
 嘴:zuǐ
 鹬:yù
-一:yī,yì,yi,yí
+一:yī,yi
 对:duì
 应:yìng,yīng,ying
 映:yìng
@@ -45,7 +45,7 @@
 干:gān,gàn
 二:èr,ér
 净:jìng,jing
-了:le,liǎo,liào,lē
+了:le,liǎo,liào
 百:bǎi,bò
 事:shì,shi
 无:wú,mó
@@ -405,7 +405,7 @@
 棍:gùn
 概:gài
 槌:chuí
-音:yīn,yin,yín
+音:yīn,yin
 枪:qiāng
 模:mó,mú
 次:cì
@@ -864,7 +864,7 @@
 从:cóng
 后:hòu
 拗:ào,niù,ǎo
-汤:tāng,shāng,táng
+汤:tāng,táng
 局:jú
 治:zhì
 食:shí,shi,sì
@@ -1590,7 +1590,7 @@
 氨:ān
 腈:jīng
 唑:zuò
-纶:lún,guān
+纶:lún
 辰:chén,chen
 酮:tóng
 脱:tuō
@@ -1863,7 +1863,7 @@
 讨:tǎo
 贷:dài
 哪:nǎ,něi,né,na
-今:jīn,jín
+今:jīn
 乢:gài
 乣:jiǔ
 乤:xx
@@ -2162,7 +2162,7 @@
 寿:shòu
 妖:yāo
 拖:tuō
-牵:qiān,qián
+牵:qiān
 驴:lǘ
 你:nǐ
 橛:jué
@@ -8541,7 +8541,7 @@
 臖:xìng
 臛:huò
 臞:qú
-臧:zàng,zāng,záng
+臧:zàng,zāng
 蓐:rù
 诩:xǔ
 臽:xiàn

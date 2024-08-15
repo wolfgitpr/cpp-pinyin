@@ -30,6 +30,10 @@ namespace Pinyin
                   std::unordered_map<u8string, u8stringlist> &resultMap, const char &sep1 = ':',
                   const std::string &sep2 = ",");
 
+    bool loadUserDict(const std::string &dict_dir, const std::string &fileName,
+                      std::unordered_map<u8string, u8stringlist> &resultMap, const char &sep1 = ':',
+                      const std::string &sep2 = " ");
+
     std::vector<std::string> toStdList(const u8stringlist &input);
 
     bool isLetter(char32_t c);
