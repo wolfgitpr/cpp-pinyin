@@ -14,7 +14,7 @@ namespace Pinyin
 
     std::vector<std::string> Pinyin::getDefaultPinyin(const std::string &text, ManTone::Style style,
                                                       bool v_to_u, bool neutral_tone_with_five) const {
-        return ChineseG2p::getDefaultPinyin(text, static_cast<int>(style));
+        return ChineseG2p::getDefaultPinyin(text, static_cast<int>(style), v_to_u, neutral_tone_with_five);
     }
 
 }

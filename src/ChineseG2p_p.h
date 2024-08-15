@@ -38,29 +38,34 @@ namespace Pinyin
             return it != trans_dict.end() ? it->second : text;
         }
 
-        inline u8string toneConvert(const u8string &pinyin, int style) const {
-            return m_toneConverter->convert(pinyin, style);
+        inline u8string toneConvert(const u8string &pinyin, int style, bool v_to_u = false,
+                                    bool neutral_tone_with_five = false) const {
+            return m_toneConverter->convert(pinyin, style, v_to_u, neutral_tone_with_five);
         }
 
-        inline u8stringlist toneConvert(const u8stringlist &pinyin, int style) const {
+        inline u8stringlist toneConvert(const u8stringlist &pinyin, int style, bool v_to_u = false,
+                                        bool neutral_tone_with_five = false) const {
             u8stringlist tonePinyin;
             tonePinyin.reserve(pinyin.size());
             for (const u8string &p : pinyin) {
-                tonePinyin.push_back(toneConvert(p, style));
+                tonePinyin.push_back(toneConvert(p, style, v_to_u, neutral_tone_with_five));
             }
             return tonePinyin;
         }
 
-        inline std::vector<std::string> stdToneConvert(const std::vector<std::string> &pinyin, int style) const {
+        inline std::vector<std::string> stdToneConvert(const std::vector<std::string> &pinyin, int style,
+                                                       bool v_to_u = false,
+                                                       bool neutral_tone_with_five = false) const {
             std::vector<std::string> tonePinyin;
             tonePinyin.reserve(pinyin.size());
             for (const std::string &p : pinyin) {
-                tonePinyin.emplace_back(toneConvert(u8string(p), style).c_str());
+                tonePinyin.emplace_back(toneConvert(u8string(p), style, v_to_u, neutral_tone_with_five).c_str());
             }
             return tonePinyin;
         }
 
-        inline u8stringlist getDefaultPinyin(const u8string &hans, int style = 0) const {
+        inline u8stringlist getDefaultPinyin(const u8string &hans, int style = 0, bool v_to_u = false,
+                                             bool neutral_tone_with_five = false) const {
             const auto it = word_dict.find(tradToSim(hans));
             if (it == word_dict.end())
                 return {hans};
@@ -72,7 +77,7 @@ namespace Pinyin
             std::unordered_set<u8string> seen;
 
             for (u8string &pinyin : candidates) {
-                const auto tarPinyin = toneConvert(pinyin, style);
+                const auto tarPinyin = toneConvert(pinyin, style, v_to_u, neutral_tone_with_five);
                 if (seen.insert(tarPinyin).second) {
                     toneCandidates.push_back(tarPinyin);
                 }

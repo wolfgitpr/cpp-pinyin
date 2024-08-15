@@ -39,7 +39,8 @@ namespace Pinyin
                                       Error error = Error::Default, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
 
-        std::vector<std::string> getDefaultPinyin(const std::string &text, int style = 0) const;
+        std::vector<std::string> getDefaultPinyin(const std::string &text, int style = 0, bool v_to_u = false,
+                                                  bool neutral_tone_with_five = false) const;
 
         explicit ChineseG2p(ChineseG2pPrivate &d);
 

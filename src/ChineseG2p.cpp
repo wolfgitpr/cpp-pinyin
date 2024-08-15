@@ -143,8 +143,7 @@ namespace Pinyin
                     false
                 });
                 cursor++;
-            }
-            else {
+            } else {
                 bool found = false;
                 for (int length = 4; length >= 2 && !found; length--) {
                     if (cursor + length <= inputList.size()) {
@@ -267,7 +266,8 @@ namespace Pinyin
         return d_ptr->isPolyphonic(text);
     }
 
-    std::vector<std::string> ChineseG2p::getDefaultPinyin(const std::string &text, int style) const {
-        return toStdList(d_ptr->getDefaultPinyin(d_ptr->tradToSim(text), style));
+    std::vector<std::string> ChineseG2p::getDefaultPinyin(const std::string &text, int style, bool v_to_u,
+                                                          bool neutral_tone_with_five) const {
+        return toStdList(d_ptr->getDefaultPinyin(d_ptr->tradToSim(text), style, v_to_u, neutral_tone_with_five));
     }
 }
