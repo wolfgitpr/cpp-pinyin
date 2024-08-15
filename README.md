@@ -8,6 +8,8 @@ Chinese dialects can be used to create their own dictionaries using makedict.
 
 Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN), and undergo significant optimization.
 
+[pinyin-makedict](https://github.com/wolfgitpr/pinyin-makedict) is the tool for creating Chinese/Cantonese dictionaries.
+
 ## Feature
 
 + Interface reference [pypinyin](https://github.com/mozillazg/python-pinyin)
