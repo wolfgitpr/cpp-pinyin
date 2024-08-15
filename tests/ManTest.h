@@ -6,13 +6,13 @@
 
 namespace Test
 {
-    class ManTest
-    {
+    class ManTest {
     public:
         explicit ManTest();
         ~ManTest();
         bool apiTest() const;
-        bool batchTest(bool resDisplay = false) const;
+        bool toneBatchTest(bool resDisplay = false) const;
+        bool unToneBatchTest(bool resDisplay = false) const;
 
     private:
         std::unique_ptr<Pinyin::Pinyin> g2p_zh;

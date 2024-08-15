@@ -135,7 +135,7 @@ namespace Pinyin
 
             // is polypropylene
             if (!d_ptr->isPolyphonic(current_char)) {
-                const auto pinyin = d_ptr->getDefaultPinyin(current_char, style);
+                const auto pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
                 result.emplace_back(PinyinRes{
                     current_char.cpp_str(),
                     pinyin[0].cpp_str(),
@@ -156,7 +156,7 @@ namespace Pinyin
                                 result.emplace_back(PinyinRes{
                                     lyric,
                                     subRes[i].cpp_str(),
-                                    toStdList(d_ptr->getDefaultPinyin(lyric, style)),
+                                    toStdList(d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)),
                                     false
                                 });
                             }
@@ -176,7 +176,8 @@ namespace Pinyin
                                     result.emplace_back(PinyinRes{
                                         lyric,
                                         subRes1[i].cpp_str(),
-                                        toStdList(d_ptr->getDefaultPinyin(lyric, style)),
+                                        toStdList(d_ptr->getDefaultPinyin(
+                                            lyric, style, v_to_u, neutral_tone_with_five)),
                                         false
                                     });
                                 }
@@ -199,7 +200,7 @@ namespace Pinyin
                                 result.emplace_back(PinyinRes{
                                     lyric,
                                     subResBack[i].cpp_str(),
-                                    toStdList(d_ptr->getDefaultPinyin(lyric, style)),
+                                    toStdList(d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)),
                                     false
                                 });
                             }
@@ -221,7 +222,7 @@ namespace Pinyin
                                 result.emplace_back(PinyinRes{
                                     lyric,
                                     subResBack1[i].cpp_str(),
-                                    toStdList(d_ptr->getDefaultPinyin(lyric, style)),
+                                    toStdList(d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)),
                                     false
                                 });
                             }
@@ -235,8 +236,8 @@ namespace Pinyin
                 if (!found) {
                     result.emplace_back(PinyinRes{
                         current_char.cpp_str(),
-                        d_ptr->getDefaultPinyin(current_char, style)[0].cpp_str(),
-                        toStdList(d_ptr->getDefaultPinyin(current_char, style)),
+                        d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)[0].cpp_str(),
+                        toStdList(d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)),
                         false
                     });
                     cursor++;
@@ -258,12 +259,12 @@ namespace Pinyin
         d.init();
     }
 
-    std::string ChineseG2p::tradToSim(const std::string &text) const {
-        return d_ptr->tradToSim(text).cpp_str();
+    std::string ChineseG2p::tradToSim(const std::string &hanzi) const {
+        return d_ptr->tradToSim(hanzi).cpp_str();
     }
 
-    bool ChineseG2p::isPolyphonic(const std::string &text) const {
-        return d_ptr->isPolyphonic(text);
+    bool ChineseG2p::isPolyphonic(const std::string &hanzi) const {
+        return d_ptr->isPolyphonic(hanzi);
     }
 
     std::vector<std::string> ChineseG2p::getDefaultPinyin(const std::string &text, int style, bool v_to_u,

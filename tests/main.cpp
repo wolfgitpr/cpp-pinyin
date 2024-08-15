@@ -19,7 +19,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Pinyin G2P test: " << std::endl;
     std::cout << "--------------------" << std::endl;
     std::cout << "apiTest: " << manTest.apiTest() << std::endl;
-    manTest.batchTest();
+    std::cout << "--------------------" << std::endl;
+    manTest.toneBatchTest();
+    std::cout << "--------------------" << std::endl;
+    manTest.unToneBatchTest();
     std::cout << "--------------------\n" << std::endl;
 
     const JyuptingTest jyuptingTest;

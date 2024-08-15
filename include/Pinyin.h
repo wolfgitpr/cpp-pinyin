@@ -22,7 +22,7 @@ namespace Pinyin
                                       Error error = Error::Default, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
 
-        std::vector<std::string> getDefaultPinyin(const std::string &text,
+        std::vector<std::string> getDefaultPinyin(const std::string &hanzi,
                                                   ManTone::Style style = ManTone::Style::TONE,
                                                   bool v_to_u = false, bool neutral_tone_with_five = false) const;
     };

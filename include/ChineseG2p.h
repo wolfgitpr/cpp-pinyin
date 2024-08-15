@@ -9,9 +9,9 @@
 namespace Pinyin
 {
     enum class Error {
-        // 保留原字符
+        // Keep original characters
         Default = 0,
-        // 忽略该字符
+        // Ignore this character (do not export)
         Ignore = 1
     };
 
@@ -25,9 +25,9 @@ namespace Pinyin
 
         bool initialized() const;
 
-        std::string tradToSim(const std::string &text) const;
+        std::string tradToSim(const std::string &hanzi) const;
 
-        bool isPolyphonic(const std::string &text) const;
+        bool isPolyphonic(const std::string &hanzi) const;
 
     protected:
         PinyinResVector hanziToPinyin(const std::string &hans, int style = 0,

@@ -1,7 +1,6 @@
 #ifndef ChineseG2pPRIVATE_H
 #define ChineseG2pPRIVATE_H
 
-#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -64,11 +63,11 @@ namespace Pinyin
             return tonePinyin;
         }
 
-        inline u8stringlist getDefaultPinyin(const u8string &hans, int style = 0, bool v_to_u = false,
+        inline u8stringlist getDefaultPinyin(const u8string &hanzi, int style = 0, bool v_to_u = false,
                                              bool neutral_tone_with_five = false) const {
-            const auto it = word_dict.find(tradToSim(hans));
+            const auto it = word_dict.find(tradToSim(hanzi));
             if (it == word_dict.end())
-                return {hans};
+                return {hanzi};
 
             u8stringlist candidates = it->second;
             u8stringlist toneCandidates;
@@ -84,7 +83,7 @@ namespace Pinyin
             }
 
             if (toneCandidates.empty())
-                return {hans};
+                return {hanzi};
             return toneCandidates;
         }
 

@@ -30,7 +30,57 @@ namespace Test
         return true;
     }
 
-    bool ManTest::batchTest(bool resDisplay) const {
+    bool ManTest::toneBatchTest(bool resDisplay) const {
+        size_t count = 0;
+        size_t error = 0;
+
+        const auto dataLines = readData("testData/cpp_dataset.txt");
+
+        const auto start = std::chrono::high_resolution_clock::now();
+        for (const auto &line : dataLines) {
+            const auto keyValuePair = Pinyin::split(line, "▁");
+
+            if (keyValuePair.size() == 3) {
+                const std::string &hans = keyValuePair[0];
+                const int loc = std::stoi(keyValuePair[1]);
+                const std::string &pinyin = keyValuePair[2];
+
+                auto resWords = g2p_zh->hanziToPinyin(hans, Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default,
+                                                      false, true).
+                                        toStdVector();
+                count++;
+
+                bool diff = false;
+                if (resWords[loc] != pinyin) {
+                    diff = true;
+                    error++;
+                }
+
+                if (resDisplay && diff) {
+                    std::cout << "text: " << hans << std::endl;
+                    std::cout << "raw: " << pinyin << std::endl;
+                    std::cout << "loc: " << loc << std::endl;
+                    std::cout << "res: " << resWords[loc] << std::endl;
+                }
+            } else {
+                std::cerr << "Invalid line format: " << line << std::endl;
+            }
+        }
+
+        const auto end = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+        const double percentage = (static_cast<double>(error) / static_cast<double>(count)) * 100.0;
+
+        std::cout << "toneBatchTest: success" << std::endl;
+        std::cout << "toneBatchTest time: " << duration << "ms" << std::endl;
+        std::cout << "错误率: " << percentage << "%" << std::endl;
+        std::cout << "错误数: " << error << std::endl;
+        std::cout << "总句数: " << count << std::endl;
+        return true;
+    }
+
+    bool ManTest::unToneBatchTest(bool resDisplay) const {
         size_t count = 0;
         size_t error = 0;
 
@@ -77,8 +127,8 @@ namespace Test
 
         const double percentage = (static_cast<double>(error) / static_cast<double>(count)) * 100.0;
 
-        std::cout << "batchTest: success" << std::endl;
-        std::cout << "batchTest time: " << duration << "ms" << std::endl;
+        std::cout << "unToneBatchTest: success" << std::endl;
+        std::cout << "unToneBatchTest time: " << duration << "ms" << std::endl;
         std::cout << "错误率: " << percentage << "%" << std::endl;
         std::cout << "错误数: " << error << std::endl;
         std::cout << "总字数: " << count << std::endl;
