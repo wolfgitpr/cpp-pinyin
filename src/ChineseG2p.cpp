@@ -48,7 +48,7 @@ namespace Pinyin
         PinyinResVector result;
         result.reserve(input.size());
         for (const auto &lyric : input) {
-            result.emplace_back(PinyinRes{u32strToUtf8str(lyric)});
+            result.emplace_back(PinyinRes{lyric.encodeUtf8()});
         }
 
         for (int i = 0; i < positions.size(); i++) {
@@ -145,11 +145,11 @@ namespace Pinyin
         int cursor = 0;
         while (cursor < inputList.size()) {
             // get char
-            const auto &current_char = inputList[cursor];
+            const u32str &current_char = inputList[cursor];
 
             // not in dict
             if (d_ptr->word_dict.find(current_char) == d_ptr->word_dict.end()) {
-                result.emplace_back(PinyinRes{u32strToUtf8str(current_char)});
+                result.emplace_back(PinyinRes{current_char.encodeUtf8()});
                 cursor++;
                 continue;
             }
@@ -158,7 +158,7 @@ namespace Pinyin
             if (!d_ptr->isPolyphonic(current_char)) {
                 const auto pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
                 result.emplace_back(PinyinRes{
-                    u32strToUtf8str(current_char),
+                    current_char.encodeUtf8(),
                     pinyin[0],
                     pinyin,
                     false
@@ -174,10 +174,10 @@ namespace Pinyin
                         if (it != d_ptr->phrases_dict.end()) {
                             const auto subRes = d_ptr->toneConvert(it->second, style);
                             for (int i = 0; i < subRes.size(); i++) {
-                                const auto lyric = subPhrase.substr(i, 1);
+                                const u32str lyric = subPhrase.substr(i, 1);
                                 result.emplace_back(PinyinRes{
-                                    u32strToUtf8str(lyric),
-                                    u32strToUtf8str(subRes[i]),
+                                    lyric.encodeUtf8(),
+                                    subRes[i].encodeUtf8(),
                                     d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
                                     false
                                 });
@@ -194,10 +194,10 @@ namespace Pinyin
                                 result.pop_back();
                                 const auto &subRes1 = d_ptr->toneConvert(it1->second, style);
                                 for (int i = 0; i < subRes1.size(); i++) {
-                                    const auto lyric = subPhrase1.substr(i, 1);
+                                    const u32str lyric = subPhrase1.substr(i, 1);
                                     result.emplace_back(PinyinRes{
-                                        u32strToUtf8str(lyric),
-                                        u32strToUtf8str(subRes1[i]),
+                                        lyric.encodeUtf8(),
+                                        subRes1[i].encodeUtf8(),
                                         d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
                                         false
                                     });
@@ -217,10 +217,10 @@ namespace Pinyin
                             removeElements(result, cursor + 1 - length, length - 1);
                             const auto &subResBack = d_ptr->toneConvert(it->second, style);
                             for (int i = 0; i < subResBack.size(); i++) {
-                                const auto lyric = subPhraseBack.substr(i, 1);
+                                const u32str lyric = subPhraseBack.substr(i, 1);
                                 result.emplace_back(PinyinRes{
-                                    u32strToUtf8str(lyric),
-                                    u32strToUtf8str(subResBack[i]),
+                                    lyric.encodeUtf8(),
+                                    subResBack[i].encodeUtf8(),
                                     d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
                                     false
                                 });
@@ -239,10 +239,10 @@ namespace Pinyin
                             removeElements(result, cursor + 2 - length, length - 2);
                             const auto &subResBack1 = d_ptr->toneConvert(it->second, style);
                             for (int i = 0; i < subResBack1.size(); i++) {
-                                const auto lyric = subPhraseBack1.substr(i, 1);
+                                const u32str lyric = subPhraseBack1.substr(i, 1);
                                 result.emplace_back(PinyinRes{
-                                    u32strToUtf8str(lyric),
-                                    u32strToUtf8str(subResBack1[i]),
+                                    lyric.encodeUtf8(),
+                                    subResBack1[i].encodeUtf8(),
                                     d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
                                     false
                                 });
@@ -256,7 +256,7 @@ namespace Pinyin
                 // not found, use default pinyin
                 if (!found) {
                     result.emplace_back(PinyinRes{
-                        u32strToUtf8str(current_char),
+                        current_char.encodeUtf8(),
                         d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)[0],
                         d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five),
                         false
