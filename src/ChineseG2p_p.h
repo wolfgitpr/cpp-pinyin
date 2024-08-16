@@ -65,17 +65,17 @@ namespace Pinyin
 
         inline u8stringlist getDefaultPinyin(const u8string &hanzi, int style = 0, bool v_to_u = false,
                                              bool neutral_tone_with_five = false) const {
-            const auto it = word_dict.find(tradToSim(hanzi));
+            const auto it = word_dict.find(hanzi);
             if (it == word_dict.end())
                 return {hanzi};
 
-            u8stringlist candidates = it->second;
+            const u8stringlist &candidates = it->second;
             u8stringlist toneCandidates;
             toneCandidates.reserve(candidates.size());
 
-            std::unordered_set<u8string> seen;
+            std::unordered_set<u8string> seen(candidates.size());
 
-            for (u8string &pinyin : candidates) {
+            for (const u8string &pinyin : candidates) {
                 const auto tarPinyin = toneConvert(pinyin, style, v_to_u, neutral_tone_with_five);
                 if (seen.insert(tarPinyin).second) {
                     toneCandidates.push_back(tarPinyin);

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
     const std::string raw2 =
         "举杯あャ坐ュ饮放あ歌竹林间/清风拂 面悄word然xax asx a xxs拨？Q！动初弦/便推开烦恼与尘喧/便还是当时的少年";
-    const auto res1 = g2p_man->hanziToPinyin(raw2, Pinyin::ManTone::Style::TONE3, Pinyin::Error::Ignore, false,
+    const auto res1 = g2p_man->hanziToPinyin(raw2, Pinyin::ManTone::Style::TONE2, Pinyin::Error::Default, false,
                                              true).
                                toStdStr();
 

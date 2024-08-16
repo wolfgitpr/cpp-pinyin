@@ -7,19 +7,6 @@
 
 namespace Pinyin
 {
-    static const std::unordered_map<char32_t, u8string> numMap = {
-        {U'0', U"零"},
-        {U'1', U"一"},
-        {U'2', U"二"},
-        {U'3', U"三"},
-        {U'4', U"四"},
-        {U'5', U"五"},
-        {U'6', U"六"},
-        {U'7', U"七"},
-        {U'8', U"八"},
-        {U'9', U"九"}
-    };
-
     static u8string mid(const u8stringlist &inputList, size_t cursor, size_t length) {
         const size_t end = std::min(cursor + length, inputList.size());
 
@@ -149,8 +136,9 @@ namespace Pinyin
                     if (cursor + length <= inputList.size()) {
                         // cursor: 地, subPhrase: 地久天长
                         const u8string subPhrase = mid(inputList, cursor, length);
-                        if (d_ptr->phrases_dict.find(subPhrase) != d_ptr->phrases_dict.end()) {
-                            const auto subRes = d_ptr->toneConvert(d_ptr->phrases_dict[subPhrase], style);
+                        const auto it = d_ptr->phrases_dict.find(subPhrase);
+                        if (it != d_ptr->phrases_dict.end()) {
+                            const auto subRes = d_ptr->toneConvert(it->second, style);
                             for (int i = 0; i < subRes.size(); i++) {
                                 const auto lyric = subPhrase.substr(i, 1).cpp_str();
                                 result.emplace_back(PinyinRes{
@@ -167,7 +155,7 @@ namespace Pinyin
                         if (cursor >= 1) {
                             // cursor: 重, subPhrase_1: 语重心长
                             const u8string subPhrase1 = mid(inputList, cursor - 1, length);
-                            auto it = d_ptr->phrases_dict.find(subPhrase1);
+                            const auto it = d_ptr->phrases_dict.find(subPhrase1);
                             if (it != d_ptr->phrases_dict.end()) {
                                 result.pop_back();
                                 const auto &subRes1 = d_ptr->toneConvert(it->second, style);
@@ -190,7 +178,7 @@ namespace Pinyin
                     if (cursor + 1 >= length && cursor + 1 <= inputList.size()) {
                         // cursor: 好, xSubPhrase: 各有所好
                         const u8string subPhraseBack = mid(inputList, cursor + 1 - length, length);
-                        auto it = d_ptr->phrases_dict.find(subPhraseBack);
+                        const auto it = d_ptr->phrases_dict.find(subPhraseBack);
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
                             removeElements(result, cursor + 1 - length, length - 1);
