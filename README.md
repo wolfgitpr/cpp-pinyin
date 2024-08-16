@@ -33,13 +33,13 @@ Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN
 #include <filesystem>
 
 const std::string applicationDirPath = std::filesystem::current_path().string();
-IKg2p::setDictionaryPath(applicationDirPath + "\\dict");  // Set dictionary path.
+Pinyin::setDictionaryPath(applicationDirPath + "\\dict");
 
 const auto g2p_man = std::make_unique<Pinyin::Pinyin>(); // or Pinyin::Jyutping
-const std::string raw = "明月@1几32时有##一";
-const std::string tar = "ming yue yi ji san er shi you yi";
-const auto g2pRes = g2p_man->hanziToPinyin(raw, false, true, IKg2p::errorType::Ignore);
-const std::string res = IKg2p::join(g2p_man->resToStringList(g2pRes), " ");
+const std::string hans = "明月@1几32时有##一";
+PinyinResVector pinyinRes = g2p_zh->hanziToPinyin(hans, Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, false, true);
+
+std::vector<std::string> pinyin = g2p_man->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, false)
 ```
 
 ## Doc
