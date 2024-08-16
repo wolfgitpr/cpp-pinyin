@@ -14,19 +14,32 @@ namespace Test
     ManTest::~ManTest() = default;
 
     bool ManTest::apiTest() const {
-        assert(g2p_zh->isPolyphonic("的"));
-        assert(!g2p_zh->isPolyphonic("犬"));
-        assert(g2p_zh->tradToSim("臺") == "台");
-        assert(g2p_zh->tradToSim("犬") == "犬");
-        assert(g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::NORMAL).at(0) == "xiu");
-        assert(g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::TONE).at(0) == "xiù");
-        assert(g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::TONE2).at(0) == "xiu4");
-        assert(g2p_zh->getDefaultPinyin("擎", Pinyin::ManTone::Style::TONE2).at(0) == "qi2ng");
-        assert(g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::TONE3).at(0) == "xiu4");
-        assert(g2p_zh->getDefaultPinyin("虐", Pinyin::ManTone::Style::TONE3, true).at(0) == "nüe4");
-        assert(g2p_zh->getDefaultPinyin("虐", Pinyin::ManTone::Style::TONE3, false).at(0) == "nve4");
-        assert(g2p_zh->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, false).at(0) == "le");
-        assert(g2p_zh->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, true).at(0) == "le5");
+        if (!g2p_zh->isPolyphonic("的"))
+            std::cerr << "Polyphonic test failed." << std::endl;
+        if (g2p_zh->isPolyphonic("犬"))
+            std::cerr << "Polyphonic test failed." << std::endl;
+        if (g2p_zh->tradToSim("臺") != "台")
+            std::cerr << "Traditional to Simplified test failed." << std::endl;
+        if (g2p_zh->tradToSim("犬") != "犬")
+            std::cerr << "Traditional to Simplified test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::NORMAL).at(0) != "xiu")
+            std::cerr << "Pinyin Style::NORMAL test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::TONE).at(0) != "xiù")
+            std::cerr << "Pinyin Style::TONE test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::TONE2).at(0) != "xiu4")
+            std::cerr << "Pinyin Style::TONE2 test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("擎", Pinyin::ManTone::Style::TONE2).at(0) != "qi2ng")
+            std::cerr << "Pinyin Style::TONE2 test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("秀", Pinyin::ManTone::Style::TONE3).at(0) != "xiu4")
+            std::cerr << "Pinyin Style::TONE3 test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("虐", Pinyin::ManTone::Style::TONE3, true).at(0) != "nüe4")
+            std::cerr << "V-to-U test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("虐", Pinyin::ManTone::Style::TONE3, false).at(0) != "nve4")
+            std::cerr << "V-to-U test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, false).at(0) != "le")
+            std::cerr << "Neutral tone test failed." << std::endl;
+        if (g2p_zh->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, true).at(0) != "le5")
+            std::cerr << "Neutral tone test failed." << std::endl;
         return true;
     }
 
