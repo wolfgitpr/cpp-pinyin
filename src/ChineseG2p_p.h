@@ -12,7 +12,7 @@ namespace Pinyin
     class ChineseG2pPrivate final {
     public:
         explicit ChineseG2pPrivate(std::string language, ToneConverter *toneConverter);
-        virtual ~ChineseG2pPrivate();
+        ~ChineseG2pPrivate();
 
         void init();
 
