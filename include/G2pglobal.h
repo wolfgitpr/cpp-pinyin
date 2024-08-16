@@ -18,8 +18,6 @@ namespace Pinyin
 
     std::vector<std::string> split(const std::string &s, const std::string &delimiter);
 
-    std::string join(const std::vector<std::string> &v, const std::string &delimiter);
-
     u8stringlist splitString(const u8string &input);
 
     bool loadDict(const std::string &dict_dir, const std::string &fileName,

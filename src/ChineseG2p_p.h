@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "ChineseG2p_p.h"
 #include "ToneConverter.h"
 
 namespace Pinyin
