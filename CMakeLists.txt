@@ -54,7 +54,7 @@ endif ()
 # ----------------------------------
 # link libraries
 # ----------------------------------
-target_include_directories(${PROJECT_NAME} PRIVATE include src src/lib src/toneUtil)
+target_include_directories(${PROJECT_NAME} PRIVATE include src src/toneUtil)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
@@ -88,7 +88,7 @@ if (CPP_PINYIN_INSTALL)
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
     )
 
-    install(DIRECTORY include/cpp-pinyin
+    install(DIRECTORY include/${PROJECT_NAME}
             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     )
 endif ()
