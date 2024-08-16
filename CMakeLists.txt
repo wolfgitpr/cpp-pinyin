@@ -6,6 +6,28 @@ project(cpp-pinyin VERSION 0.0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Use Vcpkg in system environment or Package path for dependencies
+set(USE_VCPKG ON)
+set(PATH_TO_TINYUTF8 ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
+
+# ----------------------------------
+# Main Project
+# ----------------------------------
+file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
+
+if (USE_VCPKG)
+    set(CMAKE_PREFIX_PATH ${PATH_TO_VCPKG}/installed)
+    find_package(tinyutf8 CONFIG REQUIRED)
+
+    add_library(${PROJECT_NAME} STATIC ${_src})
+    get_target_property(tinyutf8_include_dirs tinyutf8::tinyutf8 INTERFACE_INCLUDE_DIRECTORIES)
+    target_include_directories(${PROJECT_NAME} PUBLIC ${tinyutf8_include_dirs}/tinyutf8)
+else ()
+    include_directories(${PATH_TO_TINYUTF8})
+    add_library(${PROJECT_NAME} STATIC ${_src} ${PATH_TO_TINYUTF8})
+    target_include_directories(${PROJECT_NAME} PUBLIC ${PATH_TO_TINYUTF8})
+endif ()
+
 # ----------------------------------
 # Build Options
 # ----------------------------------
@@ -31,12 +53,8 @@ if (CPP_PINYIN_INSTALL)
     include(CMakePackageConfigHelpers)
 endif ()
 # ----------------------------------
-# Main Project
+# Tests
 # ----------------------------------
-include_directories(include lib)
-file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp lib/*.h)
-add_library(${PROJECT_NAME} STATIC ${_src})
-
 if (CPP_PINYIN_BUILD_TESTS)
     add_subdirectory(tests)
     set(DIRECTORIES_TO_COPY
@@ -60,7 +78,7 @@ endif ()
 # ----------------------------------
 # link libraries
 # ----------------------------------
-target_include_directories(${PROJECT_NAME} PUBLIC include lib src/util)
+target_include_directories(${PROJECT_NAME} PUBLIC include src/util)
 
 # ----------------------------------
 # copy dictionary
