@@ -1,10 +1,10 @@
 #ifndef ChineseG2p_H
 #define ChineseG2p_H
 
-#include "G2pglobal.h"
+#include <memory>
 
-#include "PinyinRes.h"
-#include "ToneConverter.h"
+#include <cpp-pinyin/PinyinRes.h>
+#include <cpp-pinyin/ToneConverter.h>
 
 namespace Pinyin
 {
@@ -24,6 +24,8 @@ namespace Pinyin
         ~ChineseG2p();
 
         bool initialized() const;
+
+        bool loadUserDict(const std::string &filePath) const;
 
         std::string tradToSim(const std::string &hanzi) const;
 
@@ -47,7 +49,7 @@ namespace Pinyin
         std::unique_ptr<ChineseG2pPrivate> d_ptr;
 
     private:
-        PinyinResVector hanziToPinyin(const u8stringlist &hans, int style = 0,
+        PinyinResVector hanziToPinyin(const u32strVec &hans, int style = 0,
                                       Error error = Error::Default, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
     };

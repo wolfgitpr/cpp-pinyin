@@ -33,61 +33,52 @@ endif ()
 # ----------------------------------
 # Main Project
 # ----------------------------------
-include_directories(include lib)
-file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp lib/*.h)
+file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
 add_library(${PROJECT_NAME} STATIC ${_src})
 
 if (CPP_PINYIN_BUILD_TESTS)
     add_subdirectory(tests)
-    set(DIRECTORIES_TO_COPY
-            dict
-    )
 
-    foreach (dir ${DIRECTORIES_TO_COPY})
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND
-                ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_CURRENT_SOURCE_DIR}/res/${dir}
-                ${CMAKE_BINARY_DIR}/tests/${dir}
-        )
-        install(
-                DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dir}
-                DESTINATION .
-        )
-    endforeach ()
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND
+            ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
+            ${CMAKE_BINARY_DIR}/tests/${dict}
+    )
+    install(
+            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
+            DESTINATION .
+    )
 endif ()
 
 # ----------------------------------
 # link libraries
 # ----------------------------------
-target_include_directories(${PROJECT_NAME} PUBLIC include lib src/util)
+target_include_directories(${PROJECT_NAME} PRIVATE include src src/lib src/toneUtil)
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 
 # ----------------------------------
 # copy dictionary
 # ----------------------------------
-set(DIRECTORIES_TO_COPY
-        dict
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
+        ${CMAKE_BINARY_DIR}/bin/${dict}
 )
-
-foreach (dir ${DIRECTORIES_TO_COPY})
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND
-            ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/res/${dir}
-            ${CMAKE_BINARY_DIR}/bin/${dir}
-    )
-    install(
-            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dir}
-            DESTINATION .
-    )
-endforeach ()
+install(
+        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
+        DESTINATION .
+)
 
 # ----------------------------------
 # install
 # ----------------------------------
 if (CPP_PINYIN_INSTALL)
     target_include_directories(${PROJECT_NAME} PUBLIC
-            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
 
     install(TARGETS ${PROJECT_NAME}
@@ -95,5 +86,9 @@ if (CPP_PINYIN_INSTALL)
             RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" OPTIONAL
             LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
+    )
+
+    install(DIRECTORY include/cpp-pinyin
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     )
 endif ()

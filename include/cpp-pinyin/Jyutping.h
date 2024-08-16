@@ -2,7 +2,7 @@
 #define DATASET_TOOLS_CANTONESE_H
 
 #include "ChineseG2p.h"
-#include "../src/util/CanTone.h"
+#include <cpp-pinyin/CanTone.h>
 
 namespace Pinyin
 {

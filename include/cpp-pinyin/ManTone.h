@@ -1,11 +1,11 @@
 #ifndef TONEUTIL_H
 #define TONEUTIL_H
 
-#include <ToneConverter.h>
+#include <cpp-pinyin/ToneConverter.h>
 
 namespace Pinyin
 {
-    class ManTone : public ToneConverter {
+    class ManTone final : public ToneConverter {
     public:
         // https://github.com/mozillazg/python-pinyin/blob/master/pypinyin/constants.py
         enum class Style {
@@ -28,13 +28,13 @@ namespace Pinyin
         };
         ~ManTone() override = default;
 
-        static u8string toneToNormal(const u8string &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u32str toneToNormal(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
 
-        static u8string toneToTone(const u8string &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u32str toneToTone(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
 
-        static u8string toneToTone2(const u8string &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u32str toneToTone2(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
 
-        static u8string toneToTone3(const u8string &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u32str toneToTone3(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
     };
 
 

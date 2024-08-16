@@ -38,7 +38,7 @@ namespace Test
 
         const auto start = std::chrono::high_resolution_clock::now();
         for (const auto &line : dataLines) {
-            const auto keyValuePair = Pinyin::split(line, "▁");
+            const auto keyValuePair = split(line, "▁");
 
             if (keyValuePair.size() == 3) {
                 const std::string &hans = keyValuePair[0];
@@ -88,7 +88,7 @@ namespace Test
 
         const auto start = std::chrono::high_resolution_clock::now();
         for (const auto &line : dataLines) {
-            const auto keyValuePair = Pinyin::split(line, "|");
+            const auto keyValuePair = split(line, "|");
 
             if (keyValuePair.size() == 2) {
                 const std::string &hans = keyValuePair[0];
@@ -98,14 +98,14 @@ namespace Test
                                                     true).
                                       toStdStr();
 
-                auto words = Pinyin::split(pinyin, " ");
+                auto words = split(pinyin, " ");
                 const auto wordSize = words.size();
                 count += wordSize;
 
                 bool diff = false;
-                auto resWords = Pinyin::split(result, " ");
+                auto resWords = split(result, " ");
                 for (int i = 0; i < wordSize; i++) {
-                    const auto expectedWords = Pinyin::split(words[i], "/");
+                    const auto expectedWords = split(words[i], "/");
                     if (std::find(expectedWords.begin(), expectedWords.end(), resWords[i]) == expectedWords.end()) {
                         diff = true;
                         error++;

@@ -1,8 +1,7 @@
 #ifndef DATASET_TOOLS_MANTEST_H
 #define DATASET_TOOLS_MANTEST_H
 
-#include "G2pglobal.h"
-#include "Pinyin.h"
+#include <cpp-pinyin/Pinyin.h>
 
 namespace Test
 {

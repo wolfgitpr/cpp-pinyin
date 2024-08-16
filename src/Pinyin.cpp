@@ -1,4 +1,4 @@
-#include "Pinyin.h"
+#include <cpp-pinyin/Pinyin.h>
 
 namespace Pinyin
 {

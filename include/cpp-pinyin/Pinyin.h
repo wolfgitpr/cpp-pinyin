@@ -1,8 +1,8 @@
 #ifndef DATASET_TOOLS_MANDARIN_H
 #define DATASET_TOOLS_MANDARIN_H
 
-#include "ChineseG2p.h"
-#include "../src/util/ManTone.h"
+#include <cpp-pinyin/ChineseG2p.h>
+#include <cpp-pinyin/ManTone.h>
 
 namespace Pinyin
 {

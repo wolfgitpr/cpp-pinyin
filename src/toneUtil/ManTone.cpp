@@ -1,10 +1,8 @@
-#include "ManTone.h"
-
-#include <map>
-
-#include "G2pglobal.h"
-
+#include <algorithm>
 #include <unordered_map>
+
+#include <cpp-pinyin/G2pglobal.h>
+#include <cpp-pinyin/ManTone.h>
 
 namespace Pinyin
 {
@@ -18,8 +16,9 @@ namespace Pinyin
         {U'ǖ', {'v', '1'}}, {U'ǘ', {'v', '2'}}, {U'ǚ', {'v', '3'}}, {U'ǜ', {'v', '4'}}
     };
 
-    u8string ManTone::toneToNormal(const u8string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u8string result;
+    u32str ManTone::toneToNormal(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        u32str result;
+        result.reserve(pinyin.size());
 
         for (char32_t ch : pinyin) {
             if (isLetter(ch)) {
@@ -31,13 +30,13 @@ namespace Pinyin
         }
 
         if (v_to_u)
-            result = result.replace(U'v', U'ü');
+            std::replace(result.begin(), result.end(), U'v', U'ü');
 
         return result;
     }
 
-    u8string ManTone::toneToTone(const u8string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u8string result;
+    u32str ManTone::toneToTone(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        u32str result;
 
         if (!v_to_u) {
             for (const char32_t &ch : pinyin) {
@@ -53,8 +52,8 @@ namespace Pinyin
         return result;
     }
 
-    u8string ManTone::toneToTone2(const u8string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u8string result;
+    u32str ManTone::toneToTone2(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        u32str result;
 
         for (char32_t ch : pinyin) {
             if (isLetter(ch)) {
@@ -77,8 +76,8 @@ namespace Pinyin
     }
 
 
-    u8string ManTone::toneToTone3(const u8string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u8string result;
+    u32str ManTone::toneToTone3(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        u32str result;
         char toneNumber = '5';
 
         for (char32_t ch : pinyin) {

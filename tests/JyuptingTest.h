@@ -1,8 +1,7 @@
 #ifndef DATASET_TOOLS_JYUPTINGTEST_H
 #define DATASET_TOOLS_JYUPTINGTEST_H
 
-#include "G2pglobal.h"
-#include "Jyutping.h"
+#include <cpp-pinyin/Jyutping.h>
 
 namespace Test
 {

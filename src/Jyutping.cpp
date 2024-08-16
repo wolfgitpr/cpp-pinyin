@@ -1,4 +1,4 @@
-#include "Jyutping.h"
+#include <cpp-pinyin/Jyutping.h>
 
 namespace Pinyin
 {

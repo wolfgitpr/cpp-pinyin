@@ -1,12 +1,11 @@
 #include <filesystem>
 
-#include "G2pglobal.h"
-#include "Pinyin.h"
+#include <cpp-pinyin/Pinyin.h>
+#include <cpp-pinyin/G2pglobal.h>
 #include <iostream>
 
 #include "JyuptingTest.h"
 #include "ManTest.h"
-#include "../src/util/ManTone.h"
 
 using namespace Test;
 

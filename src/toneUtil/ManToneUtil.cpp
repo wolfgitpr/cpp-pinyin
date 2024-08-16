@@ -1,31 +1,27 @@
 #include "ManToneUtil.h"
 
-#include <iostream>
-#include <ostream>
-#include <regex>
-
 namespace Pinyin
 {
     // 定义 phonetic_symbol_reverse 映射表
-    static const std::unordered_map<u8string, char32_t> phoneticSymbolReverse = {
-        {u8"a1", U'ā'}, {u8"a2", U'á'}, {u8"a3", U'ǎ'}, {u8"a4", U'à'},
-        {u8"e1", U'ē'}, {u8"e2", U'é'}, {u8"e3", U'ě'}, {u8"e4", U'è'},
-        {u8"i1", U'ī'}, {u8"i2", U'í'}, {u8"i3", U'ǐ'}, {u8"i4", U'ì'},
-        {u8"o1", U'ō'}, {u8"o2", U'ó'}, {u8"o3", U'ǒ'}, {u8"o4", U'ò'},
-        {u8"u1", U'ū'}, {u8"u2", U'ú'}, {u8"u3", U'ǔ'}, {u8"u4", U'ù'},
-        {u8"v1", U'ǖ'}, {u8"v2", U'ǘ'}, {u8"v3", U'ǚ'}, {u8"v4", U'ǜ'},
+    static const u32strHashMap<u32str, char32_t> phoneticSymbolReverse = {
+        {U"a1", U'ā'}, {U"a2", U'á'}, {U"a3", U'ǎ'}, {U"a4", U'à'},
+        {U"e1", U'ē'}, {U"e2", U'é'}, {U"e3", U'ě'}, {U"e4", U'è'},
+        {U"i1", U'ī'}, {U"i2", U'í'}, {U"i3", U'ǐ'}, {U"i4", U'ì'},
+        {U"o1", U'ō'}, {U"o2", U'ó'}, {U"o3", U'ǒ'}, {U"o4", U'ò'},
+        {U"u1", U'ū'}, {U"u2", U'ú'}, {U"u3", U'ǔ'}, {U"u4", U'ù'},
+        {U"v1", U'ǖ'}, {U"v2", U'ǘ'}, {U"v3", U'ǚ'}, {U"v4", U'ǜ'},
     };
 
     // https://github.com/mozillazg/python-pinyin/blob/master/pypinyin/style/_tone_rule.py
-    int rightMarkIndex(const u8string &pinyin_no_tone) {
+    int rightMarkIndex(const u32str &pinyin_no_tone) {
         // 'iou', 'uei', 'uen': 根据还原前的拼音进行标记
-        if (pinyin_no_tone.find("iou") != std::string::npos) {
+        if (pinyin_no_tone.find(U"iou") != std::string::npos) {
             return pinyin_no_tone.find('u');
         }
-        if (pinyin_no_tone.find("uei") != std::string::npos) {
+        if (pinyin_no_tone.find(U"uei") != std::string::npos) {
             return pinyin_no_tone.find('i');
         }
-        if (pinyin_no_tone.find("uen") != std::string::npos) {
+        if (pinyin_no_tone.find(U"uen") != std::string::npos) {
             return pinyin_no_tone.find('u');
         }
 
@@ -33,16 +29,16 @@ namespace Pinyin
         static const std::vector<char32_t> vowels = {U'a', U'o', U'e'};
         for (const char32_t c : vowels) {
             const auto pos = pinyin_no_tone.find(c);
-            if (pos != u8string::npos) {
+            if (pos != u32str::npos) {
                 return pos;
             }
         }
 
         // 'i'、'u' 若是连在一起，谁在后面就标谁
-        static const u8stringlist combos = {U"iu", U"ui"};
-        for (const u8string &combo : combos) {
+        static const u32strVec combos = {U"iu", U"ui"};
+        for (const u32str &combo : combos) {
             const auto pos = pinyin_no_tone.find(combo);
-            if (pos != u8string::npos) {
+            if (pos != u32str::npos) {
                 return pos + 1;
             }
         }
@@ -51,7 +47,7 @@ namespace Pinyin
         static const std::vector<char32_t> other_vowels = {U'i', U'u', U'v', U'ü'};
         for (const char32_t c : other_vowels) {
             const auto pos = pinyin_no_tone.find(c);
-            if (pos != u8string::npos) {
+            if (pos != u32str::npos) {
                 return pos;
             }
         }
@@ -60,7 +56,7 @@ namespace Pinyin
         static const std::vector<char32_t> final_chars = {U'n', U'm', U'ê'};
         for (const char32_t c : final_chars) {
             const auto pos = pinyin_no_tone.find(c);
-            if (pos != u8string::npos) {
+            if (pos != u32str::npos) {
                 return pos;
             }
         }
@@ -74,12 +70,12 @@ namespace Pinyin
     }
 
     static bool isPhoneticSymbol(char32_t c) {
-        return u8string("aeiouüv").find(c) != u8string::npos;
+        return u32str(U"aeiouüv").find(c) != u32str::npos;
     }
 
-    static u8string toneToTone(const u8string &tone2) {
+    static u32str toneToTone(const u32str &tone2) {
         // 替换 "ü" 为 "v" 并去掉 5 和 0
-        u8string string;
+        u32str string;
         for (const char32_t c : tone2)
             string += c == U'ü' ? U'v' : c;
 
@@ -112,27 +108,27 @@ namespace Pinyin
             }
         }
 
-        u8string result_str;
+        u32str result_str;
         for (const char32_t c : result)
             result_str += c == U'ü' ? U'v' : c;
 
         return result_str;
     }
 
-    static u8string tone3ToTone2(const u8string &pinyin, bool v_to_u = false) {
+    static u32str tone3ToTone2(const u32str &pinyin, bool v_to_u = false) {
         const auto no_number_tone3 = pinyin.substr(0, pinyin.size() - 1);
         auto mark_index = rightMarkIndex(no_number_tone3);
         if (mark_index == -1)
             mark_index = no_number_tone3.size() - 1;
 
-        const u8string before = no_number_tone3.substr(0, mark_index + 1);
-        const u8string after = no_number_tone3.substr(mark_index + 1);
-        const u8string number = pinyin.substr(pinyin.size() - 1);
+        const u32str before = no_number_tone3.substr(0, mark_index + 1);
+        const u32str after = no_number_tone3.substr(mark_index + 1);
+        const u32str number = pinyin.substr(pinyin.size() - 1);
 
         return before + number + after;
     }
 
-    u8string tone3ToTone(const u8string &pinyin) {
+    u32str tone3ToTone(const u32str &pinyin) {
         const auto tone2 = tone3ToTone2(pinyin, true);
         return toneToTone(tone2);
     }
