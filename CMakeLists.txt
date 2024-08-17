@@ -35,6 +35,7 @@ endif ()
 # ----------------------------------
 file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
 add_library(${PROJECT_NAME} STATIC ${_src})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 if (CPP_PINYIN_BUILD_TESTS)
     add_subdirectory(tests)
@@ -100,7 +101,7 @@ if (CPP_PINYIN_INSTALL)
     )
 
     configure_package_config_file(
-            ${CMAKE_CURRENT_LIST_DIR}/cpp-pinyinConfig.cmake.in
+            ${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}Config.cmake.in
             "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
             INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
             NO_CHECK_REQUIRED_COMPONENTS_MACRO
@@ -112,9 +113,9 @@ if (CPP_PINYIN_INSTALL)
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
 
-    install(EXPORT cpp-pinyinTargets
-            FILE cpp-pinyinTargets.cmake
-            NAMESPACE cpp-pinyin::
+    install(EXPORT ${PROJECT_NAME}Targets
+            FILE ${PROJECT_NAME}Targets.cmake
+            NAMESPACE ${PROJECT_NAME}::
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
 endif ()
