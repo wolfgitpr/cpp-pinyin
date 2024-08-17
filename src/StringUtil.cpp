@@ -5,6 +5,8 @@
 
 #ifdef _WIN32
 #  include <windows.h>
+#else
+#  include <filesystem>
 #endif
 
 #ifdef _WIN32
