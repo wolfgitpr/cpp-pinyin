@@ -82,7 +82,7 @@ if (CPP_PINYIN_INSTALL)
     )
 
     install(TARGETS ${PROJECT_NAME}
-            EXPORT ${OPENDSPX_INSTALL_NAME}Targets
+            EXPORT ${PROJECT_NAME}Targets
             RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" OPTIONAL
             LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
@@ -90,5 +90,31 @@ if (CPP_PINYIN_INSTALL)
 
     install(DIRECTORY include/${PROJECT_NAME}
             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    )
+
+    # Generate and install package config and version files
+    write_basic_package_version_file(
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+            VERSION ${PROJECT_VERSION}
+            COMPATIBILITY AnyNewerVersion
+    )
+
+    configure_package_config_file(
+            ${CMAKE_CURRENT_LIST_DIR}/cpp-pinyinConfig.cmake.in
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+            INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+            NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
+
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    )
+
+    install(EXPORT cpp-pinyinTargets
+            FILE cpp-pinyinTargets.cmake
+            NAMESPACE cpp-pinyin::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
 endif ()
