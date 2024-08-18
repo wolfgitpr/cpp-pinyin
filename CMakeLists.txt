@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 # ----------------------------------
 # Build Options
 # ----------------------------------
-option(CPP_PINYIN_BUILD_STATIC "Build static library" OFF)
+option(CPP_PINYIN_BUILD_STATIC "Build static library" ON)
 option(CPP_PINYIN_BUILD_TESTS "Build test cases" ON)
 option(CPP_PINYIN_INSTALL "Install library" ON)
 

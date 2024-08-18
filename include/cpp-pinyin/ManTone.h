@@ -9,7 +9,7 @@ namespace Pinyin
     class CPP_PINYIN_EXPORT ManTone final : public ToneConverter {
     public:
         // https://github.com/mozillazg/python-pinyin/blob/master/pypinyin/constants.py
-        enum class Style {
+        enum Style {
             // 普通风格，不带声调。如： 中国 -> ``zhong guo``
             NORMAL = 0,
             // 标准声调风格，拼音声调在韵母第一个字母上（默认风格）。如： 中国 -> ``zhōng guó``

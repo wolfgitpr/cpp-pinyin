@@ -18,30 +18,10 @@ namespace Pinyin
     class CPP_PINYIN_EXPORT PinyinResVector : public std::vector<PinyinRes> {
     public:
         // Convert PinyinResVector to std::vector<std::string>
-        inline std::vector<std::string> toStdVector() const {
-            std::vector<std::string> result;
-            result.reserve(this->size());
-            for (const auto &res : *this) {
-                result.emplace_back(res.error ? res.hanzi : res.pinyin);
-            }
-            return result;
-        }
+        std::vector<std::string> toStdVector() const;
 
         // Convert PinyinResVector to std::string with delimiter
-        inline std::string toStdStr(const std::string &delimiter = " ") const {
-            std::string result;
-            bool first = true;
-
-            for (const auto &res : *this) {
-                if (!first) {
-                    result += delimiter;
-                }
-                result += res.error ? res.hanzi : res.pinyin;
-                first = false;
-            }
-
-            return result;
-        }
+        std::string toStdStr(const std::string &delimiter = " ") const;
     };
 }
 #endif //G2PRES_H

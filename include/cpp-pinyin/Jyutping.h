@@ -15,11 +15,11 @@ namespace Pinyin
 
         PinyinResVector hanziToPinyin(const std::string &hans,
                                       CanTone::Style style = CanTone::Style::TONE3,
-                                      Error error = Error::Default) const;
+                                      Error error = Default) const;
 
         PinyinResVector hanziToPinyin(const std::vector<std::string> &hans,
                                       CanTone::Style style = CanTone::Style::TONE3,
-                                      Error error = Error::Default) const;
+                                      Error error = Default) const;
         std::vector<std::string> getDefaultPinyin(const std::string &hanzi,
                                                   CanTone::Style style = CanTone::Style::TONE3) const;
     };

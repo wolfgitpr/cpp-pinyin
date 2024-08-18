@@ -8,7 +8,7 @@ namespace Pinyin
 {
     class CPP_PINYIN_EXPORT CanTone final : public ToneConverter {
     public:
-        enum class Style {
+        enum Style {
             // 普通风格，不带声调。如： 中国 -> ``zung gwok``
             NORMAL = 0,
             // 声调风格3，即拼音声调在各个拼音之后，用数字 [1-4] 进行表示。如： 中国 -> ``zung1 gwok3``
