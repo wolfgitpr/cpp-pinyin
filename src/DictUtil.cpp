@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "StringUtil.h"
+#include <cpp-pinyin/StringUtil.h>
 
 namespace Pinyin
 {

@@ -1,12 +1,13 @@
 #ifndef DATASET_TOOLS_CANTONESE_H
 #define DATASET_TOOLS_CANTONESE_H
 
-#include "ChineseG2p.h"
+#include <cpp-pinyin/PinyinGlobal.h>
+#include <cpp-pinyin/ChineseG2p.h>
 #include <cpp-pinyin/CanTone.h>
 
 namespace Pinyin
 {
-    class Jyutping final : public ChineseG2p {
+    class CPP_PINYIN_EXPORT Jyutping final : public ChineseG2p {
     public:
         explicit Jyutping() :
             ChineseG2p("cantonese", new CanTone()) {};

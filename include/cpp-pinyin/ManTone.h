@@ -1,11 +1,12 @@
 #ifndef TONEUTIL_H
 #define TONEUTIL_H
 
+#include <cpp-pinyin/PinyinGlobal.h>
 #include <cpp-pinyin/ToneConverter.h>
 
 namespace Pinyin
 {
-    class ManTone final : public ToneConverter {
+    class CPP_PINYIN_EXPORT ManTone final : public ToneConverter {
     public:
         // https://github.com/mozillazg/python-pinyin/blob/master/pypinyin/constants.py
         enum class Style {

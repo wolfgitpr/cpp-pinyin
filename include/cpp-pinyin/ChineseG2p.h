@@ -3,12 +3,13 @@
 
 #include <memory>
 
+#include <cpp-pinyin/PinyinGlobal.h>
 #include <cpp-pinyin/PinyinRes.h>
 #include <cpp-pinyin/ToneConverter.h>
 
 namespace Pinyin
 {
-    enum class Error {
+    enum CPP_PINYIN_EXPORT Error {
         // Keep original characters
         Default = 0,
         // Ignore this character (do not export)
@@ -17,7 +18,7 @@ namespace Pinyin
 
     class ChineseG2pPrivate;
 
-    class ChineseG2p {
+    class CPP_PINYIN_EXPORT ChineseG2p {
     public:
         explicit ChineseG2p(const std::string &language, ToneConverter *toneConverter = nullptr);
 

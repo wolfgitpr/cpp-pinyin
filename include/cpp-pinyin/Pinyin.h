@@ -1,12 +1,13 @@
 #ifndef DATASET_TOOLS_MANDARIN_H
 #define DATASET_TOOLS_MANDARIN_H
 
+#include <cpp-pinyin/PinyinGlobal.h>
 #include <cpp-pinyin/ChineseG2p.h>
 #include <cpp-pinyin/ManTone.h>
 
 namespace Pinyin
 {
-    class Pinyin final : public ChineseG2p {
+    class CPP_PINYIN_EXPORT Pinyin final : public ChineseG2p {
     public:
         explicit Pinyin() :
             ChineseG2p("mandarin", new ManTone()) {};

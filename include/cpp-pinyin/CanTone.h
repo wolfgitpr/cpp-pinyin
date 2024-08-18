@@ -1,11 +1,12 @@
 #ifndef CANTONECONVERTER_H
 #define CANTONECONVERTER_H
 
+#include <cpp-pinyin/PinyinGlobal.h>
 #include <cpp-pinyin/ToneConverter.h>
 
 namespace Pinyin
 {
-    class CanTone final : public ToneConverter {
+    class CPP_PINYIN_EXPORT CanTone final : public ToneConverter {
     public:
         enum class Style {
             // 普通风格，不带声调。如： 中国 -> ``zung gwok``

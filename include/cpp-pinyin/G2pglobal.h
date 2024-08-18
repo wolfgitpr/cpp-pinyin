@@ -3,23 +3,25 @@
 
 #include <string>
 
+#include <cpp-pinyin/PinyinGlobal.h>
+
 namespace Pinyin
 {
-    std::string dictionaryPath();
+    std::string CPP_PINYIN_EXPORT dictionaryPath();
 
-    void setDictionaryPath(const std::string &dir);
+    void CPP_PINYIN_EXPORT setDictionaryPath(const std::string &dir);
 
-    bool isLetter(char32_t c);
+    bool CPP_PINYIN_EXPORT isLetter(char32_t c);
 
-    bool isHanzi(char32_t c);
+    bool CPP_PINYIN_EXPORT isHanzi(char32_t c);
 
-    bool isKana(char32_t c);
+    bool CPP_PINYIN_EXPORT isKana(char32_t c);
 
-    bool isDigit(char32_t c);
+    bool CPP_PINYIN_EXPORT isDigit(char32_t c);
 
-    bool isSpace(char32_t c);
+    bool CPP_PINYIN_EXPORT isSpace(char32_t c);
 
-    bool isSpecialKana(char32_t c);
+    bool CPP_PINYIN_EXPORT isSpecialKana(char32_t c);
 }
 
 #endif // G2PGLOBAL_H

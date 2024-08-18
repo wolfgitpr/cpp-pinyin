@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "../src/StringUtil.h"
+#include "../include/cpp-pinyin/StringUtil.h"
 
 namespace Test
 {

@@ -4,12 +4,14 @@
 #include <string>
 #include <unordered_map>
 
+#include <cpp-pinyin/PinyinGlobal.h>
+
 namespace Pinyin
 {
-    std::string u32strToUtf8str(const std::u32string &u32str);
-    std::u32string utf8strToU32str(const std::string &utf8str);
+    std::string CPP_PINYIN_EXPORT u32strToUtf8str(const std::u32string &u32str);
+    std::u32string CPP_PINYIN_EXPORT utf8strToU32str(const std::string &utf8str);
 
-    class u32str : public std::u32string {
+    class CPP_PINYIN_EXPORT u32str : public std::u32string {
     public:
         using std::u32string::u32string;
 

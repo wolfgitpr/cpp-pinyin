@@ -4,16 +4,18 @@
 #include <string>
 #include <vector>
 
+#include <cpp-pinyin/PinyinGlobal.h>
+
 namespace Pinyin
 {
-    struct PinyinRes {
+    struct CPP_PINYIN_EXPORT PinyinRes {
         std::string hanzi;
         std::string pinyin;
         std::vector<std::string> candidates; //  Candidate pinyin of Polyphonic Characters.
         bool error = true; //  Whether the conversion failed.
     };
 
-    class PinyinResVector : public std::vector<PinyinRes> {
+    class CPP_PINYIN_EXPORT PinyinResVector : public std::vector<PinyinRes> {
     public:
         // Convert PinyinResVector to std::vector<std::string>
         inline std::vector<std::string> toStdVector() const {

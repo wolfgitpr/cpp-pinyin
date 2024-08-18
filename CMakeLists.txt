@@ -9,12 +9,25 @@ set(CMAKE_CXX_STANDARD 17)
 # ----------------------------------
 # Build Options
 # ----------------------------------
+option(CPP_PINYIN_BUILD_STATIC "Build static library" OFF)
 option(CPP_PINYIN_BUILD_TESTS "Build test cases" ON)
 option(CPP_PINYIN_INSTALL "Install library" ON)
 
 # ----------------------------------
 # CMake Settings
 # ----------------------------------
+if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
+
+if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
+
+if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
+
 if (MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /manifest:no")
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /manifest:no")
@@ -34,7 +47,16 @@ endif ()
 # Main Project
 # ----------------------------------
 file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
-add_library(${PROJECT_NAME} STATIC ${_src})
+
+if(CPP_PINYIN_BUILD_STATIC)
+    add_library(${PROJECT_NAME} STATIC)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CPP_PINYIN_STATIC)
+else()
+    add_library(${PROJECT_NAME} SHARED)
+endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE CPP_PINYIN_LIBRARY)
+
+target_sources(${PROJECT_NAME} PRIVATE ${_src})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 if (CPP_PINYIN_BUILD_TESTS)

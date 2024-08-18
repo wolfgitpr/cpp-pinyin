@@ -2,16 +2,10 @@ project(Test)
 
 file(GLOB_RECURSE _src *.h *.cpp)
 
-if (WIN32)
-    set(PLATFORM_LIB dwmapi.lib)
-endif ()
-
 add_executable(${PROJECT_NAME} ${_src})
 
-target_include_directories(${PROJECT_NAME} PUBLIC .)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC
-        ${PLATFORM_LIB} cpp-pinyin
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        cpp-pinyin::cpp-pinyin
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

@@ -3,11 +3,12 @@
 
 #include <functional>
 
+#include <cpp-pinyin/PinyinGlobal.h>
 #include <cpp-pinyin/U32Str.h>
 
 namespace Pinyin
 {
-    class ToneConverter {
+    class CPP_PINYIN_EXPORT ToneConverter {
     public:
         enum class Style {
             // 普通风格，不带声调。如： 中国 -> ``zhong guo``
