@@ -146,7 +146,7 @@ if (CPP_PINYIN_INSTALL)
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
 
-    if (NOT DEFINED DVCPKG_DICT_DIR)
+    if (NOT DEFINED VCPKG_DICT_DIR)
         install(
                 DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -154,7 +154,7 @@ if (CPP_PINYIN_INSTALL)
     else ()
         install(
                 DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
-                DESTINATION ${DVCPKG_DICT_DIR}
+                DESTINATION ${VCPKG_DICT_DIR}
         )
     endif ()
 endif ()
