@@ -16,17 +16,17 @@ option(CPP_PINYIN_INSTALL "Install library" ON)
 # ----------------------------------
 # CMake Settings
 # ----------------------------------
-if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-endif()
+endif ()
 
-if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+if (NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-endif()
+endif ()
 
-if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+if (NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-endif()
+endif ()
 
 if (MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /manifest:no")
@@ -48,12 +48,12 @@ endif ()
 # ----------------------------------
 file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
 
-if(CPP_PINYIN_BUILD_STATIC)
+if (CPP_PINYIN_BUILD_STATIC)
     add_library(${PROJECT_NAME} STATIC)
     target_compile_definitions(${PROJECT_NAME} PUBLIC CPP_PINYIN_STATIC)
-else()
+else ()
     add_library(${PROJECT_NAME} SHARED)
-endif()
+endif ()
 target_compile_definitions(${PROJECT_NAME} PRIVATE CPP_PINYIN_LIBRARY)
 
 target_sources(${PROJECT_NAME} PRIVATE ${_src})
@@ -72,6 +72,15 @@ if (CPP_PINYIN_BUILD_TESTS)
             DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
             DESTINATION .
     )
+endif ()
+
+# ----------------------------------
+# Add platform specific
+# ----------------------------------
+if (WIN32)
+    set(RC_DESCRIPTION "A lightweight Chinese/Cantonese to Pinyin library.")
+    set(RC_COPYRIGHT "Copyright (C) 2023-2024 wolfgitpr")
+    include("cmake/winrc.cmake")
 endif ()
 
 # ----------------------------------
