@@ -53,7 +53,8 @@ namespace Pinyin
                 result.emplace_back(PinyinRes{input[i].encodeUtf8(), res[it - positions.begin()].pinyin,
                                               res[it - positions.begin()].candidates, false});
             else
-                result.emplace_back(PinyinRes{input[i].encodeUtf8()});
+                result.emplace_back(PinyinRes{input[i].encodeUtf8(), input[i].encodeUtf8(), {input[i].encodeUtf8()},
+                                              true});
         }
         return result;
     }
