@@ -47,12 +47,13 @@ namespace Pinyin
                                    const std::vector<int> &positions) {
         PinyinResVector result;
         result.reserve(input.size());
-        for (const auto &lyric : input) {
-            result.emplace_back(PinyinRes{lyric.encodeUtf8()});
-        }
-
-        for (int i = 0; i < positions.size(); i++) {
-            result[positions[i]] = res[i];
+        for (int i = 0; i < input.size(); ++i) {
+            const auto it = std::find(positions.begin(), positions.end(), i);
+            if (it != positions.end())
+                result.emplace_back(PinyinRes{input[i].encodeUtf8(), res[it - positions.begin()].pinyin,
+                                              res[it - positions.begin()].candidates, false});
+            else
+                result.emplace_back(PinyinRes{input[i].encodeUtf8()});
         }
         return result;
     }
