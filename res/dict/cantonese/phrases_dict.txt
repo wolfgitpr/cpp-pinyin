@@ -1,4 +1,5 @@
 斗转星移:dau2,zyun2,sing1,ji4
+硅末病:zik6,mut6,beng6
 比手画脚:bei2,sau2,waak6,goek3
 螳臂挡车:tong4,bei3,dong2,ce1
 Ｕ形转弯:ｕ,jing4,zyun3,waan1
@@ -31,6 +32,7 @@
 三十二相:saam1,sap6,ji6,soeng3
 三氯氰胺:saam1,luk6,cing1,on1
 三江并流:saam1,gong1,bing6,lau4
+三迭纪:saam1,dit6,gei2
 三相点:saam1,soeng3,dim2
 三聚氰胺:saam1,zeoi6,cing1,on1
 三角腹带:saam1,gok3,fuk1,daai2
@@ -86,7 +88,8 @@
 主机名:zyu2,gei1,meng2
 久假不归:gau2,gaa3,bat1,gwai1
 久别重逢:gau2,bit6,cung5,fung4
-幺并矢:jiu1,bing6,ci2
+么并矢:jiu1,bing6,ci2
+么么小丑:jiu1,mo1,siu2,cau2
 乍青乍白:zaa3,ceng1,zaa3,baak6
 九分之一:gau2,fan6,zi1,jat1
 九齿钉耙:gau2,ci2,deng1,baa3
@@ -95,6 +98,7 @@
 乱咕攘:lyun6,gu1,joeng5
 二人转:ji6,jan4,zyun3
 僧帽瓣:zang1,mou6,faan6
+二迭纪:ji6,dit6,gei2
 二阿姨:ji6,aa3,ji1
 五分之一:ng5,fan6,zi1,jat1
 五斗柜:ng5,dau2,gwai6
@@ -112,6 +116,7 @@
 仡佬族:go1,lou5,zuk6
 代表队:doi6,biu2,deoi6
 令导人:ling5,dou6,jan4
+以免藉口:ji5,min5,ze3,hau2
 仰卧起坐:joeng5,ngo6,hei2,co5
 任重道远:jam6,zung6,dou6,jyun5
 伊塞克湖:ji1,coi3,hak1,wu4
@@ -175,8 +180,7 @@
 兼收并蓄:gim1,sau1,bing6,cuk1
 冠心病:gun1,sam1,beng6
 冷笑话:laang5,siu3,waa2
-净身出户:zeng6,san1,ceot1,wu6
-凸折线:dat6,zip3,sin3
+凈身出户:zeng6,san1,ceot1,wu6
 出口额:ceot1,hau2,ngaak2
 出埃及记:ceot1,oi1,kap6,gei3
 出大差:ceot1,daai6,caai1
@@ -188,7 +192,6 @@
 分子料理:fan6,zi2,liu6,lei5
 分步骤:fan1,bou6,zau6
 分水岭:fan1,seoi2,leng5
-分离分子:fan1,lei4,fan6,zi2
 刑事犯:jing4,si6,faan2
 划不来:waa4,bat1,loi4
 划得来:waa4,dak1,loi4
@@ -244,8 +247,6 @@
 去皮重:heoi3,pei4,cung5
 参谋总长:caam1,mau4,zung2,zoeng2
 参谋长:caam1,mau4,zoeng2
-反动分子:faan2,dung6,fan6,zi2
-反叛分子:faan2,bun6,fan6,zi2
 反射面:faan2,se6,min2
 口口声声:hau2,hau2,seng1,seng1
 口袋妖怪:hau2,doi6,jiu1,gwaai3
@@ -265,8 +266,8 @@
 可塑性:ho2,sok3,sing3
 可疑分子:ho2,ji4,fan6,zi2
 可转让:ho2,zyun3,joeng6
+叱咤风云:cik1,caak1,fung1,wan4
 史沫特莱:si2,mut3,dak6,loi4
-右派分子:jau6,paai3,fan6,zi2
 司马穰苴:si1,maa5,joeng4,zeoi1
 吃拿卡要:hek3,naa4,kaat1,jiu3
 吃里爬外:hek3,leoi5,paa4,ngoi6
@@ -299,6 +300,7 @@
 咖啡豆:gaa3,fe1,dau2
 咧开嘴笑:lit6,hoi1,zeoi2,siu3
 哆啰美远:do1,lo4,mei5,jyun5
+哈啰德:haa1,lo4,dak1
 哈雷彗星:haa1,leoi4,wai6,sing1
 哨子声:saau3,zi2,seng1
 哩溜歪斜:li1,liu1,waai1,ce3
@@ -331,6 +333,7 @@
 噼里啪啦:pik1,leoi5,paak1,laa1
 劈里啪啦:pik1,leoi5,paak1,laa1
 严刑拷打:jim4,jing4,haau1,daa2
+啰曼带克:lo4,maan6,daai3,hak1
 啰里啰嗦:lo1,li1,lo1,so1
 四下里:sei3,haa6,leoi5
 四分之一:sei3,fan6,zi1,jat1
@@ -393,7 +396,6 @@
 墓志铭:mou6,zi3,ming4
 压岁钱:aat3,seoi3,cin4
 压线钳:aat3,sin3,kim2
-坏分子:waai6,fan6,zi2
 士多啤梨:si6,do1,be1,lei2
 士巴拿:si6,baa1,naa2
 夏洛特:haa6,lok3,dak6
@@ -485,7 +487,6 @@
 室内乐:sat1,noi6,ngok6
 富商大贾:fu3,soeng1,daai6,gu2
 富商巨贾:fu3,soeng1,geoi6,gu2
-察微知著:caat3,mei4,zi1,zoek6
 审判长:sam2,pun3,zoeng2
 审时度势:sam2,si4,dok6,sai3
 审计长:sam2,gai3,zoeng2
@@ -525,6 +526,7 @@
 尖声啼哭:zim1,seng1,tai4,huk1
 尖锐湿疣:zim1,jeoi6,sap1,jau2
 尸位素餐:si1,wai6,sou3,caan1
+层见迭出:cang4,gin3,dit6,ceot1
 履历片:lei5,lik6,pin3
 山椒鱼:saan1,ziu1,jyu2
 峨冠博带:ngo4,gun3,bok3,daai2
@@ -553,7 +555,7 @@
 平易近人:ping4,ji6,gan6,jan4
 平起平坐:ping4,hei2,ping4,co5
 干事长:gon3,si6,zoeng2
-干什么:gon3,sam6,mo1
+干甚么:gon3,sam6,mo1
 干细胞:gon3,sai3,baau1
 幼儿园:jau3,ji4,jyun2
 幼稚园:jau3,zi6,jyun2
@@ -561,6 +563,7 @@
 几内亚湾:gei1,noi6,aa3,waan1
 座右铭:zo6,jau6,ming4
 库珀带:fu3,paak3,daai2
+康干盛世:hong1,kin4,sing6,sai3
 康巴藏区:hong1,baa1,zong6,keoi1
 厨师长:cyu4,si1,zoeng2
 广告牌:gwong2,gou3,paai2
@@ -591,7 +594,7 @@
 后挡板:hau6,dong2,baan2
 后会有期:hau6,wui6,jau5,kei4
 后会无期:hau6,wui6,mou4,kei4
-徐继畲:ceoi4,gai3,jyu4
+徐继畬:ceoi4,gai3,jyu4
 从容不迫:sung1,jung4,bat1,bik1
 从从容容:sung1,sung1,jung4,jung4
 微处理器:mei4,cyu2,lei5,hei3
@@ -622,6 +625,7 @@
 悠哉悠哉:jau1,zoi1,jau4,zoi1
 悠哉游哉:jau1,zoi1,jau4,zoi1
 悲歌当哭:bei1,go1,dong3,huk1
+恶名昭着:ok3,ming4,ciu1,zyu3
 恶唑啉:ok3,zo6,lam4
 恶唑啉酮:ok3,zo6,lam4,tung4
 恶性肿瘤:ok3,sing3,zung2,lau2
@@ -716,7 +720,6 @@
 散腿裤:saan2,teoi2,fu3
 敬而远之:ging3,ji4,jyun6,zi1
 敲丧钟:haau1,song1,zung1
-敌特分子:dik6,dak6,fan6,zi2
 敷衍塞责:fu1,hin5,sak1,zaak3
 数一数二:sou2,jat1,sou2,ji6
 数不上:sou2,bat1,soeng5
@@ -751,6 +754,7 @@
 断断续续:tyun5,tyun5,zuk6,zuk6
 断路器:tyun5,lou6,hei3
 施粥舍饭:si1,zuk1,se2,faan6
+旋干转坤:syun4,kin4,zyun2,kwan1
 日喀则:jat6,kaa3,zak1
 日喀则市:jat6,kaa3,zak1,si5
 日月晕:jat6,jyut6,wan6
@@ -823,7 +827,7 @@
 朝三暮四:ziu1,saam1,mou6,sei3
 朝不保夕:ziu1,bat1,bou2,zik6
 朝不虑夕:ziu1,bat1,leoi6,zik6
-朝乾夕惕:ziu1,gon1,zik6,tik1
+朝干夕惕:ziu1,gon1,zik6,tik1
 朝令夕改:ziu1,ling6,zik6,goi2
 朝思暮想:ziu1,si1,mou6,soeng2
 朝朝暮暮:ziu1,ziu1,mou6,mou6
@@ -866,8 +870,6 @@
 棉花糖:min4,faa1,tong2
 森海塞尔:sam1,hoi2,coi3,ji5
 楞子眼:ling6,zi2,ngaan5
-极右分子:gik6,jau6,fan6,zi2
-极端分子:gik6,dyun1,fan6,zi2
 榴弹炮:lau4,daan6,paau3
 乐善好施:lok6,sin6,hou3,si1
 乐学者:ngok6,hok6,ze2
@@ -886,7 +888,6 @@
 正中要害:zing3,zung3,jiu3,hoi6
 步斗踏罡:bou6,dau2,daap6,gong1
 步罡踏斗:bou6,gong1,daap6,dau2
-武装分子:mou5,zong1,fan6,zi2
 死里逃生:sei2,leoi5,tou4,sang1
 死记硬背:sei2,gei3,ngaang6,bui6
 杀人犯:saat3,jan4,faan2
@@ -938,7 +939,6 @@
 津巴布韦:zeon1,baa1,bou3,wai5
 洪庙村:hung4,miu6,cyun1
 活生生:wut6,saang1,saang1
-活跃分子:wut6,joek3,fan6,zi2
 派上用场:paai3,soeng5,jung6,coeng4
 流窜犯:lau4,cyun3,faan2
 流里流气:lau4,leoi5,lau4,hei3
@@ -969,7 +969,6 @@
 漏脯充饥:lau6,fu2,cung1,gei1
 汉藏语系:hon3,zong6,jyu5,hai6
 潭柘寺:taam4,ze3,zi2
-激进分子:gik1,zeon3,fan6,zi2
 浓墨重彩:nung4,mak6,cung5,coi2
 火腿肠:fo2,teoi2,coeng2
 为什么:wai6,sam6,mo1
@@ -1061,7 +1060,6 @@
 画饼充饥:waak6,beng2,cung1,gei1
 画龙点睛:waak6,lung4,dim2,zing1
 异咯嗪:ji6,lok6,ceon4
-异议分子:ji6,ji5,fan6,zi2
 当世之冠:dong1,sai3,zi1,gun1
 当世冠:dong1,sai3,gun1
 当回事:dong3,wui4,si6
@@ -1092,7 +1090,6 @@
 白头鹎:baak6,tau4,pat1
 白马寺:baak6,maa5,zi2
 白骨顶:baak6,gwat1,ding2
-白暨豚:baak6,gei6,tyun4
 百废具兴:baak3,fai3,keoi1,hing1
 百发百中:baak3,faat3,baak3,zung3
 百里挑一:baak3,leoi5,tiu1,jat1
@@ -1128,11 +1125,13 @@
 石斑鱼:sek6,baan1,jyu2
 石玉昆:sek6,juk6,gwan1
 石鲮鱼:sek6,leng4,jyu2
-矽晶片:zik6,zing1,pin3
+硅铝层:zik6,leoi5,cang4
+硅镁层:zik6,mei5,cang4
 研究生:jin4,gau3,saang1
 硬生生:ngaang6,saang1,saang1
 硬磁盘:ngaang6,ci4,pun2
 硬骨鱼:ngaang6,gwat1,jyu2
+祇不过:zi2,bat1,gwo3
 祈使句:kei4,sai2,geoi3
 神不守舍:san4,fau2,sau2,se2
 神差鬼使:san4,caai1,gwai2,si2
@@ -1148,7 +1147,6 @@
 稀里糊涂:hei1,leoi5,wu4,tou4
 稀里哗啦:hei1,leoi5,waa1,laa1
 谷梁传:guk1,loeng4,zyun6
-积极分子:zik1,gik6,fan6,zi2
 积重难返:zik1,cung5,naan4,faan2
 穿着打扮:cyun1,zoek3,daa2,baan3
 窗明几净:coeng1,ming4,gei1,zing6
@@ -1172,7 +1170,7 @@
 箪食壶浆:daan1,sik6,wu4,zoeng1
 笼鸟槛猿:lung4,niu5,haam5,jyun4
 粘乎乎:nim1,fu1,fu1
-粘皮著骨:nim1,pei4,zoek3,gwat1
+粘皮着骨:nim1,pei4,zoek3,gwat1
 精校本:zing1,gaau3,bun2
 糖醋鱼:tong4,cou3,jyu2
 纪传体:gei2,zyun6,tai2
@@ -1180,7 +1178,6 @@
 红殷殷:hung4,jin1,jin1
 红霉素:hung4,mei4,sou3
 纳什维尔:naap6,sam6,wai4,ji5
-纳粹分子:naap6,seoi6,fan6,zi2
 纽几内亚:nau2,gei1,noi6,aa3
 索马里:sok3,maa5,leoi5
 紫微斗数:zi2,mei4,dau2,sou3
@@ -1195,7 +1192,7 @@
 绵里藏针:min4,leoi5,cong4,zam1
 紧迫盯人:gan2,bik1,deng1,jan4
 纵剖面:zung1,fau2,min2
-纵坐标:zung1,zo6,biu1
+纵座标:zung1,zo6,biu1
 纵断面:zung1,dyun6,min2
 纵火犯:zung3,fo2,faan2
 纵神经索:zung1,san4,ging1,sok3
@@ -1248,6 +1245,7 @@
 胭脂鱼:jin1,zi1,jyu2
 胸大无脑:hung1,daai6,mou5,nou5
 能上能下:nang4,soeng5,nang4,haa6
+脊柱侧弯:zek3,zeoi1,zak1,waan1
 脯氨酸:fu2,on1,syun1
 腔棘鱼:hong1,gik1,jyu2
 脑内啡:nou5,naap6,fe1
@@ -1255,6 +1253,7 @@
 膀大腰圆:pong4,daai6,jiu1,jyun4
 膜翅目:mok6,ci3,muk6
 自画像:zi6,waak6,zoeng6
+臭名昭着:cau3,ming4,ciu1,zyu3
 臭架子:cau3,gaa3,zi2
 致病菌:zi3,sei2,kwan2
 兴妖作怪:hing1,jiu1,zok3,gwaai3
@@ -1275,6 +1274,7 @@
 花朝节:faa1,ziu1,zit3
 花架子:faa1,gaa3,zi2
 苦思冥想:fu2,si1,ming4,soeng2
+苦迭打:fu2,dit6,daa2
 苯并噻吩:bun2,bing6,sak1,fan1
 荒山野岭:fong1,saan1,je5,leng5
 荔枝核:lai6,zi1,wat6
@@ -1302,7 +1302,6 @@
 蔡李佛:coi3,lei5,fat1
 蕾哈娜:leoi5,haa1,no5
 蔷薇花蕾:coeng4,mei4,faa1,leoi5
-借词推搪:ze6,ci4,teoi1,tong4
 蓝光光盘:laam4,gwong1,gwong1,pun2
 蓝田种玉:laam4,tin4,zung3,juk6
 蓝色妖姬:laam4,sik1,jiu1,gei1
@@ -1361,7 +1360,7 @@
 西红柿:sai1,hung4,ci2
 西门町:sai1,mun4,ting5
 覆盖面:fuk1,goi3,min2
-见微知著:gin3,mei4,zi1,zoek3
+见微知着:gin3,mei4,zi1,zoek3
 见缝就钻:gin3,fung6,zau6,zyun3
 见缝插针:gin3,fung6,caap3,zam1
 见难而上:gin3,naan4,ji4,soeng5
@@ -1398,7 +1397,7 @@
 谋财害命:mau4,coi4,hoi6,meng6
 识文断字:sik1,man4,dyun3,zi6
 读卡器:duk6,kaat1,hei3
-变徵之声:bin3,zi2,zi1,sing1
+变征之声:bin3,zi2,zi1,sing1
 豌豆尖:wun2,dau2,zim1
 猪水泡病:zyu1,seoi2,paau1,beng6
 贞操带:zing1,cou1,daai2
@@ -1454,6 +1453,7 @@
 转速表:zyun3,cuk1,biu1
 辜鸿铭:gu1,hung4,ming4
 近距离:kan6,keoi5,lei4
+迷迭香:mai4,dit6,hoeng1
 退避三舍:teoi3,bei6,saam1,se2
 送上太空:sung3,soeng5,taai3,hung1
 送上轨道:sung3,soeng5,gwai2,dou6
@@ -1579,6 +1579,7 @@
 隆隆声:lung4,lung4,seng1
 随身听:ceoi4,san1,teng1
 只鸡斗酒:zek3,gai1,dau2,zau2
+雁杳鱼沈:ngaan6,miu5,jyu4,cam4
 雅罗鱼:ngaa5,lo4,jyu2
 集资额:zaap6,zi1,ngaak2
 雕梁画栋:diu1,loeng4,waak6,dung6
@@ -1626,7 +1627,6 @@
 颐指气使:ji4,zi2,hei3,sai2
 颐指风使:ji4,zi2,fung1,sai2
 头重脚轻:tau4,cung5,goek3,heng1
-颠覆分子:din1,fuk1,fan6,zi2
 类球面:leoi6,kau4,min2
 顾不上:gu3,bat1,soeng5
 显示卡:hin2,si6,kaat1
@@ -1794,6 +1794,7 @@
 不测:bat1,cak1
 不当:bat1,dong3
 不禁:bat1,gam1
+不迭:bat1,dit6
 世行:sai3,hong4
 丘疹:jau1,zan2
 丞相:sing4,soeng3
@@ -1839,6 +1840,8 @@
 主犯:zyu2,faan2
 主簿:zyu2,bou6
 主队:zyu2,deoi6
+么二:jiu1,ji6
+么点:jiu1,dim2
 乘兴:sing4,hing3
 乜斜:me1,ce4
 乞儿:hat1,ji1
@@ -1846,7 +1849,12 @@
 乳晕:jyu5,wan6
 乳酪:jyu5,lok6
 干哕:gon1,jyut6
+干坤:kin4,kwan1
+干安:kin4,on1
 干净:gon1,zeng6
+干县:kin4,jyun6
+干陵:kin4,ling4
+干隆:kin4,lung4
 乱画:lyun6,waak6
 了当:liu5,dong3
 事假:si6,gaa3
@@ -1885,8 +1893,8 @@
 任重:jam6,cung5
 彷似:fong2,ci5
 企鹅:kei5,ngo2
+伄当:diu3,dong3
 休假:jau1,gaa3
-伙计:fo2,gei3
 伴娘:bun6,noeng2
 伴郎:bun6,long2
 位列:wai6,lit6
@@ -2143,6 +2151,7 @@
 半打:bun3,daa1
 半蹲:bun3,cyun4
 半载:bun3,zoi2
+卓着:coek3,zyu3
 协调:hip3,tiu4
 南洋:naam4,joeng2
 南燕:naam4,jin1
@@ -2165,6 +2174,7 @@
 厚重:hau5,cung5
 原位:jyun4,wai6
 原名:jyun4,meng2
+原着:jyun4,zyu3
 原鸽:jyun4,gap3
 厌恶:jim3,wu3
 厉声:lai6,seng1
@@ -2227,6 +2237,7 @@
 名位:ming4,wai6
 名分:ming4,fan6
 名相:ming4,soeng3
+名着:ming4,zyu3
 名表:ming4,biu1
 吐沫:tou3,mut3
 君位:gwan1,wai6
@@ -2267,7 +2278,7 @@
 哈喽:haa1,lau3
 哈啰:haa1,lo2
 哈罗:haa1,lo2
-哪吒:naa4,zaa1
+哪咤:naa4,zaa1
 哪里:naa5,leoi5
 哭丧:huk1,song1
 哭声:huk1,seng1
@@ -2353,6 +2364,7 @@
 圆领:jyun4,leng5
 图样:tou4,joeng2
 团长:tyun4,zoeng2
+土着:tou2,zyu3
 土豆:tou2,dau2
 在位:zoi6,wai6
 在行:zoi6,hong4
@@ -2565,11 +2577,11 @@
 将军:zoeng1,gwan1
 将近:zoeng1,gan6
 专断:zyun1,dyun3
+专着:zyun1,zyu3
 尊重:zyun1,zung6
 尊长:zyun1,zoeng2
 尊鱼:zyun1,jyu2
 对上:deoi3,soeng5
-对幺:deoi3,mo1
 对折:deoi3,zip3
 对称:deoi3,cing3
 对簿:deoi3,bou6
@@ -2633,8 +2645,8 @@
 左传:zo2,zyun6
 左转:zo2,zyun3
 巧干:haau2,gon3
+巨着:geoi6,zyu3
 巨额:geoi6,ngaak2
-钜额:geoi6,ngaak2
 差事:caai1,si6
 差使:caai1,si3
 差役:caai1,jik6
@@ -2781,6 +2793,7 @@
 弹雨:daan6,jyu5
 彩带:coi2,daai2
 彩扩:coi2,kong3
+彷佛:fong2,fat1
 仿佛:fong2,fat1
 役使:jik6,sai2
 待复:doi6,fuk1
@@ -2827,6 +2840,7 @@
 患难:waan6,naan6
 情分:cing4,fan6
 情操:cing4,cou3
+情搜:cing4,sau1
 惋惜:jyun2,sik1
 恶少:ok3,siu3
 恶相:ok3,soeng3
@@ -2931,6 +2945,7 @@
 折中:zit3,zung3
 折光:zip3,gwong1
 折断:zit3,tyun5
+折线:zip3,sin3
 折转:zip3,zyun2
 抱摔:pou5,seoi1
 抵挡:dai2,dong2
@@ -2952,6 +2967,7 @@
 拖累:to1,leoi6
 拖鞋:to1,haai2
 拗断:aau2,tyun5
+拙着:zyut3,zyu3
 招架:ziu1,gaa3
 拜拜:baai1,baai3
 拜会:baai3,wui6
@@ -2961,7 +2977,6 @@
 拼房:ping3,fong2
 拼缀:ping3,zeoi6
 持重:ci4,zung6
-按跷:on3,giu2
 挎斗:kwaa3,dau2
 挖苦:waa1,fu2
 挨克:ngaai4,hak1
@@ -2982,7 +2997,6 @@
 舍得:se2,dak1
 舍弃:se2,hei3
 舍身:se2,san1
-挨延:ngaai4,jin4
 卷带:gyun2,daai2
 捷径:zit6,ging3
 扫兴:sou3,hing3
@@ -3020,7 +3034,10 @@
 揩油:haai1,jau2
 援藏:wun4,zong6
 摇篮:jiu4,laam2
+搜寻:sau1,cam4
 搜索:sau2,saak3
+搜证:sau1,zing3
+搜集:sau1,zaap6
 搬铺:bun1,pou3
 抢购:coeng2,kau3
 摔断:seot1,tyun5
@@ -3158,7 +3175,7 @@
 斜坡:ce3,bo1
 斤两:gan1,loeng2
 斧头:fu2,tau2
-斫畲:zoek3,jyu4
+斫畬:zoek3,jyu4
 斩断:zaam2,tyun5
 新会:san1,wui6
 断句:tyun5,geoi3
@@ -3220,6 +3237,7 @@
 更深:gaang1,sam1
 更漏:gaang1,lau6
 更为:gang3,wai4
+更迭:gang1,dit6
 更阑:gaang1,laan4
 更鼓:gaang1,gu2
 书名:syu1,meng2
@@ -3391,6 +3409,7 @@
 机会:gei1,wui6
 机油:gei1,jau2
 机长:gei1,zoeng2
+横折:waang4,zip3
 横流:waang6,lau4
 横跨:waang4,kwaa1
 横队:waang4,deoi6
@@ -3587,7 +3606,6 @@
 灾难:zoi1,naan6
 炮友:paau3,jau2
 炮制:paau4,zai3
-炳著:bing2,zoek6
 炸两:zaa3,loeng2
 炸鱼:zaa3,jyu2
 为了:wai6,liu5
@@ -3609,7 +3627,6 @@
 无须:mou4,seoi1
 焦灼:ziu1,coek3
 烟斗:jin1,dau2
-菸斗:jin1,dau2
 烟筒:jin1,tung1
 烟头:jin1,tau2
 照料:ziu3,liu6
@@ -3689,6 +3706,7 @@
 王位:wong4,wai6
 王冠:wong4,gun1
 王牌:wong4,paai2
+王着:wong4,zyu3
 玩家:waan4,gaa1
 玩火:waan4,fo2
 玩牌:waan4,paai2
@@ -3822,6 +3840,7 @@
 皮带:pei4,daai2
 皮重:pei4,cung5
 皴裂:ceon1,lit6
+皱折:zau3,zip3
 盎然:ong3,jin4
 盒带:hap6,daai2
 盛会:sing6,wui6
@@ -3849,7 +3868,6 @@
 相处:soeng1,cyu2
 相貌:soeng3,maau6
 相面:soeng3,min6
-盼复:paan3,fuk1
 省城:saang2,seng4
 省察:sing2,caat3
 省悟:sing2,ng6
@@ -3881,6 +3899,8 @@
 睢鸠:seoi1,gau1
 瞓觉:fan3,gaau3
 瞪眼:dang1,ngaan5
+瞭哨:liu4,saau3
+瞭望:liu4,mong6
 知会:zi1,wui6
 知道:zi1,dou3
 知青:zi3,cing1
@@ -3890,6 +3910,7 @@
 石榴:sek6,lau2
 石片:sek6,pin3
 石松:sek6,sung1
+硅肺:zik6,fai3
 破相:po3,soeng3
 破处:po3,cyu2
 硬干:ngaang6,gon3
@@ -3901,13 +3922,12 @@
 碰上:pung3,soeng5
 磁卡:ci4,kaat1
 磁带:ci4,daai2
-磅礴:pong4,bok6
+磅礡:pong4,bok6
 磨叨:mo4,tou1
 磨坊:mo6,fong1
 磨难:mo4,naan6
 魔难:mo1,naan6
 矿难:kwong3,naan6
-示复:si6,fuk1
 社长:se5,zoeng2
 祛瘀:keoi1,jyu1
 神话:san4,waa2
@@ -3956,7 +3976,6 @@
 童话:tung4,waa2
 端上:dyun1,soeng5
 竹青:zuk1,ceng1
-竺乾:zuk1,gon1
 笆斗:baa1,dau2
 笑声:siu3,seng1
 笑话:siu3,waa2
@@ -4071,10 +4090,12 @@
 缎带:dyun6,daai2
 缔造:tai3,zou6
 缘分:jyun4,fan6
+编着:pin1,zyu3
 编队:pin1,deoi6
 县名:jyun6,meng2
 县长:jyun6,zoeng2
 缝子:fung6,zi2
+缝纴:fung4,jam6
 缝隙:fung6,kwik1
 纵向:zung1,hoeng3
 纵梁:zung1,loeng4
@@ -4120,6 +4141,7 @@
 翻卷:faan1,kyun4
 翻转:faan1,zyun3
 翻领:faan1,leng5
+老么:lou5,jiu1
 老二:lou5,ji2
 老少:lou5,siu3
 老挝:lou5,gwo1
@@ -4307,10 +4329,16 @@
 落难:lok6,naan6
 落魄:lok6,tok3
 叶片:jip6,pin3
+着作:zyu3,zok3
+着名:zyu3,ming4
 着呢:zoek6,ne1
+着书:zyu3,syu1
+着称:zyu3,cing1
 着衣:zoek3,ji1
 着装:zoek3,zong1
+着述:zyu3,seot6
 着重:zoek6,zung6
+着录:zyu3,luk6
 葫芦:wu4,lou2
 葵涌:kwai4,cung1
 蒙难:mung4,naan6
@@ -4325,12 +4353,12 @@
 蔽芾:bai3,fai3
 蕉岭:ziu1,leng5
 芜累:mou4,leoi6
+萧干:siu1,kin4
 薄片:bok6,pin3
 薄面:bok6,min2
 薪俸:san1,fung6
 薯条:syu4,tiu2
 荠菜:cai5,coi3
-借此:ze6,ci2
 蓝领:laam4,leng5
 藏人:zong6,jan4
 藏品:zong6,ban2
@@ -4472,7 +4500,6 @@
 复变:fuk1,bin3
 复赛:fuk1,coi3
 复迭:fuk1,dit6
-复述:fuk1,seot6
 复杂:fuk1,zaap6
 搭裢:daap3,lin4
 裤带:fu3,daai2
@@ -4676,6 +4703,7 @@
 轩槛:hin1,haam5
 软盘:jyun5,pun2
 软糖:jyun5,tong2
+较着:gaau3,zyu3
 载漪:zoi3,ji1
 载荷:zoi3,ho6
 载重:zoi3,cung5
@@ -4716,6 +4744,9 @@
 近路:kan5,lou6
 迤逦:ji5,lei5
 迫使:bik1,sai2
+迭代:dit6,doi6
+迭起:dit6,hei2
+迭部:dit6,bou6
 迷上:mai4,soeng5
 追上:zeoi1,soeng5
 退位:teoi3,wai6
@@ -4759,6 +4790,7 @@
 遮挡:ze1,dong2
 选中:syun2,zung3
 选购:syun2,kau3
+遗着:wai4,zyu3
 遗赠:wai6,zang6
 要功:jiu1,gung1
 边塞:bin1,coi3
@@ -4828,6 +4860,7 @@
 重犯:cung5,faan6
 重瓣:cung5,baan6
 重用:zung6,jung6
+重迭:cung4,dit6
 重病:cung5,beng6
 重症:cung5,zing3
 重炮:cung5,paau3
@@ -4891,7 +4924,6 @@
 锯子:geoi3,zi2
 锯开:geoi3,hoi1
 钢条:gong3,tiu2
-钢钎:gong3,gim3
 录相:luk6,soeng3
 录共:luk6,gung1
 锥面:zeoi1,min2
@@ -5167,6 +5199,7 @@
 频率:pan4,leot6
 颠簸:din1,bo2
 显卡:hin2,kaat1
+显着:hin2,zyu3
 风挡:fung1,dong2
 风韵:fung1,wan6
 飘带:piu1,daai2
@@ -5176,7 +5209,6 @@
 饰带:sik1,daai2
 饼铛:beng2,caang1
 养分:joeng5,fan6
-哺子:bou1,zi2
 余额:jyu4,ngaak2
 馏分:lau6,fan6
 馊臭:suk1,cau3
@@ -5260,7 +5292,7 @@
 鲶鱼:nim4,jyu2
 鳀鱼:tai4,jyu2
 鲫鱼:zik1,jyu2
-䲠鱼:ceon1,jyu2
+鰆鱼:ceon1,jyu2
 鲽片:dip6,pin3
 鲥鱼:si4,jyu2
 鲢鱼:lin4,jyu2
