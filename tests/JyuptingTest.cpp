@@ -1,5 +1,6 @@
 #include "JyuptingTest.h"
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 
