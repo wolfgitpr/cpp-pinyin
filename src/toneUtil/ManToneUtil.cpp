@@ -1,5 +1,7 @@
 #include "ManToneUtil.h"
 
+#include <algorithm>
+
 namespace Pinyin
 {
     // 定义 phonetic_symbol_reverse 映射表
