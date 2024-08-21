@@ -13,7 +13,8 @@ namespace Test
 
 #ifdef _WIN32
         // Convert the UTF-8 string to a wide string
-        std::ifstream file(Pinyin::utf8ToWide(filename));
+        const std::wstring wdict_dir = Pinyin::utf8ToWide(filename);
+        std::ifstream file(wdict_dir.c_str());
 #else
         std::ifstream file(filename);
 #endif

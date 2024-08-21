@@ -30,7 +30,8 @@ namespace Pinyin
     bool loadDict(const std::string &dict_dir, const std::string &fileName,
                   u32strHashMap<u32str, u32str> &resultMap, const char &sep1) {
 #ifdef _WIN32
-        std::ifstream file(Pinyin::utf8ToWide(dict_dir + "/" + fileName));
+        const std::wstring wdict_dir = Pinyin::utf8ToWide(dict_dir + "/" + fileName);
+        std::ifstream file(wdict_dir.c_str());
 #else
         std::ifstream file(dict_dir + "/" + fileName);
 #endif
@@ -57,7 +58,8 @@ namespace Pinyin
                   u32strHashMap<u32str, u32strVec> &resultMap, const char &sep1,
                   const std::string &sep2) {
 #ifdef _WIN32
-        std::ifstream file(Pinyin::utf8ToWide(dict_dir + "/" + fileName));
+        const std::wstring wdict_dir = Pinyin::utf8ToWide(dict_dir + "/" + fileName);
+        std::ifstream file(wdict_dir.c_str());
 #else
         std::ifstream file(dict_dir + "/" + fileName);
 #endif
@@ -90,7 +92,8 @@ namespace Pinyin
                             const std::string &sep2,
                             const std::function<u32str(const u32str &pinyin)> &converterForDefaultPinyin) {
 #ifdef _WIN32
-        std::ifstream file(Pinyin::utf8ToWide(dict_dir + "/" + fileName));
+        const std::wstring wdict_dir = Pinyin::utf8ToWide(dict_dir + "/" + fileName);
+        std::ifstream file(wdict_dir.c_str());
 #else
         std::ifstream file(dict_dir + "/" + fileName);
 #endif
