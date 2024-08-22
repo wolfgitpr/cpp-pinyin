@@ -4,6 +4,8 @@
 #include "ChineseG2p_p.h"
 #include "DictUtil.h"
 
+#include <algorithm>
+
 namespace Pinyin
 {
     static u32strVec splitString(const u32str &input) {
