@@ -114,7 +114,7 @@ namespace Test
                 const std::string &pinyin = keyValuePair[1];
 
                 auto result = g2p_zh->hanziToPinyin(hans, Pinyin::ManTone::Style::NORMAL, Pinyin::Error::Default, false,
-                                                    true).
+                                                    false, false).
                                       toStdStr();
 
                 auto words = split(pinyin, " ");

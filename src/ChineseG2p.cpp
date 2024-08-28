@@ -268,12 +268,11 @@ namespace Pinyin
 
                 // not found, use default pinyin
                 if (!found) {
+                    const auto pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
                     result.emplace_back(PinyinRes{
                         current_char.encodeUtf8(),
-                        d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)[0],
-                        candidates
-                        ? d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)
-                        : std::vector<std::string>{},
+                        pinyin[0],
+                        candidates ? pinyin : std::vector<std::string>{},
                         false
                     });
                     cursor++;
