@@ -7,13 +7,13 @@
 namespace Pinyin
 {
     // 映射表，音调符号 -> (无音调元音, 对应的调号)
-    static const std::unordered_map<char32_t, std::pair<char, char>> toneToNum = {
-        {U'ā', {'a', '1'}}, {U'á', {'a', '2'}}, {U'ǎ', {'a', '3'}}, {U'à', {'a', '4'}},
-        {U'ō', {'o', '1'}}, {U'ó', {'o', '2'}}, {U'ǒ', {'o', '3'}}, {U'ò', {'o', '4'}},
-        {U'ē', {'e', '1'}}, {U'é', {'e', '2'}}, {U'ě', {'e', '3'}}, {U'è', {'e', '4'}},
-        {U'ī', {'i', '1'}}, {U'í', {'i', '2'}}, {U'ǐ', {'i', '3'}}, {U'ì', {'i', '4'}},
-        {U'ū', {'u', '1'}}, {U'ú', {'u', '2'}}, {U'ǔ', {'u', '3'}}, {U'ù', {'u', '4'}},
-        {U'ǖ', {'v', '1'}}, {U'ǘ', {'v', '2'}}, {U'ǚ', {'v', '3'}}, {U'ǜ', {'v', '4'}}
+    static const std::unordered_map<char32_t, std::pair<char32_t, char32_t>> toneToNum = {
+        {U'ā', {U'a', U'1'}}, {U'á', {U'a', U'2'}}, {U'ǎ', {U'a', U'3'}}, {U'à', {U'a', U'4'}},
+        {U'ō', {U'o', U'1'}}, {U'ó', {U'o', U'2'}}, {U'ǒ', {U'o', U'3'}}, {U'ò', {U'o', U'4'}},
+        {U'ē', {U'e', U'1'}}, {U'é', {U'e', U'2'}}, {U'ě', {U'e', U'3'}}, {U'è', {U'e', U'4'}},
+        {U'ī', {U'i', U'1'}}, {U'í', {U'i', U'2'}}, {U'ǐ', {U'i', U'3'}}, {U'ì', {U'i', U'4'}},
+        {U'ū', {U'u', U'1'}}, {U'ú', {U'u', U'2'}}, {U'ǔ', {U'u', U'3'}}, {U'ù', {U'u', U'4'}},
+        {U'ǖ', {U'v', U'1'}}, {U'ǘ', {U'v', U'2'}}, {U'ǚ', {U'v', U'3'}}, {U'ǜ', {U'v', U'4'}}
     };
 
     u32str ManTone::toneToNormal(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
@@ -78,7 +78,7 @@ namespace Pinyin
 
     u32str ManTone::toneToTone3(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
         u32str result;
-        char toneNumber = '5';
+        char32_t toneNumber = U'5';
 
         for (char32_t ch : pinyin) {
             if (isLetter(ch)) {
@@ -98,7 +98,7 @@ namespace Pinyin
 
         result += toneNumber;
 
-        if (!neutral_tone_with_five && toneNumber == '5')
+        if (!neutral_tone_with_five && toneNumber == U'5')
             result = result.substr(0, result.length() - 1);
         return result;
     }
