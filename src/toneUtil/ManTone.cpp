@@ -36,24 +36,26 @@ namespace Pinyin
     }
 
     u32str ManTone::toneToTone(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u32str result;
-
-        if (!v_to_u) {
-            for (const char32_t &ch : pinyin) {
-                if (isLetter(ch)) {
-                    result += ch;
-                } else {
-                    result += ch == U'ü' ? U'v' : ch;
-                }
-            }
-        } else
+        if (v_to_u)
             return pinyin;
+
+        u32str result;
+        result.reserve(pinyin.size());
+
+        for (const char32_t &ch : pinyin) {
+            if (isLetter(ch)) {
+                result += ch;
+            } else {
+                result += ch == U'ü' ? U'v' : ch;
+            }
+        }
 
         return result;
     }
 
     u32str ManTone::toneToTone2(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
         u32str result;
+        result.reserve(pinyin.size() + 1);
 
         for (char32_t ch : pinyin) {
             if (isLetter(ch)) {
@@ -78,6 +80,8 @@ namespace Pinyin
 
     u32str ManTone::toneToTone3(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
         u32str result;
+        result.reserve(pinyin.size() + 1);
+
         char32_t toneNumber = U'5';
 
         for (char32_t ch : pinyin) {
