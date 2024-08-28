@@ -2,29 +2,28 @@
 
 namespace Pinyin
 {
-    PinyinResVector Jyutping::hanziToPinyin(const std::string &hans, CanTone::Style style, Error error) const {
+    PinyinResVector Jyutping::hanziToPinyin(const std::string &hans, CanTone::Style style, Error error,
+                                            bool candidates) const {
         /*
             @param hans : raw utf-8 std::string.
             @param ManTone::Style : Preserve the pinyin tone.
             @param errorType : Ignore words that have failed conversion. Default: Keep original.
-            @param v_to_u : Convert v to ü. Default: false.
-            @param neutral_tone_with_five : Use 5 as neutral tone. Default: false.
+            @param candidates : Return all possible pinyin candidates. Default: true.
             @return PinyinResVector.
         */
-        return ChineseG2p::hanziToPinyin(hans, static_cast<int>(style), error, false, false);
+        return ChineseG2p::hanziToPinyin(hans, static_cast<int>(style), error, candidates, false, false);
     }
 
     PinyinResVector Jyutping::hanziToPinyin(const std::vector<std::string> &hans, CanTone::Style style,
-                                            Error error) const {
+                                            Error error, bool candidates) const {
         /*
             @param hans : raw utf-8 std::string vector, each element of the vector is a character.
             @param ManTone::Style : Preserve the pinyin tone.
             @param errorType : Ignore words that have failed conversion. Default: Keep original.
-            @param v_to_u : Convert v to ü. Default: false.
-            @param neutral_tone_with_five : Use 5 as neutral tone. Default: false.
+            @param candidates : Return all possible pinyin candidates. Default: true.
             @return PinyinResVector.
         */
-        return ChineseG2p::hanziToPinyin(hans, static_cast<int>(style), error, false, false);
+        return ChineseG2p::hanziToPinyin(hans, static_cast<int>(style), error, candidates, false, false);
     }
 
     //  Convert to Simplified Chinese.  utf-8 std::string

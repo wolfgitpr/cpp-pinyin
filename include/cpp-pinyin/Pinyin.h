@@ -15,12 +15,12 @@ namespace Pinyin
 
         PinyinResVector hanziToPinyin(const std::string &hans,
                                       ManTone::Style style = ManTone::Style::TONE,
-                                      Error error = Default, bool v_to_u = false,
+                                      Error error = Default, bool candidates = true, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
 
         PinyinResVector hanziToPinyin(const std::vector<std::string> &hans,
                                       ManTone::Style style = ManTone::Style::TONE,
-                                      Error error = Default, bool v_to_u = false,
+                                      Error error = Default, bool candidates = true, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
 
         std::vector<std::string> getDefaultPinyin(const std::string &hanzi,

@@ -28,9 +28,8 @@ namespace Test
                 const std::string &hans = keyValuePair[0];
                 const std::string &pinyin = keyValuePair[1];
 
-                const auto result = g2p_can->hanziToPinyin(hans, Pinyin::CanTone::Style::NORMAL, Pinyin::Error::Default)
-                                           .
-                                           toStdStr();
+                const auto result = g2p_can->hanziToPinyin(hans, Pinyin::CanTone::Style::NORMAL, Pinyin::Error::Default,
+                                                           false).toStdStr();
 
                 auto words = split(pinyin, " ");
                 const auto wordSize = words.size();

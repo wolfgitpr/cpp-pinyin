@@ -40,10 +40,10 @@ namespace Test
             std::cerr << "Neutral tone test failed." << std::endl;
         if (g2p_zh->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, true).at(0) != "le5")
             std::cerr << "Neutral tone test failed." << std::endl;
-        if (g2p_zh->hanziToPinyin("好 xiu 的", Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default,
+        if (g2p_zh->hanziToPinyin("好 xiu 的", Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, true,
                                   false, true).toStdStr() != u8"hao3 xiu de5")
             std::cerr << "Hanzi to Pinyin test failed." << std::endl;
-        if (g2p_zh->hanziToPinyin("hao de", Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default,
+        if (g2p_zh->hanziToPinyin("hao de", Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, true,
                                   false, true).toStdStr() != u8"hao de")
             std::cerr << "Hanzi to Pinyin test failed." << std::endl;
         return true;
@@ -65,7 +65,7 @@ namespace Test
                 const std::string &pinyin = keyValuePair[2];
 
                 auto resWords = g2p_zh->hanziToPinyin(hans, Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default,
-                                                      false, true).
+                                                      false, false, true).
                                         toStdVector();
                 count++;
 

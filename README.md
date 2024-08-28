@@ -37,7 +37,7 @@ Pinyin::setDictionaryPath(applicationDirPath + "\\dict");
 
 const auto g2p_man = std::make_unique<Pinyin::Pinyin>(); // or Pinyin::Jyutping
 const std::string hans = "明月@1几32时有##一";
-PinyinResVector pinyinRes = g2p_zh->hanziToPinyin(hans, Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, false, true);
+PinyinResVector pinyinRes = g2p_zh->hanziToPinyin(hans, Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, true, false, true);
 
 std::vector<std::string> pinyin = g2p_man->getDefaultPinyin("了", Pinyin::ManTone::Style::TONE3, false, false)
 ```
@@ -75,13 +75,14 @@ public:
     @param hans : raw utf-8 std::string.
     @param ManTone::Style : Preserve the pinyin tone.
     @param errorType : Ignore words that have failed conversion. Default: Keep original.
+    @param candidates : Whether to return all candidate pinyin. Default: true.
     @param v_to_u : Convert v to ü. Default: false.
     @param neutral_tone_with_five : Use 5 as neutral tone. Default: false.
     @return PinyinResVector.
 */
 PinyinResVector hanziToPinyin(const std::string &hans,
                               ManTone::Style style = ManTone::Style::TONE,
-                              Error error = Error::Default, bool v_to_u = false,
+                              Error error = Error::Default, bool candidates = true, bool v_to_u = false,
                               bool neutral_tone_with_five = false) const;
 
 /*
@@ -91,7 +92,7 @@ PinyinResVector hanziToPinyin(const std::string &hans,
 */
 PinyinResVector hanziToPinyin(const std::vector<std::string> &hans,
                               ManTone::Style style = ManTone::Style::TONE,
-                              Error error = Error::Default, bool v_to_u = false,
+                              Error error = Error::Default, bool candidates = true, bool v_to_u = false,
                               bool neutral_tone_with_five = false) const;
 
 //  Convert to Simplified Chinese.  utf-8 std::string

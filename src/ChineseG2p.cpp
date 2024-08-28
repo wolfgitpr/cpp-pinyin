@@ -121,23 +121,24 @@ namespace Pinyin
         return loadAdditionalDict(filePath, "user_dict.txt", d_ptr->phrases_dict);
     }
 
-    PinyinResVector ChineseG2p::hanziToPinyin(const std::string &hans, int style,
-                                              Error error, bool v_to_u, bool neutral_tone_with_five) const {
-        return hanziToPinyin(splitString(utf8strToU32str(hans)), style, error, v_to_u, neutral_tone_with_five);
+    PinyinResVector ChineseG2p::hanziToPinyin(const std::string &hans, int style, Error error, bool candidates,
+                                              bool v_to_u, bool neutral_tone_with_five) const {
+        return hanziToPinyin(splitString(utf8strToU32str(hans)), style, error, candidates, v_to_u,
+                             neutral_tone_with_five);
     }
 
-    PinyinResVector ChineseG2p::hanziToPinyin(const std::vector<std::string> &hans, int style,
-                                              Error error, bool v_to_u, bool neutral_tone_with_five) const {
+    PinyinResVector ChineseG2p::hanziToPinyin(const std::vector<std::string> &hans, int style, Error error,
+                                              bool candidates, bool v_to_u, bool neutral_tone_with_five) const {
         u32strVec hansList;
         hansList.reserve(hans.size());
         for (const auto &item : hans) {
             hansList.emplace_back(utf8strToU32str(item));
         }
-        return hanziToPinyin(hansList, style, error, v_to_u, neutral_tone_with_five);
+        return hanziToPinyin(hansList, style, error, candidates, v_to_u, neutral_tone_with_five);
     }
 
-    PinyinResVector ChineseG2p::hanziToPinyin(const u32strVec &hans, int style,
-                                              Error error, bool v_to_u, bool neutral_tone_with_five) const {
+    PinyinResVector ChineseG2p::hanziToPinyin(const u32strVec &hans, int style, Error error, bool candidates,
+                                              bool v_to_u, bool neutral_tone_with_five) const {
         u32strVec inputList;
         std::vector<int> inputPos;
 
@@ -164,7 +165,7 @@ namespace Pinyin
                 result.emplace_back(PinyinRes{
                     current_char.encodeUtf8(),
                     pinyin[0],
-                    pinyin,
+                    candidates ? pinyin : std::vector<std::string>{},
                     false
                 });
                 cursor++;
@@ -182,7 +183,9 @@ namespace Pinyin
                                 result.emplace_back(PinyinRes{
                                     lyric.encodeUtf8(),
                                     subRes[i].encodeUtf8(),
-                                    d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
+                                    candidates
+                                    ? d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)
+                                    : std::vector<std::string>{},
                                     false
                                 });
                             }
@@ -202,7 +205,9 @@ namespace Pinyin
                                     result.emplace_back(PinyinRes{
                                         lyric.encodeUtf8(),
                                         subRes1[i].encodeUtf8(),
-                                        d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
+                                        candidates
+                                        ? d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)
+                                        : std::vector<std::string>{},
                                         false
                                     });
                                 }
@@ -225,7 +230,9 @@ namespace Pinyin
                                 result.emplace_back(PinyinRes{
                                     lyric.encodeUtf8(),
                                     subResBack[i].encodeUtf8(),
-                                    d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
+                                    candidates
+                                    ? d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)
+                                    : std::vector<std::string>{},
                                     false
                                 });
                             }
@@ -247,7 +254,9 @@ namespace Pinyin
                                 result.emplace_back(PinyinRes{
                                     lyric.encodeUtf8(),
                                     subResBack1[i].encodeUtf8(),
-                                    d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five),
+                                    candidates
+                                    ? d_ptr->getDefaultPinyin(lyric, style, v_to_u, neutral_tone_with_five)
+                                    : std::vector<std::string>{},
                                     false
                                 });
                             }
@@ -262,7 +271,9 @@ namespace Pinyin
                     result.emplace_back(PinyinRes{
                         current_char.encodeUtf8(),
                         d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)[0],
-                        d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five),
+                        candidates
+                        ? d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five)
+                        : std::vector<std::string>{},
                         false
                     });
                     cursor++;
