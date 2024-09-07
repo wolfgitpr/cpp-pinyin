@@ -34,7 +34,6 @@
 三地门乡:sān,dì,mén,xiāng
 三相点:sān,xiàng,diǎn
 三部曲:sān,bù,qǔ
-三都县:sān,dū,xiàn
 三点全露:sān,diǎn,quán,lòu
 上一个:shàng,yī,ge
 上半部分:shàng,bàn,bù,fèn
@@ -62,7 +61,6 @@
 不由得:bù,yóu,de
 不省人事:bù,xǐng,rén,shì
 不答理:bù,dā,lǐ
-不粘锅:bù,zhān,guō
 不着痕迹:bù,zhuó,hén,jì
 不着边际:bù,zhuó,biān,jì
 不见得:bù,jiàn,de
@@ -120,7 +118,6 @@
 任丘市:rén,qiū,shì
 任达华:rén,dá,huá
 伍子胥:wǔ,zǐ,xū
-伏都教:fú,dū,jiào
 低能儿:dī,néng,ér
 佛吉尼亚:fú,jí,ní,yà
 佛洛斯特:fú,luò,sī,tè
@@ -172,7 +169,6 @@
 儿媳妇:ér,xí,fu
 儿媳妇儿:ér,xí,fu,er
 儿茶素:ér,chá,sù
-内比都:nèi,bǐ,dū
 全地形车:quán,dì,xíng,chē
 两岸三地:liǎng,àn,sān,dì
 两弹一星:liǎng,dàn,yī,xīng
@@ -235,7 +231,6 @@
 刘涓子:liú,juān,zǐ
 功不可没:gōng,bù,kě,mò
 功高望重:gōng,gāo,wàng,zhòng
-加德满都:jiā,dé,mǎn,dū
 加的斯:jiā,dì,sī
 勃艮第:bó,gěn,dì
 勉勉强强:miǎn,miǎn,qiǎng,qiǎng
@@ -377,7 +372,6 @@
 单口相声:dān,kǒu,xiàng,shēng
 嗡嗡弹:wēng,wēng,dàn
 哔哩哔哩:bī,lī,bī,lī
-嘁嘁喳喳:qī,qi,chā,chā
 嘉应大学:jiā,yīng,dà,xué
 嘉柏隆里:jiā,bó,lóng,lǐ
 嘎拉哈:gā,lā,hà
@@ -533,7 +527,6 @@
 奏鸣曲:zòu,míng,qǔ
 奏鸣曲式:zòu,míng,qǔ,shì
 奥切诺斯:ào,qiē,nuò,sī
-奥古斯都:ào,gǔ,sī,dū
 奥塞梯:ào,sè,tī
 奥米伽:ào,mǐ,gā
 奥西娜斯:ào,xī,nuó,sī
@@ -586,7 +579,6 @@
 安步当车:ān,bù,dàng,chē
 安琪儿:ān,qí,ér
 安重根:ān,zhòng,gēn
-宏都拉斯:hóng,dū,lā,sī
 室内乐:shì,nèi,yuè
 家给人足:jiā,jǐ,rén,zú
 家雀儿:jiā,qiǎo,er
@@ -886,7 +878,6 @@
 撒切尔:sā,qiē,ěr
 撒呓挣:sā,yì,zheng
 撒狗粮:sǎ,gǒu,liáng
-撒都该人:sā,dū,gāi,rén
 撒马尔干:sā,mǎ,ěr,gàn
 拨浪鼓:bō,lang,gǔ
 撼天动地:hàn,tiān,dòng,dì
@@ -941,8 +932,6 @@
 施粥舍饭:shī,zhōu,shě,fàn
 早生贵子:zǎo,shēng,guì,zǐ
 早知道:zǎo,zhī,dao
-昆都仑:kūn,dū,lún
-昆都仑区:kūn,dū,lún,qū
 明儿个:míng,er,ge
 明晃晃:míng,huǎng,huǎng
 明窗净几:míng,chuāng,jìng,jī
@@ -1009,7 +998,6 @@
 朝过夕改:zhāo,guò,xī,gǎi
 朝饔夕飧:zhāo,yōng,xī,sūn
 木子美:mù,zǐ,měi
-木骨都束:mù,gǔ,dū,shù
 未达一间:wèi,dá,yī,jiàn
 本本分分:běn,běn,fèn,fèn
 札马剌丁:zhá,mǎ,lá,dīng
@@ -1145,7 +1133,6 @@
 洗发精:xǐ,fà,jīng
 洗发露:xǐ,fà,lù
 洛子峰:luò,zǐ,fēng
-洪都拉斯:hóng,dū,lā,sī
 活不下去:huó,bù,xià,qu
 活跃分子:huó,yuè,fèn,zǐ
 流浪儿:liú,làng,ér
@@ -1199,7 +1186,6 @@
 为虎作伥:wèi,hǔ,zuò,chāng
 乌咖哩:wū,gā,lí
 乌漆抹黑:wū,qī,mā,hēi
-乌尔都语:wū,ěr,dū,yǔ
 乌良哈:wū,liáng,hǎ
 乌鱼子:wū,yú,zǐ
 无地自容:wú,dì,zì,róng
@@ -1268,7 +1254,6 @@
 琉璃蓝鹟:liú,lí,lán,wēng
 琴瑟不调:qín,sè,bù,tiáo
 瓜地马拉:guā,dì,mǎ,lā
-瓦都兹:wǎ,dū,zī
 瓶塞钻:píng,sāi,zuàn
 甜得发腻:tián,de,fā,nì
 生儿育女:shēng,ér,yù,nǚ
@@ -1367,6 +1352,7 @@
 眼泪横流:yǎn,lèi,hèng,liú
 眼见得:yǎn,jiàn,de
 众口难调:zhòng,kǒu,nán,tiáo
+众星攒月:zhòng,xīng,cuán,yuè
 众矢之的:zhòng,shǐ,zhī,dì
 睡回笼觉:shuì,huí,lóng,jiào
 睡得着:shuì,de,zháo
@@ -1439,8 +1425,9 @@
 粒子束:lì,zǐ,shù
 粒子流:lì,zǐ,liú
 粒子物理:lì,zǐ,wù,lǐ
+粘乎乎:nián,hū,hū
+粘皮带骨:nián,pí,dài,gǔ
 粘皮著骨:nián,pí,zhuó,gǔ
-粘船鱼:zhān,chuán,yú
 精挑细选:jīng,tiāo,xì,xuǎn
 精灵宝钻:jīng,líng,bǎo,zuàn
 糊糊涂涂:hú,hu,tú,tu
@@ -1555,7 +1542,6 @@
 台儿庄:tái,ér,zhuāng
 台面呢:tái,miàn,ní
 兴冲冲:xìng,chōng,chōng
-兴都库什:xīng,dū,kù,shí
 兴高彩烈:xìng,gāo,cǎi,liè
 兴高采烈:xìng,gāo,cǎi,liè
 举隅法:jǔ,yù,fǎ
@@ -1667,7 +1653,6 @@
 里急后重:lǐ,jí,hòu,zhòng
 里海地鸦:lǐ,hǎi,dì,yā
 裸子植物:luǒ,zǐ,zhí,wù
-褪套儿:tùn,tào,er
 西地那非:xī,dì,nà,fēi
 西塞山:xī,sài,shān
 西塞山区:xī,sài,shān,qū
@@ -1803,14 +1788,6 @@
 邷么儿:wǎ,mó,er
 郢书燕说:yǐng,shū,yān,shuō
 郭子仪:guō,zǐ,yí
-都伯林:dū,bó,lín
-都安县:dū,ān,xiàn
-都更案:dū,gēng,àn
-都柏林:dū,bó,lín
-都江堰:dū,jiāng,yàn
-都江堰市:dū,jiāng,yàn,shì
-都铎王朝:dū,duó,wáng,cháo
-都庞岭:dū,páng,lǐng
 乡人子:xiāng,rén,zǐ
 酢浆草:cù,jiāng,cǎo
 酸不溜丢:suān,bu,liū,diū
@@ -1868,7 +1845,6 @@
 闭门塞窦:bì,mén,sè,dòu
 开天辟地:kāi,tiān,pì,dì
 开小差:kāi,xiǎo,chāi
-开都河:kāi,dū,hé
 间不容发:jiān,bù,róng,fà
 闵行区:mǐn,háng,qū
 阙特勤:quē,tè,qín
@@ -1929,7 +1905,6 @@
 露马脚:lòu,mǎ,jiǎo
 灵雀寺:líng,qiǎo,sì
 非利士地:fēi,lì,shì,dì
-非都会郡:fēi,dū,huì,jùn
 靠不住:kào,bu,zhù
 靠得住:kào,de,zhù
 靴掖子:xuē,yē,zi
@@ -1974,7 +1949,6 @@
 发冠卷尾:fà,guān,juǎn,wěi
 发指眦裂:fà,zhǐ,zì,liè
 鬼使神差:guǐ,shǐ,shén,chāi
-魔鬼粘:mó,guǐ,zhān
 鲁佛尔宫:lǔ,fú,ěr,gōng
 鲁子敬:lǔ,zǐ,jìng
 鲜为人知:xiǎn,wéi,rén,zhī
@@ -2026,7 +2000,6 @@
 上调:shàng,tiáo
 上载:shàng,zǎi
 上边:shàng,bian
-上都:shàng,dū
 上头:shàng,tou
 下作:xià,zuo
 下来:xià,lai
@@ -2083,7 +2056,6 @@
 中试:zhòng,shì
 中选:zhòng,xuǎn
 中邪:zhòng,xié
-中都:zhōng,dū
 中风:zhòng,fēng
 中魔:zhòng,mó
 串供:chuàn,gòng
@@ -2118,7 +2090,6 @@
 交差:jiāo,chāi
 交情:jiāo,qing
 交还:jiāo,huán
-京都:jīng,dū
 亭长:tíng,zhǎng
 亮相:liàng,xiàng
 人参:rén,shēn
@@ -2158,7 +2129,6 @@
 休息:xiū,xi
 伙计:huǒ,ji
 伯伯:bó,bo
-伯都:bó,dū
 伯颜:bà,yán
 估摸:gū,mo
 估衣:gù,yī
@@ -2568,7 +2538,6 @@
 口角:kǒu,jué
 口音:kǒu,yin
 古刹:gǔ,chà
-古都:gǔ,dū
 句读:jù,dòu
 叨叨:dāo,dao
 叨扰:tāo,rǎo
@@ -2703,9 +2672,7 @@
 啁哳:zhāo,zhā
 商行:shāng,háng
 商贾:shāng,gǔ
-商都:shāng,dū
 商量:shāng,liang
-啊哟:ā,yo
 问卷:wèn,juàn
 哑巴:yǎ,ba
 啦呱:lā,gua
@@ -2743,7 +2710,6 @@
 单曲:dān,qǔ
 单相:dān,xiàng
 单县:shàn,xiàn
-喳喳:chā,cha
 呛到:qiāng,dào
 呛咕:qiāng,gu
 唝吥:gòng,bù
@@ -2754,6 +2720,7 @@
 呜咽:wū,yè
 嗜好:shì,hào
 嗣子:sì,zǐ
+嗯哼:en,hēng
 嘀咕:dí,gu
 喽啰:lóu,luo
 喽罗:lóu,luo
@@ -2804,7 +2771,6 @@
 圈地:quān,dì
 圈养:juàn,yǎng
 国乐:guó,yuè
-国都:guó,dū
 国难:guó,nàn
 园地:yuán,dì
 园长:yuán,zhǎng
@@ -2931,7 +2897,6 @@
 执着:zhí,zhuó
 培果:bèi,guǒ
 基地:jī,dì
-尧都:yáo,dū
 报丧:bào,sāng
 报载:bào,zǎi
 报酬:bào,chou
@@ -2997,7 +2962,6 @@
 大方:dà,fang
 大爷:dà,ye
 大王:dài,wang
-大都:dà,dū
 大难:dà,nàn
 天分:tiān,fèn
 天台:tiān,tāi
@@ -3035,7 +2999,6 @@
 套曲:tào,qǔ
 套种:tào,zhòng
 套色:tào,shǎi
-奠都:diàn,dū
 奢靡:shē,mí
 奥什:ào,shí
 夺冠:duó,guàn
@@ -3183,7 +3146,6 @@
 定子:dìng,zǐ
 定当:dìng,dàng
 定钱:dìng,qian
-宜都:yí,dū
 客气:kè,qi
 宫观:gōng,guàn
 宰予:zǎi,yú
@@ -3208,7 +3170,6 @@
 实相:shí,xiàng
 宁可:nìng,kě
 宁肯:nìng,kěn
-宁都:níng,dū
 宁愿:nìng,yuàn
 审干:shěn,gàn
 审度:shěn,duó
@@ -3330,7 +3291,6 @@
 希罕:xī,han
 帑藏:tǎng,zàng
 帖服:tiē,fú
-帝都:dì,dū
 帅气:shuài,qi
 师傅:shī,fu
 师父:shī,fu
@@ -3396,7 +3356,6 @@
 厅长:tīng,zhǎng
 延误:yán,wu
 建行:jiàn,háng
-建都:jiàn,dū
 弄堂:lòng,táng
 弄混:nòng,hún
 吊丧:diào,sāng
@@ -3466,7 +3425,6 @@
 征传:zhēng,zhuàn
 德性:dé,xing
 德行:dé,xing
-德都:dé,dū
 徼幸:jiǎo,xìng
 心地:xīn,dì
 心思:xīn,si
@@ -3491,6 +3449,8 @@
 怨艾:yuàn,yì
 怪物:guài,wu
 怪相:guài,xiàng
+恁般:rèn,bān
+恁么:rèn,me
 恐吓:kǒng,hè
 恨恶:hèn,wù
 恩眄:ēn,miǎn
@@ -3552,7 +3512,6 @@
 戊子:wù,zǐ
 戎行:róng,háng
 成分:chéng,fèn
-成都:chéng,dū
 成长:chéng,zhǎng
 我操:wǒ,cào
 戒指:jiè,zhi
@@ -3665,6 +3624,7 @@
 拜拜:bài,bai
 拮据:jié,jū
 拳头:quán,tou
+拼攒:pīn,cuán
 拾掇:shí,duo
 拾级:shè,jí
 持重:chí,zhòng
@@ -3794,6 +3754,9 @@
 攘辟:rǎng,bì
 搀和:chān,huo
 撺掇:cuān,duo
+攒簇:cuán,cù
+攒聚:cuán,jù
+攒集:cuán,jí
 搅和:jiǎo,huo
 搅混:jiǎo,hun
 支吾:zhī,wu
@@ -3807,7 +3770,6 @@
 放还:fàng,huán
 故事:gù,shi
 故地:gù,dì
-故都:gù,dū
 救难:jiù,nàn
 败子:bài,zǐ
 败兴:bài,xìng
@@ -3878,9 +3840,7 @@
 新干:xīn,gàn
 新晃:xīn,huǎng
 新正:xīn,zhēng
-新都:xīn,dū
 方丈:fāng,zhang
-于都:yú,dū
 施舍:shī,shě
 旄车:máo,chē
 旋子:xuàn,zi
@@ -3890,7 +3850,6 @@
 日没:rì,mò
 旦角:dàn,jué
 早上:zǎo,shang
-昌都:chāng,dū
 明了:míng,liǎo
 明朝:míng,zhāo
 明白:míng,bai
@@ -3951,7 +3910,6 @@
 曾孙:zēng,sūn
 曾朴:zēng,pǔ
 曾祖:zēng,zǔ
-曾都:zēng,dū
 曾巩:zēng,gǒng
 替角:tì,jué
 会计:kuài,jì
@@ -3968,7 +3926,6 @@
 服丧:fú,sāng
 服帖:fú,tiē
 服服:fú,fu
-望都:wàng,dū
 朝夕:zhāo,xī
 朝日:zhāo,rì
 朝曦:zhāo,xī
@@ -4104,7 +4061,6 @@
 乐经:yuè,jīng
 乐谱:yuè,pǔ
 乐迷:yuè,mí
-乐都:lè,dū
 乐陵:lào,líng
 乐队:yuè,duì
 乐音:yuè,yīn
@@ -4168,7 +4124,6 @@
 正着:zhèng,zháo
 正角:zhèng,jué
 此地:cǐ,dì
-武都:wǔ,dū
 岁数:suì,shu
 归省:guī,xǐng
 归还:guī,huán
@@ -4177,7 +4132,6 @@
 殉难:xùn,nàn
 残卷:cán,juàn
 殷红:yān,hóng
-殷都:yīn,dū
 壳牌:qiào,pái
 壳质:qiào,zhì
 毋宁:wú,nìng
@@ -4207,7 +4161,6 @@
 水相:shuǐ,xiàng
 求子:qiú,zǐ
 汗国:hán,guó
-江都:jiāng,dū
 沉没:chén,mò
 沉着:chén,zhuó
 沉重:chén,zhòng
@@ -4488,7 +4441,6 @@
 男儿:nán,ér
 男子:nán,zǐ
 留空:liú,kòng
-留都:liú,dū
 留难:liú,nàn
 畚斗:běn,dǒu
 畜牧:xù,mù
@@ -4682,7 +4634,6 @@
 租地:zū,dì
 租钱:zū,qian
 秦桧:qín,huì
-秦都:qín,dū
 秧歌:yāng,ge
 稀罕:xī,han
 稍息:shào,xī
@@ -4704,7 +4655,6 @@
 稼穑:jià,sè
 稽颡:qǐ,sǎng
 穆棱:mù,líng
-积攒:jī,zǎn
 稳当:wěn,dang
 稳重:wěn,zhòng
 穴头:xué,tou
@@ -4771,9 +4721,11 @@
 篱笆:lí,ba
 吁请:yù,qǐng
 粗率:cū,shuài
-粘接:zhān,jiē
-粘贴:zhān,tiē
-粘连:zhān,lián
+粘稠:nián,chóu
+粘糯:nián,nuò
+粘缠:nián,chán
+粘聚:nián,jù
+粘虫:nián,chóng
 精子:jīng,zǐ
 精干:jīng,gàn
 精校:jīng,jiào
@@ -5004,7 +4956,6 @@
 兴头:xìng,tou
 举重:jǔ,zhòng
 旧地:jiù,dì
-旧都:jiù,dū
 舌头:shé,tou
 舒坦:shū,tan
 舒服:shū,fu
@@ -5036,7 +4987,6 @@
 花呢:huā,ní
 花哨:huā,shao
 花着:huā,zhāo
-花都:huā,dū
 花头:huā,tou
 苗条:miáo,tiao
 苗头:miáo,tou
@@ -5146,7 +5096,6 @@
 蓬散:péng,sǎn
 蓬蓬:péng,peng
 莲子:lián,zǐ
-莲都:lián,dū
 蓼蓝:liǎo,lán
 蔓菁:mán,jing
 蔚县:yù,xiàn
@@ -5291,7 +5240,6 @@
 裸裎:luǒ,chéng
 制模:zhì,mú
 褒呔:bāo,tāi
-褪下:tùn,xià
 西子:xī,zǐ
 西打:xī,dá
 西藏:xī,zàng
@@ -5332,7 +5280,6 @@
 言中:yán,zhòng
 言语:yán,yu
 言重:yán,zhòng
-计都:jì,dū
 讨还:tǎo,huán
 记住:jì,zhu
 记传:jì,zhuàn
@@ -5431,7 +5378,6 @@
 豁楞:huō,leng
 豆佉:dòu,qiā
 豆腐:dòu,fu
-丰都:fēng,dū
 猪圈:zhū,juàn
 貌相:mào,xiàng
 猫儿:māo,ér
@@ -5611,7 +5557,6 @@
 递解:dì,jiè
 适当:shì,dàng
 遭难:zāo,nàn
-迁都:qiān,dū
 选中:xuǎn,zhòng
 避讳:bì,hui
 避难:bì,nàn
@@ -5656,22 +5601,11 @@
 部分:bù,fen
 部长:bù,zhǎng
 邮差:yóu,chāi
-都匀:dū,yún
-都城:dū,chéng
-都尉:dū,wèi
-都市:dū,shì
-都昌:dū,chāng
-都会:dū,huì
-都督:dū,dū
-都兰:dū,lán
-都护:dū,hù
-都灵:dū,líng
 乡下:xiāng,xia
 乡戚:xiāng,qi
 乡长:xiāng,zhǎng
 邓拓:dèng,tuò
 郑重:zhèng,zhòng
-酆都:fēng,dū
 酊剂:dīng,jì
 酋长:qiú,zhǎng
 酌处:zhuó,chǔ
@@ -5918,7 +5852,6 @@
 院长:yuàn,zhǎng
 阵地:zhèn,dì
 除子:chú,zǐ
-陪都:péi,dū
 陆地:lù,dì
 阳曲:yáng,qǔ
 隆子:lóng,zǐ
@@ -6029,7 +5962,6 @@
 馍馍:mó,mo
 馒头:mán,tou
 首相:shǒu,xiàng
-首都:shǒu,dū
 首重:shǒu,zhòng
 首长:shǒu,zhǎng
 香几:xiāng,jī
@@ -6096,8 +6028,6 @@
 鬓发:bìn,fà
 闹腾:nào,teng
 郁塞:yù,sè
-魏都:wèi,dū
-魔都:mó,dū
 魔难:mó,nàn
 鱼子:yú,zǐ
 鱼肚:yú,dǔ
@@ -6108,7 +6038,6 @@
 凫茈:fú,cí
 鹄的:gǔ,dì
 盐分:yán,fèn
-盐都:yán,dū
 麇集:qún,jí
 丽水:lí,shuǐ
 面的:miàn,dī

@@ -13,7 +13,9 @@ namespace Pinyin
         {U'ē', {U'e', U'1'}}, {U'é', {U'e', U'2'}}, {U'ě', {U'e', U'3'}}, {U'è', {U'e', U'4'}},
         {U'ī', {U'i', U'1'}}, {U'í', {U'i', U'2'}}, {U'ǐ', {U'i', U'3'}}, {U'ì', {U'i', U'4'}},
         {U'ū', {U'u', U'1'}}, {U'ú', {U'u', U'2'}}, {U'ǔ', {U'u', U'3'}}, {U'ù', {U'u', U'4'}},
-        {U'ǖ', {U'v', U'1'}}, {U'ǘ', {U'v', U'2'}}, {U'ǚ', {U'v', U'3'}}, {U'ǜ', {U'v', U'4'}}
+        {U'ǖ', {U'v', U'1'}}, {U'ǘ', {U'v', U'2'}}, {U'ǚ', {U'v', U'3'}}, {U'ǜ', {U'v', U'4'}},
+        {U'ń', {U'n', U'2'}}, {U'ň', {U'n', U'3'}}, {U'ǹ', {U'n', U'4'}},
+        {U'ḿ', {U'm', U'2'}}
     };
 
     u32str ManTone::toneToNormal(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
