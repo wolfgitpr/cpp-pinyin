@@ -31,8 +31,8 @@ namespace Pinyin
             }
         }
 
-        if (v_to_u)
-            std::replace(result.begin(), result.end(), U'v', U'ü');
+        if (!v_to_u)
+            std::replace(result.begin(), result.end(), U'ü', U'v');
 
         return result;
     }
