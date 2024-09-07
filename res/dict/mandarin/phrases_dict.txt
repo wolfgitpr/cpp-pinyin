@@ -76,7 +76,6 @@
 中箭落马:zhòng,jiàn,luò,mǎ
 中规中矩:zhòng,guī,zhòng,jǔ
 主题曲:zhǔ,tí,qǔ
-幺麽小丑:yāo,mó,xiǎo,chǒu
 乙种粒子:yǐ,zhǒng,lì,zǐ
 乳臭未干:rǔ,xiù,wèi,gān
 乱臣贼子:luàn,chén,zéi,zǐ
@@ -1762,7 +1761,6 @@
 那曲地区:nà,qǔ,dì,qū
 那曲市:nà,qǔ,shì
 那维克:nǎ,wéi,kè
-邷么儿:wǎ,mó,er
 郢书燕说:yǐng,shū,yān,shuō
 郭子仪:guō,zǐ,yí
 郭松焘:guō,sōng,dào
@@ -3266,7 +3264,6 @@
 干警:gàn,jǐng
 干道:gàn,dào
 干部:gàn,bù
-干么:gàn,má
 幼儿:yòu,ér
 几丁:jī,dīng
 几乎:jī,hū
