@@ -177,7 +177,7 @@ namespace Pinyin
                         const u32str subPhrase = mid(inputList, cursor, length);
                         const auto it = d_ptr->phrases_dict.find(subPhrase);
                         if (it != d_ptr->phrases_dict.end()) {
-                            const auto subRes = d_ptr->toneConvert(it->second, style);
+                            const auto subRes = d_ptr->toneConvert(it->second, style, v_to_u, neutral_tone_with_five);
                             for (int i = 0; i < subRes.size(); i++) {
                                 const u32str lyric = subPhrase.substr(i, 1);
                                 result.emplace_back(PinyinRes{
@@ -199,7 +199,8 @@ namespace Pinyin
                             const auto it1 = d_ptr->phrases_dict.find(subPhrase1);
                             if (it1 != d_ptr->phrases_dict.end()) {
                                 result.pop_back();
-                                const auto &subRes1 = d_ptr->toneConvert(it1->second, style);
+                                const auto &subRes1 = d_ptr->toneConvert(
+                                    it1->second, style, v_to_u, neutral_tone_with_five);
                                 for (int i = 0; i < subRes1.size(); i++) {
                                     const u32str lyric = subPhrase1.substr(i, 1);
                                     result.emplace_back(PinyinRes{
@@ -224,7 +225,8 @@ namespace Pinyin
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
                             removeElements(result, cursor + 1 - length, length - 1);
-                            const auto &subResBack = d_ptr->toneConvert(it->second, style);
+                            const auto &subResBack = d_ptr->toneConvert(it->second, style, v_to_u,
+                                                                        neutral_tone_with_five);
                             for (int i = 0; i < subResBack.size(); i++) {
                                 const u32str lyric = subPhraseBack.substr(i, 1);
                                 result.emplace_back(PinyinRes{
@@ -248,7 +250,8 @@ namespace Pinyin
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
                             removeElements(result, cursor + 2 - length, length - 2);
-                            const auto &subResBack1 = d_ptr->toneConvert(it->second, style);
+                            const auto &subResBack1 = d_ptr->toneConvert(
+                                it->second, style, v_to_u, neutral_tone_with_five);
                             for (int i = 0; i < subResBack1.size(); i++) {
                                 const u32str lyric = subPhraseBack1.substr(i, 1);
                                 result.emplace_back(PinyinRes{
