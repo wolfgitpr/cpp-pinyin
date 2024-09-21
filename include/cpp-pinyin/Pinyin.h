@@ -10,7 +10,10 @@ namespace Pinyin
     class CPP_PINYIN_EXPORT Pinyin final : public ChineseG2p {
     public:
         explicit Pinyin() :
-            ChineseG2p("mandarin", new ManTone()) {};
+            ChineseG2p("mandarin") {
+            this->setToneConverter(m_toneConverter);
+        }
+
         ~Pinyin() = default;
 
         PinyinResVector hanziToPinyin(const std::string &hans,
@@ -26,6 +29,8 @@ namespace Pinyin
         std::vector<std::string> getDefaultPinyin(const std::string &hanzi,
                                                   ManTone::Style style = ManTone::Style::TONE,
                                                   bool v_to_u = false, bool neutral_tone_with_five = false) const;
+
+        ManTone m_toneConverter;
     };
 }
 

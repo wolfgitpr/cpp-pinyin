@@ -11,14 +11,12 @@ namespace Pinyin
 {
     class ChineseG2pPrivate final {
     public:
-        explicit ChineseG2pPrivate(std::string language, ToneConverter *toneConverter);
+        explicit ChineseG2pPrivate(std::string language);
         ~ChineseG2pPrivate();
 
         void init();
 
         bool initialized = false;
-
-        ChineseG2p *q_ptr{};
 
         u32strHashMap<u32str, u32str> phrases_map;
         u32strHashMap<u32str, u32strVec> phrases_dict;
@@ -26,7 +24,7 @@ namespace Pinyin
         u32strHashMap<u32str, u32str> trans_dict;
 
         std::string m_language;
-        ToneConverter *m_toneConverter;
+        ToneConverter m_toneConverter;
 
         inline bool isPolyphonic(const u32str &text) const {
             return phrases_map.find(text) != phrases_map.end();
@@ -39,7 +37,7 @@ namespace Pinyin
 
         inline u32str toneConvert(const u32str &pinyin, int style, bool v_to_u = false,
                                   bool neutral_tone_with_five = false) const {
-            return m_toneConverter->convert({pinyin.begin(), pinyin.end()}, style, v_to_u, neutral_tone_with_five);
+            return m_toneConverter.convert({pinyin.begin(), pinyin.end()}, style, v_to_u, neutral_tone_with_five);
         }
 
         inline u32strVec toneConvert(const u32strVec &pinyin, int style, bool v_to_u = false,

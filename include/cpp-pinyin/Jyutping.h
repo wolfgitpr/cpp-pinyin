@@ -10,7 +10,10 @@ namespace Pinyin
     class CPP_PINYIN_EXPORT Jyutping final : public ChineseG2p {
     public:
         explicit Jyutping() :
-            ChineseG2p("cantonese", new CanTone()) {};
+            ChineseG2p("cantonese") {
+            this->setToneConverter(m_toneConverter);
+        }
+
         ~Jyutping() = default;
 
         PinyinResVector hanziToPinyin(const std::string &hans,
@@ -22,6 +25,8 @@ namespace Pinyin
                                       Error error = Default, bool candidates = true) const;
         std::vector<std::string> getDefaultPinyin(const std::string &hanzi,
                                                   CanTone::Style style = CanTone::Style::TONE3) const;
+
+        CanTone m_toneConverter;
     };
 }
 #endif // DATASET_TOOLS_CANTONESE_H

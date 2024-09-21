@@ -20,13 +20,15 @@ namespace Pinyin
 
     class CPP_PINYIN_EXPORT ChineseG2p {
     public:
-        explicit ChineseG2p(const std::string &language, ToneConverter *toneConverter = nullptr);
+        explicit ChineseG2p(const std::string &language);
 
         ~ChineseG2p();
 
         bool initialized() const;
 
         bool loadUserDict(const std::string &filePath) const;
+
+        void setToneConverter(const ToneConverter &toneConverter) const;
 
         std::string tradToSim(const std::string &hanzi) const;
 

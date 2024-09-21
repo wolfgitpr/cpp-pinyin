@@ -20,7 +20,7 @@ namespace Pinyin
         ToneConverter() {}
         virtual ~ToneConverter() {}
 
-        u32str convert(u32str str, int style, bool v_to_u = false, bool neutral_tone_with_five = false);
+        u32str convert(u32str str, int style, bool v_to_u = false, bool neutral_tone_with_five = false) const;
 
     protected:
         std::unordered_map<int, std::function<u32str(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five)>>

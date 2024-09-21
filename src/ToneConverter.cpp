@@ -2,7 +2,7 @@
 
 namespace Pinyin
 {
-    u32str ToneConverter::convert(u32str str, int style, bool v_to_u, bool neutral_tone_with_five) {
+    u32str ToneConverter::convert(u32str str, int style, bool v_to_u, bool neutral_tone_with_five) const {
         const auto it = m_converts.find(style);
 
         if (it == m_converts.end()) {

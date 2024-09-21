@@ -67,8 +67,8 @@ namespace Pinyin
         vector.erase(vector.begin() + start, vector.begin() + start + n);
     }
 
-    ChineseG2pPrivate::ChineseG2pPrivate(std::string language, ToneConverter *toneConverter) :
-        m_language(std::move(language)), m_toneConverter(toneConverter) {}
+    ChineseG2pPrivate::ChineseG2pPrivate(std::string language) :
+        m_language(std::move(language)) {}
 
     ChineseG2pPrivate::~ChineseG2pPrivate() = default;
 
@@ -101,9 +101,10 @@ namespace Pinyin
         }
     }
 
-    ChineseG2p::ChineseG2p(const std::string &language, ToneConverter *toneConverter) :
-        ChineseG2p(
-            *new ChineseG2pPrivate(language, toneConverter)) {}
+    ChineseG2p::ChineseG2p(const std::string &language) {
+        d_ptr = std::make_unique<ChineseG2pPrivate>(language);
+        d_ptr->init();
+    }
 
     ChineseG2p::~ChineseG2p() = default;
 
@@ -119,6 +120,10 @@ namespace Pinyin
     */
     bool ChineseG2p::loadUserDict(const std::string &filePath) const {
         return loadAdditionalDict(filePath, "user_dict.txt", d_ptr->phrases_dict);
+    }
+
+    void ChineseG2p::setToneConverter(const ToneConverter &toneConverter) const {
+        d_ptr->m_toneConverter = toneConverter;
     }
 
     PinyinResVector ChineseG2p::hanziToPinyin(const std::string &hans, int style, Error error, bool candidates,
@@ -288,13 +293,6 @@ namespace Pinyin
             return result;
         }
         return resetZH(hans, result, inputPos);
-    }
-
-    ChineseG2p::ChineseG2p(ChineseG2pPrivate &d) :
-        d_ptr(&d) {
-        d.q_ptr = this;
-
-        d.init();
     }
 
     std::string ChineseG2p::tradToSim(const std::string &hanzi) const {
