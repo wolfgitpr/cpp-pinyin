@@ -7,16 +7,16 @@ namespace Pinyin
 {
     class G2pGlobal {
     public:
-        std::string path;
+        std::filesystem::path path;
     };
 
     auto m_global = std::make_unique<G2pGlobal>();
 
-    std::string dictionaryPath() {
+    std::filesystem::path dictionaryPath() {
         return m_global->path;
     }
 
-    void setDictionaryPath(const std::string &dir) {
+    void setDictionaryPath(const std::filesystem::path &dir) {
         m_global->path = dir;
     }
 

@@ -1,6 +1,7 @@
 #ifndef ChineseG2p_H
 #define ChineseG2p_H
 
+#include <filesystem>
 #include <memory>
 
 #include <cpp-pinyin/PinyinGlobal.h>
@@ -26,7 +27,7 @@ namespace Pinyin
 
         bool initialized() const;
 
-        bool loadUserDict(const std::string &filePath) const;
+        bool loadUserDict(const std::filesystem::path &filePath) const;
 
         void setToneConverter(const ToneConverter &toneConverter) const;
 
@@ -46,8 +47,6 @@ namespace Pinyin
 
         std::vector<std::string> getDefaultPinyin(const std::string &text, int style = 0, bool v_to_u = false,
                                                   bool neutral_tone_with_five = false) const;
-
-        explicit ChineseG2p(ChineseG2pPrivate &d);
 
         std::unique_ptr<ChineseG2pPrivate> d_ptr;
 

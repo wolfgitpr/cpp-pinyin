@@ -32,8 +32,8 @@ Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN
 ```c++
 #include <filesystem>
 
-const std::string applicationDirPath = std::filesystem::current_path().string();
-Pinyin::setDictionaryPath(applicationDirPath + "\\dict");
+const auto applicationDirPath = std::filesystem::current_path() / "dict";
+Pinyin::setDictionaryPath(applicationDirPath);
 
 const auto g2p_man = std::make_unique<Pinyin::Pinyin>(); // or Pinyin::Jyutping
 const std::string hans = "明月@1几32时有##一";

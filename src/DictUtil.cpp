@@ -1,10 +1,9 @@
 #include "DictUtil.h"
 
+#include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-#include <cpp-pinyin/StringUtil.h>
 
 namespace Pinyin
 {
@@ -27,16 +26,16 @@ namespace Pinyin
         return tokens;
     }
 
-    bool loadDict(const std::string &dict_dir, const std::string &fileName,
+    bool loadDict(const std::filesystem::path &dict_dir,
                   u32strHashMap<u32str, u32str> &resultMap, const char &sep1) {
 #ifdef _WIN32
-        const std::wstring wdict_dir = Pinyin::utf8ToWide(dict_dir + "/" + fileName);
+        const std::wstring wdict_dir = dict_dir.wstring();
         std::ifstream file(wdict_dir.c_str());
 #else
-        std::ifstream file(dict_dir + "/" + fileName);
+        std::ifstream file(dict_dir.c_str());
 #endif
         if (!file.is_open()) {
-            std::cout << fileName << " error: Unable to open file" << std::endl;
+            std::cout << dict_dir << " error: Unable to open file" << std::endl;
             return false;
         }
 
@@ -54,17 +53,17 @@ namespace Pinyin
         return true;
     }
 
-    bool loadDict(const std::string &dict_dir, const std::string &fileName,
+    bool loadDict(const std::filesystem::path &dict_dir,
                   u32strHashMap<u32str, u32strVec> &resultMap, const char &sep1,
                   const std::string &sep2) {
 #ifdef _WIN32
-        const std::wstring wdict_dir = Pinyin::utf8ToWide(dict_dir + "/" + fileName);
+        const std::wstring wdict_dir = dict_dir.wstring();
         std::ifstream file(wdict_dir.c_str());
 #else
-        std::ifstream file(dict_dir + "/" + fileName);
+        std::ifstream file(dict_dir.c_str());
 #endif
         if (!file.is_open()) {
-            std::cerr << fileName << " error: Unable to open file" << std::endl;
+            std::cerr << dict_dir << " error: Unable to open file" << std::endl;
             return false;
         }
 
@@ -87,18 +86,18 @@ namespace Pinyin
         return true;
     }
 
-    bool loadAdditionalDict(const std::string &dict_dir, const std::string &fileName,
+    bool loadAdditionalDict(const std::filesystem::path &dict_dir,
                             u32strHashMap<u32str, u32strVec> &resultMap, const char &sep1,
                             const std::string &sep2,
                             const std::function<u32str(const u32str &pinyin)> &converterForDefaultPinyin) {
 #ifdef _WIN32
-        const std::wstring wdict_dir = Pinyin::utf8ToWide(dict_dir + "/" + fileName);
+        const std::wstring wdict_dir = dict_dir.wstring();
         std::ifstream file(wdict_dir.c_str());
 #else
-        std::ifstream file(dict_dir + "/" + fileName);
+        std::ifstream file(dict_dir.c_str());
 #endif
         if (!file.is_open()) {
-            std::cerr << fileName << " error: Unable to open file" << std::endl;
+            std::cerr << dict_dir << " error: Unable to open file" << std::endl;
             return false;
         }
 

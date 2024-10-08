@@ -10,9 +10,9 @@
 using namespace Test;
 
 int main(int argc, char *argv[]) {
-    const std::string applicationDirPath = std::filesystem::current_path().string();
-    Pinyin::setDictionaryPath(applicationDirPath + "/dict");
-    std::cout << "Path: " << applicationDirPath + "/dict" << std::endl;
+    const auto applicationDirPath = std::filesystem::current_path() / "dict";
+    Pinyin::setDictionaryPath(applicationDirPath);
+    std::cout << "Path: " << applicationDirPath << std::endl;
 
     const ManTest manTest;
     std::cout << "Pinyin G2P test: " << std::endl;

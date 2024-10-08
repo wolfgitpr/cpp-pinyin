@@ -5,6 +5,7 @@
 #include "DictUtil.h"
 
 #include <algorithm>
+#include <filesystem>
 
 namespace Pinyin
 {
@@ -74,13 +75,13 @@ namespace Pinyin
 
     // load zh convert dict
     void ChineseG2pPrivate::init() {
-        const std::string dict_dir = dictionaryPath() + "/" + m_language;
+        const std::filesystem::path dict_dir = dictionaryPath() / m_language;
 
-        initialized = loadDict(dict_dir, "phrases_map.txt", phrases_map) &&
-            loadDict(dict_dir, "phrases_dict.txt", phrases_dict) &&
-            loadAdditionalDict(dict_dir, "user_dict.txt", phrases_dict) &&
-            loadDict(dict_dir, "word.txt", word_dict) &&
-            loadDict(dict_dir, "trans_word.txt", trans_dict);
+        initialized = loadDict(dict_dir / "phrases_map.txt", phrases_map) &&
+            loadDict(dict_dir / "phrases_dict.txt", phrases_dict) &&
+            loadAdditionalDict(dict_dir / "user_dict.txt", phrases_dict) &&
+            loadDict(dict_dir / "word.txt", word_dict) &&
+            loadDict(dict_dir / "trans_word.txt", trans_dict);
     }
 
     // get all chinese characters and positions in the list
@@ -118,8 +119,8 @@ namespace Pinyin
         汤汤:shang1 shang1
         到了:dao4 le1
     */
-    bool ChineseG2p::loadUserDict(const std::string &filePath) const {
-        return loadAdditionalDict(filePath, "user_dict.txt", d_ptr->phrases_dict);
+    bool ChineseG2p::loadUserDict(const std::filesystem::path &filePath) const {
+        return loadAdditionalDict(filePath / "user_dict.txt", d_ptr->phrases_dict);
     }
 
     void ChineseG2p::setToneConverter(const ToneConverter &toneConverter) const {
