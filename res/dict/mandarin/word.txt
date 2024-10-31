@@ -377,7 +377,7 @@
 本:běn
 正:zhèng,zhēng
 经:jīng
-万:wàn,mò
+万:wàn
 利:lì,li
 杯:bēi
 羹:gēng
@@ -778,7 +778,6 @@
 鳃:sāi
 鳗:mán
 珠:zhū
-俟:sì,qí
 刚:gāng,gang
 摸:mō,mo
 着:zhe,zhuó,zháo,zhāo
@@ -2428,6 +2427,7 @@
 俞:yú,shù
 豹:bào
 穴:xué
+俟:sì
 猎:liè
 噪:zào
 封:fēng
@@ -3189,7 +3189,7 @@
 缔:dì
 挨:ái,āi
 饿:è
-夹:jiā,jiá,gā
+夹:jiā,jiá
 浸:jìn
 灾:zāi
 窘:jiǒng
