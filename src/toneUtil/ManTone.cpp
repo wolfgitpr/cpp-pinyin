@@ -22,11 +22,11 @@ namespace Pinyin
         u32str result;
         result.reserve(pinyin.size());
 
-        for (char32_t ch : pinyin) {
+        for (const char32_t &ch : pinyin) {
             if (isLetter(ch)) {
                 result += ch;
             } else {
-                const auto it = toneToNum.find(ch);
+                const auto &it = toneToNum.find(ch);
                 result += it != toneToNum.end() ? it->second.first : ch;
             }
         }
@@ -59,19 +59,21 @@ namespace Pinyin
         u32str result;
         result.reserve(pinyin.size() + 1);
 
-        for (char32_t ch : pinyin) {
+        for (const char32_t &ch : pinyin) {
             if (isLetter(ch)) {
                 result += ch;
             } else {
-                const auto it = toneToNum.find(ch);
+                const auto &it = toneToNum.find(ch);
                 if (it != toneToNum.end()) {
                     result += it->second.first;
-                    const char32_t toneNumber = it->second.second;
+                    const char32_t &toneNumber = it->second.second;
                     if (!(!neutral_tone_with_five && toneNumber == U'5'))
                         result += toneNumber;
                 } else {
-                    if (!v_to_u && ch == U'ü')
-                        ch = U'v';
+                    if (!v_to_u && ch == U'ü') {
+                        result += U'v';
+                        continue;
+                    }
                     result += ch;
                 }
             }
@@ -86,17 +88,19 @@ namespace Pinyin
 
         char32_t toneNumber = U'5';
 
-        for (char32_t ch : pinyin) {
+        for (const char32_t &ch : pinyin) {
             if (isLetter(ch)) {
                 result += ch;
             } else {
-                const auto it = toneToNum.find(ch);
+                const auto &it = toneToNum.find(ch);
                 if (it != toneToNum.end()) {
                     result += it->second.first;
                     toneNumber = it->second.second;
                 } else {
-                    if (!v_to_u && ch == U'ü')
-                        ch = U'v';
+                    if (!v_to_u && ch == U'ü') {
+                        result += U'v';
+                        continue;
+                    }
                     result += ch;
                 }
             }

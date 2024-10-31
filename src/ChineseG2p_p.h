@@ -31,7 +31,7 @@ namespace Pinyin
         }
 
         inline u32str tradToSim(const u32str &text) const {
-            const auto it = trans_dict.find(text);
+            const auto &it = trans_dict.find(text);
             return it != trans_dict.end() ? it->second : text;
         }
 
@@ -52,7 +52,7 @@ namespace Pinyin
 
         inline std::vector<std::string> getDefaultPinyin(const u32str &hanzi, int style = 0, bool v_to_u = false,
                                                          bool neutral_tone_with_five = false) const {
-            const auto it = word_dict.find(hanzi);
+            const auto &it = word_dict.find(hanzi);
             if (it == word_dict.end())
                 return {u32strToUtf8str(hanzi)};
 
@@ -63,7 +63,7 @@ namespace Pinyin
             std::unordered_set<std::string> seen(candidates.size());
 
             for (const u32str &pinyin : candidates) {
-                const auto tarPinyin = u32strToUtf8str(toneConvert(pinyin, style, v_to_u, neutral_tone_with_five));
+                const auto &tarPinyin = u32strToUtf8str(toneConvert(pinyin, style, v_to_u, neutral_tone_with_five));
                 if (seen.insert(tarPinyin).second) {
                     toneCandidates.push_back(tarPinyin);
                 }

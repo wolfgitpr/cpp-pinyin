@@ -13,7 +13,7 @@ namespace Pinyin
         u32strVec res;
         int pos = 0;
         while (pos < input.length()) {
-            const auto currentChar = input[pos];
+            const auto &currentChar = input[pos];
             if (isLetter(currentChar)) {
                 const int start = pos;
                 while (pos < input.length() && isLetter(input[pos])) {
@@ -51,7 +51,7 @@ namespace Pinyin
         PinyinResVector result;
         result.reserve(input.size());
         for (int i = 0; i < input.size(); ++i) {
-            const auto it = std::find(positions.begin(), positions.end(), i);
+            const auto &it = std::find(positions.begin(), positions.end(), i);
             if (it != positions.end())
                 result.emplace_back(PinyinRes{input[i].encodeUtf8(), res[it - positions.begin()].pinyin,
                                               res[it - positions.begin()].candidates, false});
@@ -93,7 +93,7 @@ namespace Pinyin
             if (item.empty())
                 continue;
 
-            const auto simItem = trans_dict.find(item) != trans_dict.end() ? trans_dict[item] : item;
+            const auto &simItem = trans_dict.find(item) != trans_dict.end() ? trans_dict[item] : item;
 
             if (word_dict.find(simItem) != word_dict.end()) {
                 res.emplace_back(simItem);
@@ -167,7 +167,7 @@ namespace Pinyin
 
             // is polypropylene
             if (!d_ptr->isPolyphonic(current_char)) {
-                const auto pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
+                const auto &pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
                 result.emplace_back(PinyinRes{
                     current_char.encodeUtf8(),
                     pinyin[0],
@@ -181,9 +181,9 @@ namespace Pinyin
                     if (cursor + length <= inputList.size()) {
                         // cursor: 地, subPhrase: 地久天长
                         const u32str subPhrase = mid(inputList, cursor, length);
-                        const auto it = d_ptr->phrases_dict.find(subPhrase);
+                        const auto& it = d_ptr->phrases_dict.find(subPhrase);
                         if (it != d_ptr->phrases_dict.end()) {
-                            const auto subRes = d_ptr->toneConvert(it->second, style, v_to_u, neutral_tone_with_five);
+                            const auto& subRes = d_ptr->toneConvert(it->second, style, v_to_u, neutral_tone_with_five);
                             for (int i = 0; i < subRes.size(); i++) {
                                 const u32str lyric = subPhrase.substr(i, 1);
                                 result.emplace_back(PinyinRes{
@@ -202,7 +202,7 @@ namespace Pinyin
                         if (cursor >= 1) {
                             // cursor: 重, subPhrase_1: 语重心长
                             const u32str subPhrase1 = mid(inputList, cursor - 1, length);
-                            const auto it1 = d_ptr->phrases_dict.find(subPhrase1);
+                            const auto &it1 = d_ptr->phrases_dict.find(subPhrase1);
                             if (it1 != d_ptr->phrases_dict.end()) {
                                 result.pop_back();
                                 const auto &subRes1 = d_ptr->toneConvert(
@@ -227,7 +227,7 @@ namespace Pinyin
                     if (cursor + 1 >= length && cursor + 1 <= inputList.size()) {
                         // cursor: 好, xSubPhrase: 各有所好
                         const u32str subPhraseBack = mid(inputList, cursor + 1 - length, length);
-                        const auto it = d_ptr->phrases_dict.find(subPhraseBack);
+                        const auto &it = d_ptr->phrases_dict.find(subPhraseBack);
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
                             removeElements(result, cursor + 1 - length, length - 1);
@@ -252,7 +252,7 @@ namespace Pinyin
                     if (cursor + 2 >= length && cursor + 2 <= inputList.size()) {
                         // cursor: 好, xSubPhrase: 叶公好龙
                         const u32str subPhraseBack1 = mid(inputList, cursor + 2 - length, length);
-                        const auto it = d_ptr->phrases_dict.find(subPhraseBack1);
+                        const auto &it = d_ptr->phrases_dict.find(subPhraseBack1);
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
                             removeElements(result, cursor + 2 - length, length - 2);
@@ -277,7 +277,7 @@ namespace Pinyin
 
                 // not found, use default pinyin
                 if (!found) {
-                    const auto pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
+                    const auto &pinyin = d_ptr->getDefaultPinyin(current_char, style, v_to_u, neutral_tone_with_five);
                     result.emplace_back(PinyinRes{
                         current_char.encodeUtf8(),
                         pinyin[0],
