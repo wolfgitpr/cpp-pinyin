@@ -4,9 +4,47 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <functional>
 
 namespace Pinyin
 {
+    // Helper function to read and open file
+    static std::ifstream openFile(const std::filesystem::path &dict_dir) {
+#ifdef _WIN32
+        const std::wstring wdict_dir = dict_dir.wstring();
+        return std::ifstream(wdict_dir.c_str());
+#else
+        return std::ifstream(dict_dir.c_str());
+#endif
+    }
+
+    // Helper function to trim whitespace from a string
+    static void trim(std::string &str) {
+        str.erase(0, str.find_first_not_of(" \t\r\n"));
+        str.erase(str.find_last_not_of(" \t\r\n") + 1);
+    }
+
+    // Common function for reading lines and processing key-value pairs
+    template <typename K, typename V, typename KeyFunc, typename ValueFunc>
+    static bool processFile(std::ifstream &file, u32strHashMap<K, V> &resultMap,
+                            const char &sep1, KeyFunc keyProcessor, ValueFunc valueProcessor) {
+        if (!file.is_open()) {
+            std::cerr << "Error: Unable to open file" << std::endl;
+            return false;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            trim(line);
+            std::istringstream iss(line);
+            std::string key, value;
+            if (std::getline(iss, key, sep1) && std::getline(iss, value)) {
+                resultMap[keyProcessor(key)] = valueProcessor(value);
+            }
+        }
+        return true;
+    }
+
     static std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
         std::vector<std::string> tokens;
         if (delimiter.empty()) {
@@ -28,95 +66,44 @@ namespace Pinyin
 
     bool loadDict(const std::filesystem::path &dict_dir,
                   u32strHashMap<u32str, u32str> &resultMap, const char &sep1) {
-#ifdef _WIN32
-        const std::wstring wdict_dir = dict_dir.wstring();
-        std::ifstream file(wdict_dir.c_str());
-#else
-        std::ifstream file(dict_dir.c_str());
-#endif
-        if (!file.is_open()) {
-            std::cout << dict_dir << " error: Unable to open file" << std::endl;
-            return false;
-        }
-
-        std::string line;
-        while (std::getline(file, line)) {
-            line.erase(0, line.find_first_not_of(" \t\r\n"));
-            line.erase(line.find_last_not_of(" \t\r\n") + 1);
-
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, sep1) && std::getline(iss, value)) {
-                resultMap[utf8strToU32str(key)] = utf8strToU32str(value);
-            }
-        }
-        return true;
+        std::ifstream file = openFile(dict_dir);
+        return processFile(file, resultMap, sep1,
+                           [](const std::string &key) { return utf8strToU32str(key); },
+                           [](const std::string &value) { return utf8strToU32str(value); });
     }
 
     bool loadDict(const std::filesystem::path &dict_dir,
                   u32strHashMap<u32str, u32strVec> &resultMap, const char &sep1,
                   const std::string &sep2) {
-#ifdef _WIN32
-        const std::wstring wdict_dir = dict_dir.wstring();
-        std::ifstream file(wdict_dir.c_str());
-#else
-        std::ifstream file(dict_dir.c_str());
-#endif
-        if (!file.is_open()) {
-            std::cerr << dict_dir << " error: Unable to open file" << std::endl;
-            return false;
-        }
-
-        std::string line;
-        while (std::getline(file, line)) {
-            line.erase(0, line.find_first_not_of(" \t\r\n"));
-            line.erase(line.find_last_not_of(" \t\r\n") + 1);
-
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, sep1) && std::getline(iss, value)) {
-                u32strVec u8strlist;
-                for (const auto &str : split(value, sep2)) {
-                    if (!str.empty())
-                        u8strlist.emplace_back(utf8strToU32str(str));
-                }
-                resultMap[utf8strToU32str(key)] = u8strlist;
-            }
-        }
-        return true;
+        std::ifstream file = openFile(dict_dir);
+        return processFile(file, resultMap, sep1,
+                           [](const std::string &key) { return utf8strToU32str(key); },
+                           [&sep2](const std::string &value)
+                           {
+                               u32strVec u8strlist;
+                               for (const auto &str : split(value, sep2)) {
+                                   if (!str.empty())
+                                       u8strlist.emplace_back(utf8strToU32str(str));
+                               }
+                               return u8strlist;
+                           });
     }
 
     bool loadAdditionalDict(const std::filesystem::path &dict_dir,
                             u32strHashMap<u32str, u32strVec> &resultMap, const char &sep1,
                             const std::string &sep2,
                             const std::function<u32str(const u32str &pinyin)> &converterForDefaultPinyin) {
-#ifdef _WIN32
-        const std::wstring wdict_dir = dict_dir.wstring();
-        std::ifstream file(wdict_dir.c_str());
-#else
-        std::ifstream file(dict_dir.c_str());
-#endif
-        if (!file.is_open()) {
-            std::cerr << dict_dir << " error: Unable to open file" << std::endl;
-            return false;
-        }
-
-        std::string line;
-        while (std::getline(file, line)) {
-            line.erase(0, line.find_first_not_of(" \t\r\n"));
-            line.erase(line.find_last_not_of(" \t\r\n") + 1);
-
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, sep1) && std::getline(iss, value)) {
-                u32strVec u8strlist;
-                for (const auto &str : split(value, sep2)) {
-                    if (!str.empty())
-                        u8strlist.emplace_back(converterForDefaultPinyin(utf8strToU32str(str)));
-                }
-                resultMap[utf8strToU32str(key)] = u8strlist;
-            }
-        }
-        return true;
+        std::ifstream file = openFile(dict_dir);
+        return processFile(file, resultMap, sep1,
+                           [](const std::string &key) { return utf8strToU32str(key); },
+                           [&sep2, &converterForDefaultPinyin](const std::string &value)
+                           {
+                               u32strVec u8strlist;
+                               for (const auto &str : split(value, sep2)) {
+                                   if (!str.empty())
+                                       u8strlist.emplace_back(converterForDefaultPinyin(utf8strToU32str(str)));
+                               }
+                               return u8strlist;
+                           });
     }
-} // Pinyin
+} // namespace Pinyin
