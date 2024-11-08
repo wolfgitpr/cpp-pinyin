@@ -20,7 +20,7 @@ Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN
 
 + Support Traditional and Simplified Chinese.
 
-+ Speed is very fast, about 800,000 words/s on inter i3-8100.
++ Speed is very fast, about 1,000,000 words/s on Intel i3-8100.
 
 + Achieved an accuracy rate of 99.95% on a 200000 word Lyrics-Pinyin test set Without-Tone.
 
