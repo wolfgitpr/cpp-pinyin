@@ -20,8 +20,7 @@ namespace Pinyin
             TONE3 = 8
         };
 
-        ManTone():
-            ToneConverter() {
+        ManTone() {
             m_converts.insert({static_cast<int>(Style::NORMAL), toneToNormal});
             m_converts.insert({static_cast<int>(Style::TONE), toneToTone});
             m_converts.insert({static_cast<int>(Style::TONE2), toneToTone2});
@@ -29,13 +28,17 @@ namespace Pinyin
         };
         ~ManTone() override = default;
 
-        static u16str toneToNormal(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static std::u16string toneToNormal(const std::u16string &pinyin, bool v_to_u = false,
+                                           bool neutral_tone_with_five = false);
 
-        static u16str toneToTone(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static std::u16string toneToTone(const std::u16string &pinyin, bool v_to_u = false,
+                                         bool neutral_tone_with_five = false);
 
-        static u16str toneToTone2(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static std::u16string toneToTone2(const std::u16string &pinyin, bool v_to_u = false,
+                                          bool neutral_tone_with_five = false);
 
-        static u16str toneToTone3(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static std::u16string toneToTone3(const std::u16string &pinyin, bool v_to_u = false,
+                                          bool neutral_tone_with_five = false);
     };
 
 

@@ -18,8 +18,8 @@ namespace Pinyin
         {u'ḿ', {u'm', u'2'}}
     };
 
-    u16str ManTone::toneToNormal(const u16str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u16str result;
+    std::u16string ManTone::toneToNormal(const std::u16string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        std::u16string result;
         result.reserve(pinyin.size());
 
         for (const char16_t &ch : pinyin) {
@@ -37,11 +37,11 @@ namespace Pinyin
         return result;
     }
 
-    u16str ManTone::toneToTone(const u16str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+    std::u16string ManTone::toneToTone(const std::u16string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
         if (v_to_u)
             return pinyin;
 
-        u16str result;
+        std::u16string result;
         result.reserve(pinyin.size());
 
         for (const char16_t &ch : pinyin) {
@@ -55,8 +55,8 @@ namespace Pinyin
         return result;
     }
 
-    u16str ManTone::toneToTone2(const u16str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u16str result;
+    std::u16string ManTone::toneToTone2(const std::u16string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        std::u16string result;
         result.reserve(pinyin.size() + 1);
 
         for (const char16_t &ch : pinyin) {
@@ -82,8 +82,8 @@ namespace Pinyin
     }
 
 
-    u16str ManTone::toneToTone3(const u16str &pinyin, bool v_to_u, bool neutral_tone_with_five) {
-        u16str result;
+    std::u16string ManTone::toneToTone3(const std::u16string &pinyin, bool v_to_u, bool neutral_tone_with_five) {
+        std::u16string result;
         result.reserve(pinyin.size() + 1);
 
         char16_t toneNumber = u'5';

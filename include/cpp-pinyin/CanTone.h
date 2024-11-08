@@ -15,13 +15,13 @@ namespace Pinyin
             TONE3 = 8
         };
 
-        CanTone():
-            ToneConverter() {
+        CanTone() {
             m_converts.insert({static_cast<int>(Style::NORMAL), tone3ToNormal});
         };
         ~CanTone() override = default;
 
-        static u16str tone3ToNormal(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static std::u16string tone3ToNormal(const std::u16string &pinyin, bool v_to_u = false,
+                                            bool neutral_tone_with_five = false);
     };
 } // Pinyin
 

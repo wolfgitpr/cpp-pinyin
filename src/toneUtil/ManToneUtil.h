@@ -1,11 +1,11 @@
 #ifndef MANTONEUTIL_H
 #define MANTONEUTIL_H
 
-#include <cpp-pinyin/U16Str.h>
+#include <string>
 
 namespace Pinyin
 {
-    u16str tone3ToTone(const u16str &pinyin);
+    std::u16string tone3ToTone(const std::u16string &pinyin);
 } // Pinyin
 
 #endif //MANTONEUTIL_H

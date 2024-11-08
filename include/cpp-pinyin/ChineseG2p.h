@@ -51,7 +51,7 @@ namespace Pinyin
         std::unique_ptr<ChineseG2pPrivate> d_ptr;
 
     private:
-        PinyinResVector hanziToPinyin(const u16strVec &hans, int style = 0,
+        PinyinResVector hanziToPinyin(const std::vector<std::u16string> &hans, int style = 0,
                                       Error error = Default, bool candidates = true, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
     };

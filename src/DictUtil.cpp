@@ -6,6 +6,8 @@
 #include <sstream>
 #include <functional>
 
+#include "cpp-pinyin/U16Str.h"
+
 namespace Pinyin
 {
     // Helper function to read and open file
@@ -26,7 +28,7 @@ namespace Pinyin
 
     // Common function for reading lines and processing key-value pairs
     template <typename K, typename V, typename KeyFunc, typename ValueFunc>
-    static bool processFile(std::ifstream &file, u16strHashMap<K, V> &resultMap,
+    static bool processFile(std::ifstream &file, std::unordered_map<K, V> &resultMap,
                             const char &sep1, KeyFunc keyProcessor, ValueFunc valueProcessor) {
         if (!file.is_open()) {
             std::cerr << "Error: Unable to open file" << std::endl;
@@ -65,7 +67,7 @@ namespace Pinyin
     }
 
     bool loadDict(const std::filesystem::path &dict_dir,
-                  u16strHashMap<u16str, u16str> &resultMap, const char &sep1) {
+                  std::unordered_map<std::u16string, std::u16string> &resultMap, const char &sep1) {
         std::ifstream file = openFile(dict_dir);
         return processFile(file, resultMap, sep1,
                            [](const std::string &key) { return utf8strToU16str(key); },
@@ -73,14 +75,14 @@ namespace Pinyin
     }
 
     bool loadDict(const std::filesystem::path &dict_dir,
-                  u16strHashMap<u16str, u16strVec> &resultMap, const char &sep1,
+                  std::unordered_map<std::u16string, std::vector<std::u16string>> &resultMap, const char &sep1,
                   const std::string &sep2) {
         std::ifstream file = openFile(dict_dir);
         return processFile(file, resultMap, sep1,
                            [](const std::string &key) { return utf8strToU16str(key); },
                            [&sep2](const std::string &value)
                            {
-                               u16strVec u8strlist;
+                               std::vector<std::u16string> u8strlist;
                                for (const auto &str : split(value, sep2)) {
                                    if (!str.empty())
                                        u8strlist.emplace_back(utf8strToU16str(str));
@@ -90,15 +92,17 @@ namespace Pinyin
     }
 
     bool loadAdditionalDict(const std::filesystem::path &dict_dir,
-                            u16strHashMap<u16str, u16strVec> &resultMap, const char &sep1,
+                            std::unordered_map<std::u16string, std::vector<std::u16string>> &resultMap,
+                            const char &sep1,
                             const std::string &sep2,
-                            const std::function<u16str(const u16str &pinyin)> &converterForDefaultPinyin) {
+                            const std::function<std::u16string(const std::u16string &pinyin)> &
+                            converterForDefaultPinyin) {
         std::ifstream file = openFile(dict_dir);
         return processFile(file, resultMap, sep1,
                            [](const std::string &key) { return utf8strToU16str(key); },
                            [&sep2, &converterForDefaultPinyin](const std::string &value)
                            {
-                               u16strVec u8strlist;
+                               std::vector<std::u16string> u8strlist;
                                for (const auto &str : split(value, sep2)) {
                                    if (!str.empty())
                                        u8strlist.emplace_back(converterForDefaultPinyin(utf8strToU16str(str)));
