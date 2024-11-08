@@ -21,7 +21,7 @@ namespace Pinyin
         };
         ~CanTone() override = default;
 
-        static u32str tone3ToNormal(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u16str tone3ToNormal(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
     };
 } // Pinyin
 

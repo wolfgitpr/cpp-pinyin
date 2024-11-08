@@ -17,63 +17,63 @@ namespace Pinyin
 
         bool initialized = false;
 
-        u32strHashMap<u32str, u32str> phrases_map;
-        u32strHashMap<u32str, u32strVec> phrases_dict;
-        u32strHashMap<u32str, u32strVec> word_dict;
-        u32strHashMap<u32str, u32str> trans_dict;
+        u16strHashMap<u16str, u16str> phrases_map;
+        u16strHashMap<u16str, u16strVec> phrases_dict;
+        u16strHashMap<u16str, u16strVec> word_dict;
+        u16strHashMap<u16str, u16str> trans_dict;
 
         std::string m_language;
         ToneConverter m_toneConverter;
 
-        inline bool isPolyphonic(const u32str &text) const {
+        inline bool isPolyphonic(const u16str &text) const {
             return phrases_map.find(text) != phrases_map.end();
         }
 
-        inline u32str tradToSim(const u32str &text) const {
+        inline u16str tradToSim(const u16str &text) const {
             const auto &it = trans_dict.find(text);
             return it != trans_dict.end() ? it->second : text;
         }
 
-        inline u32str toneConvert(const u32str &pinyin, int style, bool v_to_u = false,
+        inline u16str toneConvert(const u16str &pinyin, int style, bool v_to_u = false,
                                   bool neutral_tone_with_five = false) const {
             return m_toneConverter.convert({pinyin.begin(), pinyin.end()}, style, v_to_u, neutral_tone_with_five);
         }
 
-        inline u32strVec toneConvert(const u32strVec &pinyin, int style, bool v_to_u = false,
+        inline u16strVec toneConvert(const u16strVec &pinyin, int style, bool v_to_u = false,
                                      bool neutral_tone_with_five = false) const {
-            u32strVec tonePinyin;
+            u16strVec tonePinyin;
             tonePinyin.reserve(pinyin.size());
-            for (const u32str &p : pinyin) {
+            for (const u16str &p : pinyin) {
                 tonePinyin.push_back(toneConvert(p, style, v_to_u, neutral_tone_with_five));
             }
             return tonePinyin;
         }
 
-        inline std::vector<std::string> getDefaultPinyin(const u32str &hanzi, int style = 0, bool v_to_u = false,
+        inline std::vector<std::string> getDefaultPinyin(const u16str &hanzi, int style = 0, bool v_to_u = false,
                                                          bool neutral_tone_with_five = false) const {
             const auto &it = word_dict.find(hanzi);
             if (it == word_dict.end())
-                return {u32strToUtf8str(hanzi)};
+                return {u16strToUtf8str(hanzi)};
 
-            const u32strVec &candidates = it->second;
+            const u16strVec &candidates = it->second;
             std::vector<std::string> toneCandidates;
             toneCandidates.reserve(candidates.size());
 
             std::unordered_set<std::string> seen(candidates.size());
 
-            for (const u32str &pinyin : candidates) {
-                const auto &tarPinyin = u32strToUtf8str(toneConvert(pinyin, style, v_to_u, neutral_tone_with_five));
+            for (const u16str &pinyin : candidates) {
+                const auto &tarPinyin = u16strToUtf8str(toneConvert(pinyin, style, v_to_u, neutral_tone_with_five));
                 if (seen.insert(tarPinyin).second) {
                     toneCandidates.push_back(tarPinyin);
                 }
             }
 
             if (toneCandidates.empty())
-                return {u32strToUtf8str(hanzi)};
+                return {u16strToUtf8str(hanzi)};
             return toneCandidates;
         }
 
-        void zhPosition(const u32strVec &input, u32strVec &res, std::vector<bool> &positions);
+        void zhPosition(const u16strVec &input, u16strVec &res, std::vector<bool> &positions);
     };
 }
 

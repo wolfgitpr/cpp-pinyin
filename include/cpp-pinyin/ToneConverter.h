@@ -4,7 +4,7 @@
 #include <functional>
 
 #include <cpp-pinyin/PinyinGlobal.h>
-#include <cpp-pinyin/U32Str.h>
+#include <cpp-pinyin/U16Str.h>
 
 namespace Pinyin
 {
@@ -20,10 +20,10 @@ namespace Pinyin
         ToneConverter() {}
         virtual ~ToneConverter() {}
 
-        u32str convert(u32str str, int style, bool v_to_u = false, bool neutral_tone_with_five = false) const;
+        u16str convert(u16str str, int style, bool v_to_u = false, bool neutral_tone_with_five = false) const;
 
     protected:
-        std::unordered_map<int, std::function<u32str(const u32str &pinyin, bool v_to_u, bool neutral_tone_with_five)>>
+        std::unordered_map<int, std::function<u16str(const u16str &pinyin, bool v_to_u, bool neutral_tone_with_five)>>
         m_converts;
     };
 }

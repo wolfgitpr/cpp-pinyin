@@ -29,13 +29,13 @@ namespace Pinyin
         };
         ~ManTone() override = default;
 
-        static u32str toneToNormal(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u16str toneToNormal(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
 
-        static u32str toneToTone(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u16str toneToTone(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
 
-        static u32str toneToTone2(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u16str toneToTone2(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
 
-        static u32str toneToTone3(const u32str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
+        static u16str toneToTone3(const u16str &pinyin, bool v_to_u = false, bool neutral_tone_with_five = false);
     };
 
 
