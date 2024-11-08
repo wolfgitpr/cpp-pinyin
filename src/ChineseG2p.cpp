@@ -47,17 +47,20 @@ namespace Pinyin
 
     // reset pinyin to raw string
     static PinyinResVector resetZH(const u32strVec &input, const PinyinResVector &res,
-                                   const std::vector<int> &positions) {
+                                   const std::vector<bool> &positions) {
         PinyinResVector result;
         result.reserve(input.size());
+        int offset = 0;
         for (int i = 0; i < input.size(); ++i) {
-            const auto &it = std::find(positions.begin(), positions.end(), i);
-            if (it != positions.end())
-                result.emplace_back(PinyinRes{input[i].encodeUtf8(), res[it - positions.begin()].pinyin,
-                                              res[it - positions.begin()].candidates, false});
-            else
-                result.emplace_back(PinyinRes{input[i].encodeUtf8(), input[i].encodeUtf8(), {input[i].encodeUtf8()},
+            const auto &encodeStr = input[i].encodeUtf8();
+            if (positions[i])
+                result.emplace_back(PinyinRes{encodeStr, res[i - offset].pinyin,
+                                              res[i - offset].candidates, false});
+            else {
+                result.emplace_back(PinyinRes{encodeStr, encodeStr, {encodeStr},
                                               true});
+                offset++;
+            }
         }
         return result;
     }
@@ -85,9 +88,8 @@ namespace Pinyin
     }
 
     // get all chinese characters and positions in the list
-    void ChineseG2pPrivate::zhPosition(const u32strVec &input, u32strVec &res, std::vector<int> &positions) {
+    void ChineseG2pPrivate::zhPosition(const u32strVec &input, u32strVec &res, std::vector<bool> &positions) {
         res.reserve(input.size());
-        positions.reserve(input.size());
         for (int i = 0; i < input.size(); ++i) {
             const auto &item = input[i];
             if (item.empty())
@@ -97,7 +99,7 @@ namespace Pinyin
 
             if (word_dict.find(simItem) != word_dict.end()) {
                 res.emplace_back(simItem);
-                positions.emplace_back(i);
+                positions[i] = true;
             }
         }
     }
@@ -146,7 +148,7 @@ namespace Pinyin
     PinyinResVector ChineseG2p::hanziToPinyin(const u32strVec &hans, int style, Error error, bool candidates,
                                               bool v_to_u, bool neutral_tone_with_five) const {
         u32strVec inputList;
-        std::vector<int> inputPos;
+        std::vector<bool> inputPos(hans.size(), false);
 
         // get char&pos in dict
         d_ptr->zhPosition(hans, inputList, inputPos);
@@ -181,9 +183,9 @@ namespace Pinyin
                     if (cursor + length <= inputList.size()) {
                         // cursor: 地, subPhrase: 地久天长
                         const u32str subPhrase = mid(inputList, cursor, length);
-                        const auto& it = d_ptr->phrases_dict.find(subPhrase);
+                        const auto &it = d_ptr->phrases_dict.find(subPhrase);
                         if (it != d_ptr->phrases_dict.end()) {
-                            const auto& subRes = d_ptr->toneConvert(it->second, style, v_to_u, neutral_tone_with_five);
+                            const auto &subRes = d_ptr->toneConvert(it->second, style, v_to_u, neutral_tone_with_five);
                             for (int i = 0; i < subRes.size(); i++) {
                                 const u32str lyric = subPhrase.substr(i, 1);
                                 result.emplace_back(PinyinRes{

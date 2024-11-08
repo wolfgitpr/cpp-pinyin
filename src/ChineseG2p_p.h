@@ -1,7 +1,6 @@
 #ifndef ChineseG2pPRIVATE_H
 #define ChineseG2pPRIVATE_H
 
-#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -74,7 +73,7 @@ namespace Pinyin
             return toneCandidates;
         }
 
-        void zhPosition(const u32strVec &input, u32strVec &res, std::vector<int> &positions);
+        void zhPosition(const u32strVec &input, u32strVec &res, std::vector<bool> &positions);
     };
 }
 
