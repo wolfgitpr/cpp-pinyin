@@ -5,6 +5,25 @@
 
 namespace Pinyin
 {
+    std::string u16strToUtf8str(const char16_t &ch16) {
+        std::string utf8str;
+        utf8str.reserve(3); // UTF-16 characters could expand into 3 bytes in UTF-8
+        if (ch16 <= 0x7F) {
+            // 1-byte UTF-8
+            utf8str.push_back(static_cast<char>(ch16));
+        } else if (ch16 <= 0x7FF) {
+            // 2-byte UTF-8
+            utf8str.push_back(static_cast<char>(0xC0 | ((ch16 >> 6) & 0x1F)));
+            utf8str.push_back(static_cast<char>(0x80 | (ch16 & 0x3F)));
+        } else {
+            // 3-byte UTF-8
+            utf8str.push_back(static_cast<char>(0xE0 | ((ch16 >> 12) & 0x0F)));
+            utf8str.push_back(static_cast<char>(0x80 | ((ch16 >> 6) & 0x3F)));
+            utf8str.push_back(static_cast<char>(0x80 | (ch16 & 0x3F)));
+        }
+        return utf8str;
+    }
+
     std::string u16strToUtf8str(const std::u16string &u16str) {
         std::string utf8str;
         utf8str.reserve(u16str.size() * 3); // UTF-16 characters could expand into 3 bytes in UTF-8
@@ -24,11 +43,11 @@ namespace Pinyin
                 if (i + 1 >= u16str.size())
                     throw std::invalid_argument("Invalid UTF-16 surrogate pair");
 
-                uint16_t low = u16str[i + 1];
+                const uint16_t low = u16str[i + 1];
                 if (low < 0xDC00 || low > 0xDFFF)
                     throw std::invalid_argument("Invalid UTF-16 surrogate pair");
 
-                uint32_t codepoint = ((ch - 0xD800) << 10) + (low - 0xDC00) + 0x10000;
+                const uint32_t codepoint = ((ch - 0xD800) << 10) + (low - 0xDC00) + 0x10000;
                 utf8str.push_back(static_cast<char>(0xF0 | (codepoint >> 18)));
                 utf8str.push_back(static_cast<char>(0x80 | ((codepoint >> 12) & 0x3F)));
                 utf8str.push_back(static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F)));

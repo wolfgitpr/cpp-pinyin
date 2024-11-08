@@ -13,7 +13,7 @@ namespace Pinyin
 {
     static std::vector<std::u16string> splitString(const std::u16string &input) {
         std::vector<std::u16string> res;
-        res.reserve(input.length());
+        res.reserve(input.size());
         auto start = input.begin();
         const auto end = input.end();
 
@@ -39,7 +39,7 @@ namespace Pinyin
         return res;
     }
 
-    static std::u16string mid(const std::vector<std::u16string> &inputList, const size_t cursor, const size_t length) {
+    static std::u16string mid(const std::vector<char16_t> &inputList, const size_t cursor, const size_t length) {
         const size_t end = std::min(cursor + length, inputList.size());
 
         std::u16string result;
@@ -93,12 +93,12 @@ namespace Pinyin
     }
 
     // get all chinese characters and positions in the list
-    void ChineseG2pPrivate::zhPosition(const std::vector<std::u16string> &input, std::vector<std::u16string> &res,
+    void ChineseG2pPrivate::zhPosition(const std::vector<std::u16string> &input, std::vector<char16_t> &res,
                                        std::vector<bool> &positions) {
         res.reserve(input.size());
         for (int i = 0; i < input.size(); ++i) {
-            const auto &item = input[i];
-            if (item.empty())
+            const auto &item = input[i][0];
+            if (!item)
                 continue;
 
             const auto &simItem = trans_dict.find(item) != trans_dict.end() ? trans_dict[item] : item;
@@ -152,20 +152,25 @@ namespace Pinyin
     }
 
     PinyinResVector ChineseG2p::hanziToPinyin(const std::vector<std::u16string> &hans, int style, Error error,
+                                              bool candidates, bool v_to_u, bool neutral_tone_with_five) const {
+        std::vector<char16_t> hansList;
+        std::vector<bool> inputPos(hans.size(), false);
+        // get char&pos in dict
+        d_ptr->zhPosition(hans, hansList, inputPos);
+        return resetZH(hans, hanziToPinyin(hansList, style, error, candidates, v_to_u, neutral_tone_with_five),
+                       inputPos);
+    }
+
+    PinyinResVector ChineseG2p::hanziToPinyin(const std::vector<char16_t> &hansList, int style, Error error,
                                               bool candidates,
                                               bool v_to_u, bool neutral_tone_with_five) const {
-        std::vector<std::u16string> inputList;
-        std::vector<bool> inputPos(hans.size(), false);
-
-        // get char&pos in dict
-        d_ptr->zhPosition(hans, inputList, inputPos);
 
         PinyinResVector result;
-        result.reserve(inputList.size());
+        result.reserve(hansList.size());
         int cursor = 0;
-        while (cursor < inputList.size()) {
+        while (cursor < hansList.size()) {
             // get char
-            const std::u16string &current_char = inputList[cursor];
+            const char16_t &current_char = hansList[cursor];
 
             // not in dict
             if (d_ptr->word_dict.find(current_char) == d_ptr->word_dict.end()) {
@@ -187,14 +192,14 @@ namespace Pinyin
             } else {
                 bool found = false;
                 for (int length = 4; length >= 2 && !found; length--) {
-                    if (cursor + length <= inputList.size()) {
+                    if (cursor + length <= hansList.size()) {
                         // cursor: 地, subPhrase: 地久天长
-                        const std::u16string subPhrase = mid(inputList, cursor, length);
+                        const std::u16string subPhrase = mid(hansList, cursor, length);
                         const auto &it = d_ptr->phrases_dict.find(subPhrase);
                         if (it != d_ptr->phrases_dict.end()) {
                             const auto &subRes = d_ptr->toneConvert(it->second, style, v_to_u, neutral_tone_with_five);
                             for (int i = 0; i < subRes.size(); i++) {
-                                const std::u16string lyric = subPhrase.substr(i, 1);
+                                const auto &lyric = subPhrase[i];
                                 result.emplace_back(PinyinRes{
                                     u16strToUtf8str(lyric),
                                     u16strToUtf8str(subRes[i]),
@@ -210,14 +215,14 @@ namespace Pinyin
 
                         if (cursor >= 1) {
                             // cursor: 重, subPhrase_1: 语重心长
-                            const std::u16string subPhrase1 = mid(inputList, cursor - 1, length);
+                            const std::u16string subPhrase1 = mid(hansList, cursor - 1, length);
                             const auto &it1 = d_ptr->phrases_dict.find(subPhrase1);
                             if (it1 != d_ptr->phrases_dict.end()) {
                                 result.pop_back();
                                 const auto &subRes1 = d_ptr->toneConvert(
                                     it1->second, style, v_to_u, neutral_tone_with_five);
                                 for (int i = 0; i < subRes1.size(); i++) {
-                                    const std::u16string lyric = subPhrase1.substr(i, 1);
+                                    const auto &lyric = subPhrase1[i];
                                     result.emplace_back(PinyinRes{
                                         u16strToUtf8str(lyric),
                                         u16strToUtf8str(subRes1[i]),
@@ -233,9 +238,9 @@ namespace Pinyin
                         }
                     }
 
-                    if (cursor + 1 >= length && cursor + 1 <= inputList.size()) {
+                    if (cursor + 1 >= length && cursor + 1 <= hansList.size()) {
                         // cursor: 好, xSubPhrase: 各有所好
-                        const std::u16string subPhraseBack = mid(inputList, cursor + 1 - length, length);
+                        const std::u16string subPhraseBack = mid(hansList, cursor + 1 - length, length);
                         const auto &it = d_ptr->phrases_dict.find(subPhraseBack);
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
@@ -243,7 +248,7 @@ namespace Pinyin
                             const auto &subResBack = d_ptr->toneConvert(it->second, style, v_to_u,
                                                                         neutral_tone_with_five);
                             for (int i = 0; i < subResBack.size(); i++) {
-                                const std::u16string lyric = subPhraseBack.substr(i, 1);
+                                const auto &lyric = subPhraseBack[i];
                                 result.emplace_back(PinyinRes{
                                     u16strToUtf8str(lyric),
                                     u16strToUtf8str(subResBack[i]),
@@ -258,9 +263,9 @@ namespace Pinyin
                         }
                     }
 
-                    if (cursor + 2 >= length && cursor + 2 <= inputList.size()) {
+                    if (cursor + 2 >= length && cursor + 2 <= hansList.size()) {
                         // cursor: 好, xSubPhrase: 叶公好龙
-                        const std::u16string subPhraseBack1 = mid(inputList, cursor + 2 - length, length);
+                        const std::u16string subPhraseBack1 = mid(hansList, cursor + 2 - length, length);
                         const auto &it = d_ptr->phrases_dict.find(subPhraseBack1);
                         if (it != d_ptr->phrases_dict.end()) {
                             // overwrite pinyin
@@ -268,7 +273,7 @@ namespace Pinyin
                             const auto &subResBack1 = d_ptr->toneConvert(
                                 it->second, style, v_to_u, neutral_tone_with_five);
                             for (int i = 0; i < subResBack1.size(); i++) {
-                                const std::u16string lyric = subPhraseBack1.substr(i, 1);
+                                const auto &lyric = subPhraseBack1[i];
                                 result.emplace_back(PinyinRes{
                                     u16strToUtf8str(lyric),
                                     u16strToUtf8str(subResBack1[i]),
@@ -302,19 +307,20 @@ namespace Pinyin
         if (error == Error::Ignore) {
             return result;
         }
-        return resetZH(hans, result, inputPos);
+        return result;
     }
 
-    std::string ChineseG2p::tradToSim(const std::string &hanzi) const {
-        return u16strToUtf8str(d_ptr->tradToSim(utf8strToU16str(hanzi)));
+    std::string ChineseG2p::tradToSim(const std::string &oneHanzi) const {
+        return u16strToUtf8str(d_ptr->tradToSim(utf8strToU16str(oneHanzi)[0]));
     }
 
-    bool ChineseG2p::isPolyphonic(const std::string &hanzi) const {
-        return d_ptr->isPolyphonic(utf8strToU16str(hanzi));
+    bool ChineseG2p::isPolyphonic(const std::string &oneHanzi) const {
+        return d_ptr->isPolyphonic(utf8strToU16str(oneHanzi)[0]);
     }
 
-    std::vector<std::string> ChineseG2p::getDefaultPinyin(const std::string &text, int style, bool v_to_u,
+    std::vector<std::string> ChineseG2p::getDefaultPinyin(const std::string &oneHanzi, int style, bool v_to_u,
                                                           bool neutral_tone_with_five) const {
-        return d_ptr->getDefaultPinyin(d_ptr->tradToSim(utf8strToU16str(text)), style, v_to_u, neutral_tone_with_five);
+        return d_ptr->getDefaultPinyin(d_ptr->tradToSim(utf8strToU16str(oneHanzi)[0]), style, v_to_u,
+                                       neutral_tone_with_five);
     }
 }

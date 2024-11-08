@@ -19,21 +19,21 @@ namespace Pinyin
 
         bool initialized = false;
 
-        std::unordered_map<std::u16string, std::u16string> phrases_map;
+        std::unordered_map<char16_t, std::u16string> phrases_map;
         std::unordered_map<std::u16string, std::vector<std::u16string>> phrases_dict;
-        std::unordered_map<std::u16string, std::vector<std::u16string>> word_dict;
-        std::unordered_map<std::u16string, std::u16string> trans_dict;
+        std::unordered_map<char16_t, std::vector<std::u16string>> word_dict;
+        std::unordered_map<char16_t, char16_t> trans_dict;
 
         std::string m_language;
         ToneConverter m_toneConverter;
 
-        inline bool isPolyphonic(const std::u16string &text) const {
-            return phrases_map.find(text) != phrases_map.end();
+        inline bool isPolyphonic(const char16_t &oneHanzi) const {
+            return phrases_map.find(oneHanzi) != phrases_map.end();
         }
 
-        inline std::u16string tradToSim(const std::u16string &text) const {
-            const auto &it = trans_dict.find(text);
-            return it != trans_dict.end() ? it->second : text;
+        inline char16_t tradToSim(const char16_t &oneHanzi) const {
+            const auto &it = trans_dict.find(oneHanzi);
+            return it != trans_dict.end() ? it->second : oneHanzi;
         }
 
         inline std::u16string toneConvert(const std::u16string &pinyin, int style, bool v_to_u = false,
@@ -52,12 +52,12 @@ namespace Pinyin
             return tonePinyin;
         }
 
-        inline std::vector<std::string> getDefaultPinyin(const std::u16string &hanzi, int style = 0,
+        inline std::vector<std::string> getDefaultPinyin(const char16_t &oneHanzi, int style = 0,
                                                          bool v_to_u = false,
                                                          bool neutral_tone_with_five = false) const {
-            const auto &it = word_dict.find(hanzi);
+            const auto &it = word_dict.find(oneHanzi);
             if (it == word_dict.end())
-                return {u16strToUtf8str(hanzi)};
+                return {u16strToUtf8str(oneHanzi)};
 
             const std::vector<std::u16string> &candidates = it->second;
             std::vector<std::string> toneCandidates;
@@ -73,11 +73,11 @@ namespace Pinyin
             }
 
             if (toneCandidates.empty())
-                return {u16strToUtf8str(hanzi)};
+                return {u16strToUtf8str(oneHanzi)};
             return toneCandidates;
         }
 
-        void zhPosition(const std::vector<std::u16string> &input, std::vector<std::u16string> &res,
+        void zhPosition(const std::vector<std::u16string> &input, std::vector<char16_t> &res,
                         std::vector<bool> &positions);
     };
 }

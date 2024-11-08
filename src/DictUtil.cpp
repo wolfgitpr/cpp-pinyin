@@ -67,11 +67,36 @@ namespace Pinyin
     }
 
     bool loadDict(const std::filesystem::path &dict_dir,
-                  std::unordered_map<std::u16string, std::u16string> &resultMap, const char &sep1) {
+                  std::unordered_map<char16_t, char16_t> &resultMap, const char &sep1) {
         std::ifstream file = openFile(dict_dir);
         return processFile(file, resultMap, sep1,
-                           [](const std::string &key) { return utf8strToU16str(key); },
+                           [](const std::string &key) { return utf8strToU16str(key)[0]; },
+                           [](const std::string &value) { return utf8strToU16str(value)[0]; });
+    }
+
+    bool loadDict(const std::filesystem::path &dict_dir,
+                  std::unordered_map<char16_t, std::u16string> &resultMap, const char &sep1) {
+        std::ifstream file = openFile(dict_dir);
+        return processFile(file, resultMap, sep1,
+                           [](const std::string &key) { return utf8strToU16str(key)[0]; },
                            [](const std::string &value) { return utf8strToU16str(value); });
+    }
+
+    bool loadDict(const std::filesystem::path &dict_dir,
+                  std::unordered_map<char16_t, std::vector<std::u16string>> &resultMap, const char &sep1,
+                  const std::string &sep2) {
+        std::ifstream file = openFile(dict_dir);
+        return processFile(file, resultMap, sep1,
+                           [](const std::string &key) { return utf8strToU16str(key)[0]; },
+                           [&sep2](const std::string &value)
+                           {
+                               std::vector<std::u16string> u8strlist;
+                               for (const auto &str : split(value, sep2)) {
+                                   if (!str.empty())
+                                       u8strlist.emplace_back(utf8strToU16str(str));
+                               }
+                               return u8strlist;
+                           });
     }
 
     bool loadDict(const std::filesystem::path &dict_dir,

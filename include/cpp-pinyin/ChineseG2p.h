@@ -31,9 +31,9 @@ namespace Pinyin
 
         void setToneConverter(const ToneConverter &toneConverter) const;
 
-        std::string tradToSim(const std::string &hanzi) const;
+        std::string tradToSim(const std::string &oneHanzi) const;
 
-        bool isPolyphonic(const std::string &hanzi) const;
+        bool isPolyphonic(const std::string &oneHanzi) const;
 
     protected:
         PinyinResVector hanziToPinyin(const std::string &hans, int style = 0,
@@ -45,13 +45,17 @@ namespace Pinyin
                                       bool candidates = true, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
 
-        std::vector<std::string> getDefaultPinyin(const std::string &text, int style = 0, bool v_to_u = false,
+        std::vector<std::string> getDefaultPinyin(const std::string &oneHanzi, int style = 0, bool v_to_u = false,
                                                   bool neutral_tone_with_five = false) const;
 
         std::unique_ptr<ChineseG2pPrivate> d_ptr;
 
     private:
-        PinyinResVector hanziToPinyin(const std::vector<std::u16string> &hans, int style = 0,
+        PinyinResVector hanziToPinyin(const std::vector<std::u16string> &hans,
+                                      int style = 0, Error error = Default,
+                                      bool candidates = true, bool v_to_u = false,
+                                      bool neutral_tone_with_five = false) const;
+        PinyinResVector hanziToPinyin(const std::vector<char16_t> &hansList, int style = 0,
                                       Error error = Default, bool candidates = true, bool v_to_u = false,
                                       bool neutral_tone_with_five = false) const;
     };

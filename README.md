@@ -96,13 +96,13 @@ PinyinResVector hanziToPinyin(const std::vector<std::string> &hans,
                               bool neutral_tone_with_five = false) const;
 
 //  Convert to Simplified Chinese.  utf-8 std::string
-std::string tradToSim(const std::string& hanzi) const;
+std::string tradToSim(const std::string& oneHanzi) const;
 
 //  Determine if it is a polyphonic character.
-bool isPolyphonic(const std::string& hanzi) const;
+bool isPolyphonic(const std::string& oneHanzi) const;
 
 //  Get a pronunciation list.
-std::vector<std::string> getDefaultPinyin(const std::string &hanzi,
+std::vector<std::string> getDefaultPinyin(const std::string &oneHanzi,
                                           ManTone::Style style = ManTone::Style::TONE,
                                           bool v_to_u = false, bool neutral_tone_with_five = false) const;
 ```
