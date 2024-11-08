@@ -41,13 +41,7 @@ namespace Pinyin
 
     static std::u16string mid(const std::vector<char16_t> &inputList, const size_t cursor, const size_t length) {
         const size_t end = std::min(cursor + length, inputList.size());
-
-        std::u16string result;
-        for (size_t i = cursor; i < end; ++i) {
-            result += inputList[i];
-        }
-
-        return result;
+        return {inputList.begin() + cursor, inputList.begin() + end};
     }
 
     // reset pinyin to raw string
@@ -90,6 +84,9 @@ namespace Pinyin
             loadAdditionalDict(dict_dir / "user_dict.txt", phrases_dict) &&
             loadDict(dict_dir / "word.txt", word_dict) &&
             loadDict(dict_dir / "trans_word.txt", trans_dict);
+
+        toneSeen.reserve(4);
+        toneCandidates.reserve(4);
     }
 
     // get all chinese characters and positions in the list

@@ -52,22 +52,24 @@ namespace Pinyin
             return tonePinyin;
         }
 
+        std::unordered_set<std::string> toneSeen;
+        std::vector<std::string> toneCandidates;
+
         inline std::vector<std::string> getDefaultPinyin(const char16_t &oneHanzi, int style = 0,
                                                          bool v_to_u = false,
-                                                         bool neutral_tone_with_five = false) const {
+                                                         bool neutral_tone_with_five = false) {
             const auto &it = word_dict.find(oneHanzi);
             if (it == word_dict.end())
                 return {u16strToUtf8str(oneHanzi)};
 
             const std::vector<std::u16string> &candidates = it->second;
-            std::vector<std::string> toneCandidates;
-            toneCandidates.reserve(candidates.size());
 
-            std::unordered_set<std::string> seen(candidates.size());
+            toneCandidates.clear();
+            toneSeen.clear();
 
             for (const std::u16string &pinyin : candidates) {
                 const auto &tarPinyin = u16strToUtf8str(toneConvert(pinyin, style, v_to_u, neutral_tone_with_five));
-                if (seen.insert(tarPinyin).second) {
+                if (toneSeen.insert(tarPinyin).second) {
                     toneCandidates.push_back(tarPinyin);
                 }
             }
