@@ -10,7 +10,7 @@ namespace Test
     public:
         explicit JyuptingTest();
         ~JyuptingTest();
-        bool batchTest(const bool& resDisplay = false) const;
+        bool unToneBatchTest(const bool& resDisplay = false) const;
 
     private:
         std::unique_ptr<Pinyin::Jyutping> g2p_can;

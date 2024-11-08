@@ -13,7 +13,7 @@ namespace Test
 
     JyuptingTest::~JyuptingTest() = default;
 
-    bool JyuptingTest::batchTest(const bool &resDisplay) const {
+    bool JyuptingTest::unToneBatchTest(const bool &resDisplay) const {
         size_t count = 0;
         size_t error = 0;
 
@@ -61,8 +61,8 @@ namespace Test
 
         const double percentage = (static_cast<double>(error) / static_cast<double>(count)) * 100.0;
 
-        std::cout << "batchTest: success" << std::endl;
-        std::cout << "batchTest time: " << duration << "ms" << std::endl;
+        std::cout << "unToneBatchTest: success" << std::endl;
+        std::cout << "unToneBatchTest time: " << duration << "ms" << std::endl;
         std::cout << "错误率: " << percentage << "%" << std::endl;
         std::cout << "错误数: " << error << std::endl;
         std::cout << "总字数: " << count << std::endl;

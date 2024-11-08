@@ -20,9 +20,9 @@ Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN
 
 + Support Traditional and Simplified Chinese.
 
-+ Speed is very fast, about 500,000 words/s.
++ Speed is very fast, about 800,000 words/s on inter i3-8100.
 
-+ Achieved an accuracy rate of 99.9% on a 200000 word Lyrics-Pinyin test set Without-Tone.
++ Achieved an accuracy rate of 99.95% on a 200000 word Lyrics-Pinyin test set Without-Tone.
 
 + The With-Tone test on CPP_Dataset(about 79k sentences) achieved an accuracy of 90.3%, while the accuracy of pypinyin
   was approximately 87%.

@@ -13,30 +13,33 @@ namespace Pinyin
 {
     static std::vector<std::u16string> splitString(const std::u16string &input) {
         std::vector<std::u16string> res;
-        int pos = 0;
-        while (pos < input.length()) {
-            const auto &currentChar = input[pos];
-            if (isLetter(currentChar)) {
-                const int start = pos;
-                while (pos < input.length() && isLetter(input[pos])) {
-                    pos++;
+        res.reserve(input.length());
+        auto start = input.begin();
+        const auto end = input.end();
+
+        while (start != end) {
+            const auto &currentChar = *start;
+            if (Pinyin::isLetter(currentChar)) {
+                auto letterStart = start;
+                while (start != end && Pinyin::isLetter(*start)) {
+                    ++start;
                 }
-                res.push_back(input.substr(start, pos - start));
-            } else if (isHanzi(currentChar) || isDigit(currentChar) || !isSpace(currentChar)) {
-                res.push_back(input.substr(pos, 1));
-                pos++;
-            } else if (isKana(currentChar)) {
-                const int length = pos + 1 < input.length() && isSpecialKana(input[pos + 1]) ? 2 : 1;
-                res.push_back(input.substr(pos, length));
-                pos += length;
+                res.emplace_back(letterStart, start);
+            } else if (Pinyin::isHanzi(currentChar) || Pinyin::isDigit(currentChar) || !Pinyin::isSpace(currentChar)) {
+                res.emplace_back(1, currentChar);
+                ++start;
+            } else if (Pinyin::isKana(currentChar)) {
+                const int length = (start + 1 != end && Pinyin::isSpecialKana(*(start + 1))) ? 2 : 1;
+                res.emplace_back(start, start + length);
+                std::advance(start, length);
             } else {
-                pos++;
+                ++start;
             }
         }
         return res;
     }
 
-    static std::u16string mid(const std::vector<std::u16string> &inputList, size_t cursor, size_t length) {
+    static std::u16string mid(const std::vector<std::u16string> &inputList, const size_t cursor, const size_t length) {
         const size_t end = std::min(cursor + length, inputList.size());
 
         std::u16string result;
@@ -90,7 +93,8 @@ namespace Pinyin
     }
 
     // get all chinese characters and positions in the list
-    void ChineseG2pPrivate::zhPosition(const std::vector<std::u16string> &input, std::vector<std::u16string> &res, std::vector<bool> &positions) {
+    void ChineseG2pPrivate::zhPosition(const std::vector<std::u16string> &input, std::vector<std::u16string> &res,
+                                       std::vector<bool> &positions) {
         res.reserve(input.size());
         for (int i = 0; i < input.size(); ++i) {
             const auto &item = input[i];
@@ -147,7 +151,8 @@ namespace Pinyin
         return hanziToPinyin(hansList, style, error, candidates, v_to_u, neutral_tone_with_five);
     }
 
-    PinyinResVector ChineseG2p::hanziToPinyin(const std::vector<std::u16string> &hans, int style, Error error, bool candidates,
+    PinyinResVector ChineseG2p::hanziToPinyin(const std::vector<std::u16string> &hans, int style, Error error,
+                                              bool candidates,
                                               bool v_to_u, bool neutral_tone_with_five) const {
         std::vector<std::u16string> inputList;
         std::vector<bool> inputPos(hans.size(), false);
