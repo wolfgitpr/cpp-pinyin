@@ -64,12 +64,12 @@ public:
 };
 
 //  include/ChineseG2p.h
-  enum class Error {
-      // Keep original characters
-      Default = 0,
-      // Ignore this character (do not export)
-      Ignore = 1
-  };
+enum class Error {
+    // Keep original characters
+    Default = 0,
+    // Ignore this character (do not export)
+    Ignore = 1
+};
 
 /*
     @param hans : raw utf-8 std::string.
@@ -129,4 +129,14 @@ std::vector<std::string> getDefaultPinyin(const std::string &hanzi,
 
 ## Contributors
 
-+ Sine Striker
++ [SineStriker](https://github.com/SineStriker)
+
+## Related projects
+
++ [pinyin](https://github.com/hotoo/pinyin): A tool for converting Chinese characters to pinyin, Node.js/JavaScript
+  version.
++ [go-pinyin](https://github.com/mozillazg/go-pinyin): A tool for converting Chinese characters to pinyin, Go version.
++ [rust-pinyin](https://github.com/mozillazg/rust-pinyin): A tool for converting Chinese characters to pinyin, Rust
+  version.
++ [csharp-pinyin](https://github.com/wolfgitpr/csharp-pinyin): A tool for converting Chinese characters to pinyin, C#
+  version.
