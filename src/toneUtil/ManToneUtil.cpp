@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <unordered_map>
+#include <vector>
 
 namespace Pinyin
 {

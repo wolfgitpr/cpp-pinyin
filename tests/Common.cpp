@@ -8,12 +8,12 @@ namespace Test
 {
     std::vector<std::string> readData(const std::filesystem::path &filepath) {
         std::vector<std::string> dataLines;
-        dataLines.reserve(1000); // 提前预留空间，避免多次分配
+        dataLines.reserve(128);
 
 #ifdef _WIN32
         // Convert the UTF-8 string to a wide string
         const std::wstring wdict_dir = filepath.wstring();
-        std::ifstream file(wdict_dir);
+        std::ifstream file((wdict_dir.data()));
 #else
         std::ifstream file(filepath);
 #endif

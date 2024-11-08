@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <cpp-pinyin/U16Str.h>
 
 #include <string>
