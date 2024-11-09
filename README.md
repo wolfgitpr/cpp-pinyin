@@ -4,11 +4,11 @@
 
 cpp-pinyin is a lightweight Chinese/Cantonese to Pinyin library.
 
-Chinese dialects can be used to create their own dictionaries using makedict.
+[Chinese dialects](./docs/Custom Chinese Dialect.md) can be used to create their own dictionaries using makedict.
 
 Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN), and undergo significant optimization.
 
-[pinyin-makedict](https://github.com/wolfgitpr/pinyin-makedict) is the tool for creating Chinese/Cantonese dictionaries.
+[pinyin-makedict](https://github.com/wolfgitpr/pinyin-makedict) is the tool for creating custom dialect dictionaries.
 
 ## Feature
 
