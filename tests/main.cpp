@@ -27,7 +27,9 @@ int main(int argc, char *argv[]) {
     const JyuptingTest jyuptingTest;
     std::cout << "Cantonese G2P test:" << std::endl;
     std::cout << "--------------------" << std::endl;
-    jyuptingTest.unToneBatchTest();
+    jyuptingTest.toneBatchTest();
+    std::cout << "--------------------\n" << std::endl;
+    jyuptingTest.untoneBatchTest();
     std::cout << "--------------------\n" << std::endl;
 
     std::cout << "G2P mix test:" << std::endl;
