@@ -27,6 +27,20 @@ Initial version algorithm reference [zh_CN](https://github.com/ZiQiangWang/zh_CN
 + The With-Tone test on CPP_Dataset(about 79k sentences) achieved an accuracy of 90.3%, while the accuracy of pypinyin
   was approximately 87%.
 
+## Install
+
+```bash
+vcpkg install cpp-pinyin
+```
+
+```cmake
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${cpp-pinyin_DIR}/dict"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/dict"
+)
+```
+
 ## Usage
 
 ```c++

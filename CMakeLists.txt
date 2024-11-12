@@ -2,15 +2,15 @@
 # Project
 # ----------------------------------
 cmake_minimum_required(VERSION 3.17)
-project(cpp-pinyin VERSION 0.0.0.1 LANGUAGES CXX)
+project(cpp-pinyin VERSION 1.0.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
 # ----------------------------------
 # Build Options
 # ----------------------------------
-option(CPP_PINYIN_BUILD_STATIC "Build static library" ON)
-option(CPP_PINYIN_BUILD_TESTS "Build test cases" ON)
+option(CPP_PINYIN_BUILD_STATIC "Build static library" OFF)
+option(CPP_PINYIN_BUILD_TESTS "Build test cases" OFF)
 option(CPP_PINYIN_INSTALL "Install library" ON)
 
 # ----------------------------------
