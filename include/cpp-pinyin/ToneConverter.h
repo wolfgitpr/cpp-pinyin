@@ -2,6 +2,7 @@
 #define TUNEUTIL_H
 
 #include <functional>
+#include <unordered_map>
 
 #include <cpp-pinyin/PinyinGlobal.h>
 #include <string>

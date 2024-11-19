@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+#include <vector>
+#include <string>
 
 #include "cpp-pinyin/U16Str.h"
 

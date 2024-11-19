@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <functional>
+#include <unordered_map>
 
 #include "ManToneUtil.h"
 
