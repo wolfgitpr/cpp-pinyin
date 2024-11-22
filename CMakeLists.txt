@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(cpp-pinyin VERSION 1.0.1.0 LANGUAGES CXX)
+project(cpp-pinyin VERSION 1.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -163,9 +163,8 @@ endif ()
 # ----------------------------------
 
 set(prefix ${CMAKE_INSTALL_PREFIX})
-set(exec_prefix ${CMAKE_INSTALL_PREFIX}/bin)
 set(libdir ${CMAKE_INSTALL_LIBDIR})
-set(includedir ${CMAKE_INSTALL_INCLUDEDIR})
+set(version ${PROJECT_VERSION})
 
 # Configure the .pc file
 configure_file(
