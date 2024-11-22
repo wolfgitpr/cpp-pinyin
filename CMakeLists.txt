@@ -62,11 +62,11 @@ if (CPP_PINYIN_BUILD_TESTS)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND
             ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
-            ${CMAKE_BINARY_DIR}/tests/${dict}
+            ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
+            ${CMAKE_BINARY_DIR}/tests/dict
     )
     install(
-            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
+            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
             DESTINATION .
     )
 endif ()
@@ -94,8 +94,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND
         ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
-        ${CMAKE_BINARY_DIR}/bin/${dict}
+        ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
+        ${CMAKE_BINARY_DIR}/bin/dict
 )
 
 # ----------------------------------
@@ -143,15 +143,17 @@ if (CPP_PINYIN_INSTALL)
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
 
-    if (NOT DEFINED VCPKG_DICT_DIR)
+    if (NOT DEFINED CPP_PINYIN_VCPKG_DICT_DIR)
+        set(dictdir ${CMAKE_INSTALL_LIBDIR}/dict)
         install(
-                DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
+                DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
     else ()
+        set(dictdir ${CPP_PINYIN_VCPKG_DICT_DIR}/dict)
         install(
-                DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/${dict}
-                DESTINATION ${VCPKG_DICT_DIR}
+                DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
+                DESTINATION ${CPP_PINYIN_VCPKG_DICT_DIR}
         )
     endif ()
 endif ()
@@ -160,10 +162,16 @@ endif ()
 # Package config (.pc file) generation
 # ----------------------------------
 
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix ${CMAKE_INSTALL_PREFIX}/bin)
+set(libdir ${CMAKE_INSTALL_LIBDIR})
+set(includedir ${CMAKE_INSTALL_INCLUDEDIR})
+
 # Configure the .pc file
 configure_file(
         ${CMAKE_CURRENT_LIST_DIR}/cpp-pinyin.pc.in
         ${CMAKE_BINARY_DIR}/cpp-pinyin.pc
+        @ONLY
 )
 
 # Install the .pc file
