@@ -1,8 +1,5 @@
-# ----------------------------------
-# Project
-# ----------------------------------
 cmake_minimum_required(VERSION 3.17)
-project(cpp-pinyin VERSION 1.0.0.0 LANGUAGES CXX)
+project(cpp-pinyin VERSION 1.0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -44,7 +41,7 @@ if (CPP_PINYIN_INSTALL)
     include(CMakePackageConfigHelpers)
 endif ()
 # ----------------------------------
-# Main Project
+# Project sources and targets
 # ----------------------------------
 file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
 
@@ -75,7 +72,7 @@ if (CPP_PINYIN_BUILD_TESTS)
 endif ()
 
 # ----------------------------------
-# Add platform specific
+# Add platform-specific settings
 # ----------------------------------
 if (WIN32)
     set(RC_DESCRIPTION "A lightweight Chinese/Cantonese to Pinyin library.")
@@ -84,7 +81,7 @@ if (WIN32)
 endif ()
 
 # ----------------------------------
-# link libraries
+# Link libraries
 # ----------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE include src src/toneUtil)
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -92,7 +89,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 # ----------------------------------
-# copy dictionary
+# Copy dictionary files
 # ----------------------------------
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND
@@ -102,7 +99,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 # ----------------------------------
-# install
+# Install settings
 # ----------------------------------
 if (CPP_PINYIN_INSTALL)
     target_include_directories(${PROJECT_NAME} PUBLIC
@@ -158,3 +155,20 @@ if (CPP_PINYIN_INSTALL)
         )
     endif ()
 endif ()
+
+# ----------------------------------
+# Package config (.pc file) generation
+# ----------------------------------
+
+# Configure the .pc file
+configure_file(
+        ${CMAKE_CURRENT_LIST_DIR}/cpp-pinyin.pc.in
+        ${CMAKE_BINARY_DIR}/cpp-pinyin.pc
+        @ONLY
+)
+
+# Install the .pc file
+install(
+        FILES ${CMAKE_BINARY_DIR}/cpp-pinyin.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
