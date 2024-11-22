@@ -1,12 +1,12 @@
-prefix=@prefix@
+prefix=${pcfiledir}/../..
 
 # cpp-pinyin pkg-config file
 
-exec_prefix=@prefix@/bin
-libdir=@prefix@/lib
-includedir=@prefix@/include
+exec_prefix=${prefix}/bin
+libdir=${prefix}/lib
+includedir=${prefix}/include
 
-dictdir=@prefix@/share/cpp-pinyin/dict
+dictdir=${prefix}/share/cpp-pinyin/dict
 
 Name: cpp-pinyin
 Description: A lightweight Chinese/Cantonese to Pinyin library.

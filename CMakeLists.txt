@@ -161,9 +161,6 @@ endif ()
 # ----------------------------------
 # Package config (.pc file) generation
 # ----------------------------------
-
-set(prefix ${CMAKE_INSTALL_PREFIX})
-set(libdir ${CMAKE_INSTALL_LIBDIR})
 set(version ${PROJECT_VERSION})
 
 # Configure the .pc file
