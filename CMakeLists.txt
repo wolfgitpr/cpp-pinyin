@@ -164,7 +164,6 @@ endif ()
 configure_file(
         ${CMAKE_CURRENT_LIST_DIR}/cpp-pinyin.pc.in
         ${CMAKE_BINARY_DIR}/cpp-pinyin.pc
-        @ONLY
 )
 
 # Install the .pc file
