@@ -1,43 +1,98 @@
-name: Build and Test
+name: C/C++ CI
 
 on:
   push:
     branches:
       - main
       - dev
-
   pull_request:
     branches:
       - main
       - dev
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
+  # Linux Job
+  linux:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-latest, windows-latest ]
-
+        include:
+          - api: jack
+            APIcmake: JACK
+            deps: libjack-dev
+          - api: alsa
+            APIcmake: ALSA
+            deps: libasound-dev
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up build environment
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-20.04" ]]; then
-            sudo apt-get update && sudo apt-get install -y build-essential
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install cmake
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            choco install cmake
-          fi
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake autoconf-archive ${{ matrix.deps }}
+      - name: Build with CMake (Linux)
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DRTMIDI_API_JACK=OFF -DRTMIDI_API_ALSA=OFF -DRTMIDI_API_${{ matrix.APIcmake }}=ON
+          cmake --build . --config Release
 
-      - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+  # macOS Job
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies (macOS)
+        run: |
+          brew install cmake autoconf-archive automake
+      - name: Build with CMake (macOS)
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
 
-      - name: Build project
-        run: cmake --build build --config ${{env.BUILD_TYPE}}
+  # Windows Job (MinGW)
+  windows-mingw:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - host: x86_64-w64-mingw32
+            api: winmm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies (Windows MinGW)
+        run: |
+          choco install cmake mingw --version 8.1
+          refreshenv
+      - name: Build with CMake (Windows MinGW)
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"
+          cmake --build . --config Release
+
+  # Windows Job (MSVC)
+  windows-msvc:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up MSVC
+        run: |
+          # Install Visual Studio build tools
+          choco install visualstudio2019-workload-vctools
+          refreshenv
+      - name: Build with MSVC (Windows)
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 16 2019"
+          cmake --build . --config Release
