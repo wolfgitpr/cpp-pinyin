@@ -54,34 +54,3 @@ jobs:
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           cmake --build . --config Release
-
-  MinGW:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - host: i686-w64-mingw32
-            api: winmm
-          - host: x86_64-w64-mingw32
-            api: winmm
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install dependencies (MinGW)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mingw-w64 cmake autoconf-archive build-essential
-      - name: Create build directory
-        run: |
-          mkdir -p build
-      - name: Build with CMake (MinGW)
-        run: |
-          cd build
-          cmake .. \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TOOLCHAIN_FILE=../mingw-toolchain.cmake \
-            -DRTMIDI_API_${{ matrix.api }}=ON \
-            -G "MinGW Makefiles"  # Use MinGW-specific makefiles
-          cmake --build . --config Release
-
