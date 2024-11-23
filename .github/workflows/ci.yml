@@ -71,10 +71,17 @@ jobs:
       - name: Install dependencies (MinGW)
         run: |
           sudo apt-get update
-          sudo apt-get install -y mingw-w64 cmake autoconf-archive
-      - name: Build with CMake (MinGW)
+          sudo apt-get install -y mingw-w64 cmake autoconf-archive build-essential
+      - name: Create build directory
         run: |
           mkdir -p build
+      - name: Build with CMake (MinGW)
+        run: |
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw-toolchain.cmake -DRTMIDI_API_${{ matrix.api }}=ON
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE=../mingw-toolchain.cmake \
+            -DRTMIDI_API_${{ matrix.api }}=ON \
+            -G "MinGW Makefiles"  # Use MinGW-specific makefiles
           cmake --build . --config Release
+
