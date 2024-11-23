@@ -55,36 +55,26 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release
           cmake --build . --config Release
 
-  # Windows Job (MinGW)
-  windows-mingw:
-    runs-on: windows-latest
+  MinGW:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
+          - host: i686-w64-mingw32
+            api: winmm
           - host: x86_64-w64-mingw32
             api: winmm
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install dependencies (Windows MinGW)
+      - name: Install dependencies (MinGW)
         run: |
-          # Install MinGW and CMake
-          choco install mingw --version 8.1
-          
-          # Install CMake directly from the official source if choco fails
-          if (-Not (Test-Path "C:\Program Files\CMake\bin\cmake.exe")) {
-            Write-Host "CMake not found, downloading and installing..."
-            Invoke-WebRequest -Uri https://cmake.org/files/v3.22/cmake-3.22.2-windows-x86_64.msi -OutFile cmake_installer.msi
-            Start-Process msiexec.exe -ArgumentList '/i', 'cmake_installer.msi', '/quiet', '/norestart' -NoNewWindow -Wait
-            Remove-Item -Force cmake_installer.msi
-          } else {
-            Write-Host "CMake already installed"
-          }
-          refreshenv
-      - name: Build with CMake (Windows MinGW)
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64 cmake autoconf-archive
+      - name: Build with CMake (MinGW)
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw-toolchain.cmake -DRTMIDI_API_${{ matrix.api }}=ON
           cmake --build . --config Release
