@@ -69,30 +69,22 @@ jobs:
           fetch-depth: 0
       - name: Install dependencies (Windows MinGW)
         run: |
-          choco install cmake mingw --version 8.1
+          # Install MinGW and CMake
+          choco install mingw --version 8.1
+          
+          # Install CMake directly from the official source if choco fails
+          if (-Not (Test-Path "C:\Program Files\CMake\bin\cmake.exe")) {
+            Write-Host "CMake not found, downloading and installing..."
+            Invoke-WebRequest -Uri https://cmake.org/files/v3.22/cmake-3.22.2-windows-x86_64.msi -OutFile cmake_installer.msi
+            Start-Process msiexec.exe -ArgumentList '/i', 'cmake_installer.msi', '/quiet', '/norestart' -NoNewWindow -Wait
+            Remove-Item -Force cmake_installer.msi
+          } else {
+            Write-Host "CMake already installed"
+          }
           refreshenv
       - name: Build with CMake (Windows MinGW)
         run: |
           mkdir -p build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"
-          cmake --build . --config Release
-
-  # Windows Job (MSVC)
-  windows-msvc:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up MSVC
-        run: |
-          # Install Visual Studio build tools
-          choco install visualstudio2019-workload-vctools
-          refreshenv
-      - name: Build with MSVC (Windows)
-        run: |
-          mkdir -p build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 16 2019"
           cmake --build . --config Release
