@@ -1,0 +1,48 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+  pull_request:
+    branches:
+      - main
+      - dev
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-latest, windows-latest ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: actions/setup-cmake@v1
+        with:
+          cmake-version: '3.20.0'
+
+      - name: Set up build environment
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-20.04" ]]; then
+            sudo apt-get update && sudo apt-get install -y build-essential
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install cmake
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            choco install cmake
+          fi
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build project
+        run: cmake --build build --config ${{env.BUILD_TYPE}}
