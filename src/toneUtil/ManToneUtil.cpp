@@ -70,7 +70,7 @@ namespace Pinyin
     }
 
     static bool isToneNumber(const char16_t c) {
-        return c >= u'0' && c <= u'4';
+        return c >= u'1' && c <= u'5';
     }
 
     static bool isPhoneticSymbol(const char16_t c) {
@@ -120,7 +120,9 @@ namespace Pinyin
     }
 
     static std::u16string tone3ToTone2(const std::u16string &pinyin) {
-        const auto no_number_tone3 = pinyin.substr(0, pinyin.size() - 1);
+        const auto no_number_tone3 = pinyin.size() > 1 && isToneNumber(pinyin.back())
+            ? pinyin.substr(0, pinyin.size() - 1)
+            : pinyin;
         auto mark_index = rightMarkIndex(no_number_tone3);
         if (mark_index == -1)
             mark_index = no_number_tone3.size() - 1;
