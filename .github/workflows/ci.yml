@@ -1,0 +1,56 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  # Linux Job
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - api: jack
+            APIcmake: JACK
+            deps: libjack-dev
+          - api: alsa
+            APIcmake: ALSA
+            deps: libasound-dev
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake autoconf-archive ${{ matrix.deps }}
+      - name: Build with CMake (Linux)
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DRTMIDI_API_JACK=OFF -DRTMIDI_API_ALSA=OFF -DRTMIDI_API_${{ matrix.APIcmake }}=ON
+          cmake --build . --config Release
+
+  # macOS Job
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies (macOS)
+        run: |
+          brew install cmake autoconf-archive automake
+      - name: Build with CMake (macOS)
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release

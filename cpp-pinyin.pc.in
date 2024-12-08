@@ -1,0 +1,19 @@
+prefix=${pcfiledir}/../..
+
+# cpp-pinyin pkg-config file
+
+exec_prefix=${prefix}/bin
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+dictdir=${prefix}/share/cpp-pinyin/dict
+
+Name: cpp-pinyin
+Description: A lightweight Chinese/Cantonese to Pinyin library.
+Version: @version@
+Requires:
+Conflicts:
+
+Cflags: -I${includedir}
+Libs: -L${libdir} -lcpp-pinyin
+
