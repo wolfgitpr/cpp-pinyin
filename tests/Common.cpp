@@ -23,6 +23,10 @@ namespace Test
             line.reserve(256);
 
             while (std::getline(file, line)) {
+                // 去除行尾的 '\r'（适用于Windows换行符）
+                if (!line.empty() && line.back() == '\r') {
+                    line.pop_back();
+                }
                 dataLines.push_back(std::move(line));
             }
             file.close();
