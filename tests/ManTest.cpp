@@ -46,6 +46,9 @@ namespace Test
         if (g2p_zh->hanziToPinyin("hao de", Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, true,
                                   false, true).toStdStr() != u8"hao de")
             std::cerr << "Hanzi to Pinyin test failed." << std::endl;
+        if (g2p_zh->hanziToPinyin("哪吒", Pinyin::ManTone::Style::TONE3, Pinyin::Error::Default, true,
+                          false, true).toStdStr() != u8"ne2 zha1")
+            std::cerr << "Hanzi to Pinyin test failed." << std::endl;
         return true;
     }
 
