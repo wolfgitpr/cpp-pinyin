@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(cpp-pinyin VERSION 1.0.1 LANGUAGES CXX)
+project(cpp-pinyin VERSION 1.0.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -64,10 +64,6 @@ if (CPP_PINYIN_BUILD_TESTS)
             ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
             ${CMAKE_BINARY_DIR}/tests/dict
-    )
-    install(
-            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
-            DESTINATION .
     )
 endif ()
 
@@ -144,10 +140,10 @@ if (CPP_PINYIN_INSTALL)
     )
 
     if (NOT DEFINED CPP_PINYIN_VCPKG_DICT_DIR)
-        set(dictdir ${CMAKE_INSTALL_LIBDIR}/dict)
+        set(dictdir ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/dict)
         install(
                 DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/dict
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}
         )
     else ()
         set(dictdir ${CPP_PINYIN_VCPKG_DICT_DIR}/dict)
