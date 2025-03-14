@@ -144,14 +144,11 @@ std::vector<std::string> getDefaultPinyin(const std::string &oneHanzi,
 + [cpp_dataset](https://github.com/kakaobrain/g2pm/tree/master/data)
   The cpp_dataset source.
 
-## Contributors
-
-+ [SineStriker](https://github.com/SineStriker)
-
 ## Related projects
 
 + [pinyin](https://github.com/hotoo/pinyin): A tool for converting Chinese characters to pinyin, Node.js/JavaScript
   version.
++ [python-pinyin](https://github.com/mozillazg/python-pinyin): A tool for converting Chinese characters to pinyin, Python version.
 + [go-pinyin](https://github.com/mozillazg/go-pinyin): A tool for converting Chinese characters to pinyin, Go version.
 + [rust-pinyin](https://github.com/mozillazg/rust-pinyin): A tool for converting Chinese characters to pinyin, Rust
   version.

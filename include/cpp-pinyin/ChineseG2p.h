@@ -27,7 +27,9 @@ namespace Pinyin
 
         bool initialized() const;
 
-        bool loadUserDict(const std::filesystem::path &filePath) const;
+        bool loadCustomUserDict(const std::filesystem::path &filePath, bool clearRawData = true) const;
+
+        bool loadCustomFanJianDictionary(const std::filesystem::path &filePath, bool clearRawData = true) const;
 
         void setToneConverter(const ToneConverter &toneConverter) const;
 

@@ -124,8 +124,22 @@ namespace Pinyin
         汤汤:shang1 shang1
         到了:dao4 le1
     */
-    bool ChineseG2p::loadUserDict(const std::filesystem::path &filePath) const {
-        return loadAdditionalDict(filePath / "user_dict.txt", d_ptr->phrases_dict);
+    bool ChineseG2p::loadCustomUserDict(const std::filesystem::path &filePath, const bool clearRawData) const {
+        if (clearRawData)
+            d_ptr->phrases_dict.clear();
+        return loadAdditionalDict(filePath, d_ptr->phrases_dict);
+    }
+
+    /*
+    Style:
+        䰾:鲃
+        魚:鱼
+        䴉:鹮
+    */
+    bool ChineseG2p::loadCustomFanJianDictionary(const std::filesystem::path &filePath, const bool clearRawData) const {
+        if (clearRawData)
+            d_ptr->trans_dict.clear();
+        return loadDict(filePath, d_ptr->trans_dict);
     }
 
     void ChineseG2p::setToneConverter(const ToneConverter &toneConverter) const {
