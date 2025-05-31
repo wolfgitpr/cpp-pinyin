@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 # ----------------------------------
 # Build Options
 # ----------------------------------
-option(CPP_PINYIN_BUILD_STATIC "Build static library" OFF)
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(CPP_PINYIN_BUILD_TESTS "Build test cases" OFF)
 option(CPP_PINYIN_INSTALL "Install library" ON)
 
@@ -45,11 +45,9 @@ endif ()
 # ----------------------------------
 file(GLOB_RECURSE _src include/*.h src/*.h src/*.cpp src/*/*.h src/*/*.cpp)
 
-if (CPP_PINYIN_BUILD_STATIC)
-    add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME})
+if (NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PUBLIC CPP_PINYIN_STATIC)
-else ()
-    add_library(${PROJECT_NAME} SHARED)
 endif ()
 target_compile_definitions(${PROJECT_NAME} PRIVATE CPP_PINYIN_LIBRARY)
 
