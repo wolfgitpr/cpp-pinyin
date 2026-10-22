@@ -55,13 +55,25 @@ def version_from_cmake(cmake_lists: Path) -> str:
 
 
 def library_name_from(native: Path) -> str:
-    """The library's file name without the suffix the loader appends."""
+    """The base name the C# loader turns into a file name: no suffix, and no version.
+
+    The loader appends `.dll`/`.dylib`/`.so` itself, so the recorded name must not carry one. It must not carry a
+    VERSION either, which is what broke macOS: CMake names the Mach-O artefact `libcpp-pinyin2.2.0.0.dylib`, this
+    function stripped only `.dylib`, and the shell then asked dyld for `libcpp-pinyin2.2.0.0` -- a name that does
+    not exist. Measured on CI, 2026-10-22: 65 of 76 C# tests failed on macOS with
+    "could not load the native library 'libcpp-pinyin2.2.0.0'". The unversioned symlink CMake installs beside it
+    is what the loader wants, so the version is dropped here: `libcpp-pinyin2.2.0.0` and `libcpp-pinyin2.so.2.0.0`
+    both answer `libcpp-pinyin2`.
+    """
     if not native.is_file():
         raise SystemExit(f"FATAL: {native} does not exist; build the native library first")
     name = native.name
     for suffix in LIBRARY_SUFFIXES:
         if name.endswith(suffix):
-            return name[: -len(suffix)]
+            name = name[: -len(suffix)]
+            break
+    name = re.sub(r"\.so(\.\d+)*$", "", name)  # ELF: libcpp-pinyin2.so.2.0.0 -> libcpp-pinyin2
+    name = re.sub(r"(\.\d+)+$", "", name)      # Mach-O and anything else: libcpp-pinyin2.2.0.0 -> libcpp-pinyin2
     return name
 
 

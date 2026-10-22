@@ -129,7 +129,12 @@ jobs:
       - name: Build
         run: cmake --build build --config RelWithDebInfo -j $(nproc)
       - name: Run tests under the sanitizers
-        run: ctest --test-dir build -C RelWithDebInfo --output-on-failure --timeout 300
+        # InstallConsumerSmoke is excluded HERE and only here. It builds a consumer executable of its
+        # own and runs it against the installed, ASan-instrumented library; that executable is not
+        # linked against the sanitizer runtime, so ASan aborts before main with "ASan runtime does
+        # not come first in initial library list" (measured on CI, 2026-10-22). The test's subject is
+        # install-and-load, not memory errors -- the plain Linux job runs it in full.
+        run: ctest --test-dir build -C RelWithDebInfo --output-on-failure --timeout 300 -E '^InstallConsumerSmoke$'
 
   # macOS Job
   macos:

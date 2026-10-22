@@ -143,10 +143,16 @@ def licence_problems(wheel: Path) -> List[str]:
         problems.append(f"expected exactly one .dist-info directory, found {dist_infos}")
         return problems
     for name in LICENCE_MEMBERS:
-        member = f"{dist_infos[0]}/{name}"
-        if member not in members:
-            problems.append(f"missing licence material: {member} (setup.py's license_files ships it, and the "
-                            f"METADATA licence expression says which texts apply)")
+        # Two layouts, both current: setuptools before PEP 639 writes `<dist-info>/LICENSE`, and a
+        # PEP 639-aware setuptools writes `<dist-info>/licenses/LICENSE`. The runner installs the latter
+        # and this check read only the former, so a correct wheel was refused on all three Python jobs
+        # (measured on the first CI runs, 2026-10-22). Accept either location, never neither.
+        legacy = f"{dist_infos[0]}/{name}"
+        pep639 = f"{dist_infos[0]}/licenses/{name}"
+        if legacy not in members and pep639 not in members:
+            problems.append(f"missing licence material: {legacy} (or {pep639} under PEP 639; "
+                            f"setup.py's license_files ships it, and the METADATA licence expression "
+                            f"says which texts apply)")
     return problems
 
 
@@ -368,6 +374,12 @@ def check(wheel: Path, notes: Optional[List[str]] = None) -> List[str]:
     if version != expected_version():
         problems.append(f"{name}: version {version!r} != {expected_version()!r} from _version.py")
 
+    # The manylinux policy line is a promise a wheel makes with its tag. A `linux_x86_64` wheel built on a
+    # modern host makes no such promise, and holding it to 2.28 refused a wheel that was doing exactly what
+    # its tag says (measured on CI, 2026-10-22: the ubuntu Python job builds on glibc 2.38). The container
+    # job is the one that earns `manylinux_2_28`, and there the rule still applies.
+    claims_manylinux = any(part.startswith("manylinux") for part in platform_tag.split("."))
+
     # The member set and the packaged bytes come from the shared implementation: tools/check_bindings.py
     # --wheel calls exactly this function, so the two entry points cannot drift apart.
     problems.extend(member_problems(wheel))
@@ -395,11 +407,17 @@ def check(wheel: Path, notes: Optional[List[str]] = None) -> List[str]:
                     "manylinux GLIBCXX ceiling stops being a variable: build with -static-libstdc++ and "
                     "-static-libgcc."
                 )
-            if highest > MAX_GLIBC:
+            if highest > MAX_GLIBC and claims_manylinux:
                 problems.append(
                     f"{member}: references glibc {highest[0]}.{highest[1]}, above the manylinux_2_28 policy "
                     f"line {MAX_GLIBC[0]}.{MAX_GLIBC[1]} (plan section 6.5 items 1 and 1b). Build the wheel "
                     "inside a manylinux_2_28 container rather than on a host with a newer glibc."
+                )
+            elif highest > MAX_GLIBC and notes is not None:
+                notes.append(
+                    f"{member}: highest glibc reference {highest[0]}.{highest[1]} is above the "
+                    f"{MAX_GLIBC[0]}.{MAX_GLIBC[1]} policy line, but the tag ({platform_tag}) makes no "
+                    "manylinux claim -- the container job owns that one"
                 )
             elif notes is not None:
                 notes.append(
@@ -485,6 +503,7 @@ def write_synthetic_wheel(
     wheel_tags: Optional[Sequence[str]] = None,
     requires_python: Optional[str] = None,
     licence_files: Sequence[str] = LICENCE_MEMBERS,
+    licence_directory: bool = False,
 ) -> None:
     """A wheel built straight from the source tree, plus whatever damage the caller asks for.
 
@@ -522,7 +541,10 @@ def write_synthetic_wheel(
             # The two texts setup.py's license_files ships beside METADATA. `licence_files` lets a control drop
             # one, which is the only way to see the check fail: it cannot go through `drop`, because the member
             # comparison ignores .dist-info/ by design.
-            archive.writestr(f"cpp_pinyin2-UNUSED.dist-info/{name}", "licence text")
+            # PEP 639 moved the texts into a `licenses/` subdirectory; `licence_directory` builds that
+            # layout so the checker can prove it accepts both.
+            where = "licenses/" if licence_directory else ""
+            archive.writestr(f"cpp_pinyin2-UNUSED.dist-info/{where}{name}", "licence text")
 
 
 def synthetic_elf(needed: Sequence[str]) -> bytes:
@@ -639,13 +661,32 @@ def self_test() -> int:
         # verdict. The dynamic-section control is therefore built byte by byte, and the wheel the board
         # actually built stays the end-to-end control on the Linux side.
         elf_member = "cpp_pinyin2/_native/libcpp-pinyin2.so"
-        too_new = tmp / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.whl"
+        # The fixture has to CLAIM manylinux now, because the tag is what makes the rule apply. The host
+        # tag stays in the set so the platform-tag check passes on whichever machine runs this.
+        manylinux_tag = f"{platform_tag}.manylinux_2_28_x86_64"
+        too_new = tmp / f"cpp_pinyin2-{version}-py3-none-{manylinux_tag}.whl"
         write_synthetic_wheel(
-            too_new, files, version, platform_tag,
+            too_new, files, version, manylinux_tag,
+            wheel_tags=[f"py3-none-{platform_tag}", "py3-none-manylinux_2_28_x86_64"],
             extra={elf_member: ELF_MAGIC + b"\x00" * 64 + b"GLIBC_2.17\x00GLIBC_2.99\x00"},
         )
-        expect("a glibc reference above the policy line is caught", check(too_new), False,
-               "above the manylinux_2_28 policy line")
+        expect("a glibc reference above the policy line is caught when the wheel claims manylinux",
+               check(too_new), False, "above the manylinux_2_28 policy line")
+
+        # The control for the control: identical bytes, no manylinux claim. Refusing this wheel WAS the bug
+        # the CI run reported, so the assertion is that this one does not raise that problem.
+        unclaimed_wheel = tmp / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.whl"
+        write_synthetic_wheel(
+            unclaimed_wheel, files, version, platform_tag,
+            extra={elf_member: ELF_MAGIC + b"\x00" * 64 + b"GLIBC_2.17\x00GLIBC_2.99\x00"},
+        )
+        unclaimed_glibc = [p for p in check(unclaimed_wheel)
+                           if "above the manylinux_2_28 policy line" in p]
+        print(f"{'PASS' if not unclaimed_glibc else 'FAIL'}  self-test: a glibc reference above the "
+              f"policy line is not a failure for a wheel that makes no manylinux claim"
+              + ("" if not unclaimed_glibc else f"  -> {unclaimed_glibc}"))
+        if unclaimed_glibc:
+            failures.append("glibc policy line applied to a wheel that claims no manylinux")
 
         # Both directions of the dynamic-section rule, innocent one first. A rule only ever fired at failing
         # inputs proves nothing about whether it discriminates -- the lesson this repository records as "a
@@ -688,10 +729,22 @@ def self_test() -> int:
         floor_ok_dir.mkdir()
         floor_ok = floor_ok_dir / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.whl"
         write_synthetic_wheel(floor_ok, files, version, platform_tag)
-        missing_notices = tmp / f"cpp_pinyin2-{version}-py3-none-{platform_tag}-nonotices.whl"
+        # A six-segment file name made `check()` bail out at "expected <distribution>-..." before it ever
+        # looked at licences, and the assertion below passed on that empty-ish list -- a control that went
+        # green for the wrong reason. Its own directory keeps the five-segment name intact.
+        notices_dir = tmp / "no-notices"
+        notices_dir.mkdir()
+        missing_notices = notices_dir / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.whl"
         write_synthetic_wheel(missing_notices, files, version, platform_tag, licence_files=("LICENSE",))
         expect("a wheel without the third-party notices is refused",
-        any("missing licence material" in p for p in check(missing_notices)), True)
+               check(missing_notices), False, "missing licence material")
+
+        # The PEP 639 layout, which is what a current setuptools produces and what three CI jobs refused.
+        pep639_dir = tmp / "pep639"
+        pep639_dir.mkdir()
+        pep639 = pep639_dir / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.whl"
+        write_synthetic_wheel(pep639, files, version, platform_tag, licence_directory=True)
+        expect("licence texts under dist-info/licenses (PEP 639) are accepted", check(pep639), True)
 
         expect("the honest floor is not reported", check(floor_ok), True)
 
