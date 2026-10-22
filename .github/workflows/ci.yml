@@ -83,23 +83,23 @@ jobs:
           TMP: ${{ github.workspace }}/.tmp/tmpdir
         run: |
           mkdir -p .tmp/tmpdir
-          # FROM `.tmp/mk-default`, not from `build/`: the file name promises the canonical configuration
-          # (examples OFF, 49 entries) and `check_gate_inventory` compares it against that number. Reading
-          # it off `build/` (examples ON, 50) made one wrong source report as two red gates -- a claim
-          # mismatch and `TOTAL 50 != expected 49` (measured 2026-10-22).
+          # THE CANONICAL CONFIGURATION FIRST. `check_doc_claims` measures it, and the documents define it
+          # as `.tmp/mk-default` with examples OFF (49 entries); `check_gate_inventory` compares the
+          # inventory file against the same number. Configuring costs a configure and no build -- the
+          # measurement is `ctest -N`. Order matters: reading the inventory before the tree existed made
+          # this step exit 1 with no output at all (measured 2026-10-22).
+          cmake -S . -B .tmp/mk-default \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPP_PINYIN2_BUILD_TESTS=ON \
+            -DCPP_PINYIN2_BUILD_EXAMPLES=OFF
+          # FROM `.tmp/mk-default`, not from `build/`: the name promises the canonical configuration and the
+          # gate compares it against 49. Reading it off `build/` (examples ON, 50) made one wrong source
+          # report as two red gates -- a claim mismatch and `TOTAL 50 != expected 49`.
           ctest --test-dir .tmp/mk-default --show-only=json-v1 > .tmp/mk-default-inventory.json
           # NO second `check_gate_inventory --expect-total <n>` here. It used to be, with its own copy of
           # the count, and the copy drifted (49 here vs 50 in `tools/run_all_gates.py`): the two would run
           # back to back in this job and one of them had to be red. The count assertion lives in
           # `run_all_gates` alone (audit round 3, H16).
-          # `check_doc_claims` measures the CANONICAL configuration, which the documents define as
-          # `.tmp/mk-default` with examples OFF (49 entries). Nothing created that tree here, so the gate
-          # reported "could not measure the tree: the canonical build is missing" and the suite stopped
-          # (measured 2026-10-22, this job). Configuring it is cheap; it needs no build, only `ctest -N`.
-          cmake -S . -B .tmp/mk-default \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCPP_PINYIN2_BUILD_TESTS=ON \
-            -DCPP_PINYIN2_BUILD_EXAMPLES=OFF
           python3 tools/run_all_gates.py --with-build
 
   # Sanitizer Job

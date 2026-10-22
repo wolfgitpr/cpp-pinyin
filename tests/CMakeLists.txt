@@ -368,7 +368,7 @@ if (CPP_PINYIN2_INSTALL)
     # heaviest entry in the suite: it installs the tree and then configures AND builds an out-of-tree
     # consumer, which on a Windows runner takes longer than 300 s (measured 2026-10-22, job `windows`:
     # "InstallConsumerSmoke (Timeout)"). A property wins over `--timeout`.
-    set_tests_properties(InstallConsumerSmoke PROPERTIES LABELS "install" RUN_SERIAL TRUE TIMEOUT 900)
+    set_tests_properties(InstallConsumerSmoke PROPERTIES LABELS "install" RUN_SERIAL TRUE TIMEOUT 1800)
     # Proves it can fail: the same consumer asks for version 0.0.1, which no installed metadata
     # offers. Without this, a ConfigVersion file that stopped comparing versions would look fine.
     add_test(NAME InstallConsumerSmokeSelfTest
