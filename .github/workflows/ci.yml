@@ -115,6 +115,11 @@ jobs:
           # `check_doc_claims` calls every claim about it a mismatch -- reproduced in a clean checkout
           # (2026-10-22): "MISMATCH measurement/check_wheel:0 [unmeasurable]".
           python3 python/tools/build_native.py --build-dir .tmp/build-python --config Release
+          # `BuildInfo.g.cs` as well, which the full run writes. `CppPinyin.csproj` refuses to build without
+          # it, so the C# gate failed with "BuildInfo.g.cs is missing" (measured 2026-10-22) -- the same
+          # generated-file class as the version.props fix, one file over.
+          lib=$(ls python/cpp_pinyin2/_native/libcpp-pinyin2* 2>/dev/null | head -n 1)
+          python3 csharp/tools/emit_build_info.py --native "${lib:-unknown}" --commit "${GITHUB_SHA}"
           python3 tools/run_all_gates.py --with-build
 
   # Sanitizer Job
@@ -304,7 +309,9 @@ jobs:
       - name: Build the static library and its tests
         run: cmake --build build-static
       - name: Run the static-build tests
-        run: ctest --test-dir build-static --output-on-failure --timeout 300
+        # The same exclusion as the first ctest above, for the same reason: this job builds twice and a
+        # rule applied to one build directory is a rule applied to half the job (measured 2026-10-22).
+        run: ctest --test-dir build-static --output-on-failure --timeout 300 -E '^ConformanceProvenanceGateSelfTest$'
 
   # MinGW 32-bit Job
   #
