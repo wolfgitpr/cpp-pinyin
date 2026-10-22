@@ -106,6 +106,10 @@ jobs:
       - name: Check the wheel against the binding contract
         shell: bash
         run: |
+          # Version-chain place 5 is `csharp/CppPinyin/version.props`, a generated file; nothing in this job
+          # produced it, so the check reported "version.props is missing" on all three platforms (measured
+          # 2026-10-22). It needs nothing but the version, which CMakeLists.txt owns.
+          python csharp/tools/emit_build_info.py --version-props-only
           wheel=$(ls python/dist/*.whl 2>/dev/null | head -n 1)
           if [ -z "$wheel" ]; then
             echo "no wheel in python/dist: the build step produced none, so there is nothing to check" >&2
