@@ -22,10 +22,33 @@
 #include <atomic>
 #include <filesystem>
 #include <fstream>
+#if defined(_WIN32)
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 #include <memory>
 #include <string>
 #include <thread>
 #include <vector>
+
+namespace
+{
+    /// A per-process tail for the scratch directories.
+    ///
+    /// ctest runs THIS binary twice at the same time -- the full entry and the `[isolation]` filter -- and the
+    /// plugin fixtures call `remove_all` on their root before writing. With a fixed name one process therefore
+    /// deleted the other's user dictionary between `create_directories` and `loadUserDict`, which is what
+    /// "REQUIRE( a.loadUserDict(userDict) )" failing under `-j 8` actually meant (reproduced 2026-10-22 in a
+    /// pristine clone; green when the suite runs serially, which is why it had never been seen).
+    std::string processTag() {
+#if defined(_WIN32)
+        return std::to_string(::_getpid());
+#else
+        return std::to_string(::getpid());
+#endif
+    }
+}  // namespace
 
 namespace
 {
@@ -70,7 +93,7 @@ namespace
     /// the image of `trans_word.txt`, and the phrase starting character present in
     /// `phrases_map.txt`, which is the gate that opens the sliding window at all.
     fs::path writeProbeDict() {
-        const fs::path root = fs::temp_directory_path() / "cpp_pinyin_plugin_tests";
+        const fs::path root = fs::temp_directory_path() / ("cpp_pinyin_plugin_tests-" + processTag());
         const fs::path dir = root / "probe";
         std::error_code ec;
         fs::remove_all(root, ec);
@@ -513,7 +536,7 @@ TEST_CASE("no shared state between instances, across threads", "[engine][thread]
 
 TEST_CASE("instances do not share loaded user dictionaries", "[engine][isolation]") {
     const fs::path dictDir = fs::current_path() / "dict";
-    const fs::path userDict = fs::temp_directory_path() / "cpp_pinyin_plugin_tests" / "user_dict.txt";
+    const fs::path userDict = fs::temp_directory_path() / ("cpp_pinyin_plugin_tests-" + processTag()) / "user_dict.txt";
     fs::create_directories(userDict.parent_path());
     {
         std::ofstream out(userDict, std::ios::binary);
