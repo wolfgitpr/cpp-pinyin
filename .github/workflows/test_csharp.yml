@@ -48,6 +48,7 @@ jobs:
             native_subdir: lib
             rid: osx-arm64
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
