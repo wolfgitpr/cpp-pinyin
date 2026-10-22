@@ -35,6 +35,7 @@ import argparse
 import hashlib
 import json
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -495,14 +496,15 @@ def check_config_fingerprints(root, build_root=None):
 
 # ---------------------------------------------------------------------------- tool inventory
 #
-# A tool that exists but is named nowhere is invisible to everyone who did not write it. Measured when this
-# was added: three of them (audit_doc_anchors.py, verify_l3_anchors.py, checklist.sh). The check is coarse
+# A tool that exists but is named nowhere is invisible to everyone who did not write it. The check is coarse
 # on purpose -- "does the filename appear in one of these documents" -- because finer judgement is what
-# produced round 10's 465 false positives.
+# produces false positives by the hundred.
+#
+# The list holds TRACKED documents only. A local file (the board harness README, say) is not part of a clone,
+# so a tool "named" only there is still a tool nobody else can find.
 
 DOCUMENTS_FOR_TOOLS = (
     "docs/NEW_DIALECT_PLAYBOOK.md",
-    "tools/board/README.md",
     "`docs/DECISIONS.md` §2.1",
     "docs/DECISIONS.md",
     "README.md",
@@ -516,6 +518,41 @@ DOCUMENTS_FOR_TOOLS = (
     # a failure: `check_doc_refs.py` is named in STABILITY §0 and in `tests/CMakeLists.txt`.
     "docs/STABILITY.md",
 )
+
+
+def iter_tools(root):
+    """(filename, directory) for every TRACKED tool, falling back to the filesystem outside a checkout.
+
+    TRACKED, because the question is "can someone who clones this repository find this tool". A script that only
+    exists on the author's machine (the board harness) is not part of that question -- and walking the filesystem
+    made it part of it, which is how six tracked tools ended up documented only in an untracked README.
+
+    The fallback matters: `--self-test` builds its cases in a sandbox directory that is not a git checkout, and it
+    must still measure something rather than pass on an empty subject.
+    """
+    completed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "tools"],
+                              capture_output=True, text=True)
+    names = []
+    if completed.returncode == 0 and completed.stdout:
+        for entry in completed.stdout.split("\0"):
+            if not entry:
+                continue
+            path = pathlib.Path(entry)
+            if path.suffix not in (".py", ".sh") or path.name.startswith(("_", ".")) or path.name == "README.md":
+                continue
+            names.append((path.name, path.parent.as_posix()))
+        if names:
+            return sorted(names)
+    for directory in (root / "tools", root / "tools" / "board"):
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.iterdir()):
+            if not path.is_file() or path.name == "README.md":
+                continue
+            if path.suffix not in (".py", ".sh") or path.name.startswith(("_", ".")):
+                continue
+            names.append((path.name, directory.relative_to(root).as_posix()))
+    return names
 
 
 def check_tool_inventory(root):
@@ -533,17 +570,10 @@ def check_tool_inventory(root):
 
     undocumented = []
     examined = 0
-    for directory in (root / "tools", root / "tools" / "board"):
-        if not directory.is_dir():
-            continue
-        for path in sorted(directory.iterdir()):
-            if not path.is_file() or path.name == "README.md":
-                continue
-            if path.suffix not in (".py", ".sh") or path.name.startswith(("_", ".")):
-                continue
-            examined += 1
-            if not any(path.name in body for body in bodies):
-                undocumented.append((path.name, directory.relative_to(root).as_posix()))
+    for name, directory in iter_tools(root):
+        examined += 1
+        if not any(name in body for body in bodies):
+            undocumented.append((name, directory))
     if examined == 0:
         return False, [("(nothing)", "tools/")], 0
     return (not undocumented), undocumented, examined

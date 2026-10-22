@@ -1,7 +1,7 @@
 // Contract tests for candidate readings (`Segment::candidates`).
 //
 // These cases pin the MEASURED semantics of the candidate feature; the authority is docs/REQUIREMENTS.md
-// section 1 K9, and the conclusion of a 3.6M-line full-corpus scan (docs/HISTORY.md section 2).
+// section 1 K9, and the conclusion of a 3.6M-line full-corpus scan (docs/HISTORY.md).
 // Wherever the behaviour disagrees with intuition the reason is written out -- these are DELIBERATE layered-dictionary
 // semantics, not bugs waiting to be fixed:
 //   * for a row that hit the phrase or user dictionary, `reading` comes from the phrase table and may differ

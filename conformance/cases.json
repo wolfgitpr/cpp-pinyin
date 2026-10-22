@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "cases_count": 49,
-  "generated_by_commit": "1e896672082ce9e9885fe1ab350beb46b69fe2de",
+  "generated_by_commit": "8e9cd004a83e082d47c3a7e92f18eaa1972ab7e1",
   "dialects": ["cantonese", "mandarin"],
   "scale": {
     "seed": 20261001,

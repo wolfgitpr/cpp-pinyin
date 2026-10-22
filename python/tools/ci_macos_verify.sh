@@ -24,7 +24,7 @@
 #     bash python/tools/ci_macos_verify.sh python/dist/cpp_pinyin2-*.whl
 #
 # The deployment target and the architecture flags are the build's business, not this script's: see the
-# APPLE branch of CMakeLists.txt (floor 10.14) and REPO_LAYOUT.md P1 for the universal2 question.
+# APPLE branch of CMakeLists.txt (per-architecture floor) for the deployment target; universal2 is not built.
 set -u
 set -o pipefail
 

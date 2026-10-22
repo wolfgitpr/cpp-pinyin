@@ -4,7 +4,7 @@ Every 2-4 character span that is also a phrases_dict key is collected, and spans
 occurrences (ignoring a neutral-tone mark) are listed. The file tests/data/corpus/consistency_baseline.txt holds the
 conflicts that have been examined and accepted: cross-word spans (为了 inside 成为了), words with two standard
 readings (当时 dang1/dang4, 分子 fen1/fen4, 地方 di/neutral di/fang1) and the items listed in
-tests/data/testdata/open_items.md. This script fails when a conflict appears that is not in the baseline, which is how a
+consistency_baseline.txt. This script fails when a conflict appears that is not in the baseline, which is how a
 future edit is caught if it makes one word inconsistent.
 
 Usage:  python tests/data/corpus/consistency_scan.py       (exit 0 = only known conflicts, 1 = something new)

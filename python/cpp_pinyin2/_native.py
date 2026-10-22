@@ -69,7 +69,7 @@ def load_library() -> ctypes.CDLL:
     except OSError as exc:
         # On Windows a missing *dependency* is reported as if the library itself were
         # missing: ctypes does not search PATH for a DLL's dependencies. That is why the
-        # build links the MinGW runtime statically (docs/PLUGIN_INTERFACE_AND_BINDINGS.md
+        # build links the MinGW runtime statically (`docs/DECISIONS.md` §2.1
         # section 6.5, item 6); this message is what the user gets if that ever regresses.
         raise CppPinyinError(
             f"could not load {path}: {exc}. If this is Windows, the library may have an "

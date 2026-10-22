@@ -44,7 +44,7 @@ namespace
         // 0 when --repeat 1 (the value then says "not measured", not "perfectly stable").
         double repeat_spread_pct = 0;
         // Cases whose cost is dominated by I/O and page cache rather than by our code (dictionary
-        // loading). Measured: load time swings ~12% run to run even at min-of-N (docs/BACKLOG.md §2,
+        // loading). Measured: load time swings ~12% run to run even at min-of-N (docs/BACKLOG.md,
         // LoadCheck used a ~20x margin for the same reason), so a comparison must not judge them with
         // the +/-2% band it uses for the rest.
         bool noisy = false;

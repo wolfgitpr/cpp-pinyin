@@ -5,7 +5,7 @@ The order is enforced rather than documented. The version is written FIRST, read
 source (the root ``CMakeLists.txt`` ``project(... VERSION)``); then the shared library is built;
 then both are staged into ``python/cpp_pinyin2/``. A build that cannot determine the version fails
 loudly instead of falling back to ``0.0.0`` -- a package that reports a version nobody built is
-worse than a package that refuses to build (docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.8.5).
+worse than a package that refuses to build (`docs/DECISIONS.md` §2.1).
 
 Usage:
     python python/tools/build_native.py [--build-dir DIR] [--config Release]

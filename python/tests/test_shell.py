@@ -1,4 +1,4 @@
-"""Behavioural gates for the Python shell (docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.8.7).
+"""Behavioural gates for the Python shell (`docs/DECISIONS.md` §2.1).
 
 Expectations come from the project's own gates rather than from memory: the install gate asserts
 中国人民 -> "zhong1 guo2 ren2 min2", and tests/catch2/test_engine_dialect.cpp asserts the

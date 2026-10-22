@@ -161,7 +161,7 @@ endif ()
 # user dictionaries, `jyut6` -> `jyu6t6`, which is exactly why that hook is per-dialect now). A NEW
 # dialect does not need conditional compilation either: it enters through the public plugin path -- a
 # `Dialect` description plus a `ToneConverter` -- which is why third parties no longer have to fork
-# this repository. Boundary rules: docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 3.4;
+# this repository. Boundary rules: `docs/DECISIONS.md` §2.1;
 # how-to: docs/Custom Chinese Dialect.md.
 #
 #   Mandarin : src/Mandarin.cpp  src/toneUtil/ManTone.cpp  src/toneUtil/ManToneUtil.cpp
@@ -298,7 +298,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE CPP_PINYIN2_LIBRARY)
 # The version the C ABI reports (cppp2_version). It is PROJECT_VERSION on purpose: that is the
 # number a consumer resolves with find_package(cpp-pinyin2 <ver>). The API docs used to carry a "2.0.0"
 # header of their own (docs/BACKLOG.md ISS-015); as of 2026-10-01 they point here instead, so this is
-# the only place in the repository that spells a version number out (plan: docs/PLUGIN_INTERFACE_AND_BINDINGS.md §6.8.5).
+# the only place in the repository that spells a version number out (plan: `docs/DECISIONS.md` §2.1).
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         CPP_PINYIN2_VERSION_STRING="${PROJECT_VERSION}")
 
@@ -374,7 +374,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:cpp-pinyin2_dev_
 # The strict set lives on an INTERFACE target so that everything we compile -- the library, the
 # tools, the tests and the benchmark -- is held to it, instead of only the library target.
 # (Measured 2026-09-23: it used to cover the library alone, so tools/tests were compiled at default
-# warning level under docs/BACKLOG.md section 2.)
+# warning level under docs/BACKLOG.md)
 add_library(cpp-pinyin2_warnings INTERFACE)
 option(CPP_PINYIN2_WERROR
        "Promote warnings to errors for the targets this build compiles (never inherited by consumers)" OFF)
@@ -495,7 +495,7 @@ if (APPLE)
     # The floor is 10.14, and it is a requirement rather than a preference: C++17's std::filesystem is
     # only <experimental/filesystem> on 10.13, and this tree uses std::filesystem throughout
     # (PLUGIN_INTERFACE_AND_BINDINGS.md section 6.5 item 2, which also records that the plan's macOS wheel
-    # is meant to be universal2 with an explicit deployment target -- REPO_LAYOUT.md P1).
+    # is meant to be universal2 with an explicit deployment target, which is also not implemented).
     #
     # It lives here, in the tree, rather than only in a workflow: every consumer of this project -- the
     # Python wheel, the C# package, a downstream `find_package` -- then inherits one answer instead of each

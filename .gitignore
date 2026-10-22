@@ -16,10 +16,6 @@
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
 # Compiled Static libraries
 *.lai
 *.la
@@ -39,7 +35,6 @@ build/
 cmake-build*
 *.user
 *.lnk
-Libs/*
 _workingDir*
 .vscode
 .idea
@@ -49,9 +44,58 @@ cache
 out/
 CMakeSettings.json
 /vcpkg
-/data
 /*.natvis
 
-*.sublime-*
-setup-vcpkg.json
-setup-vcpkg-temp*
+build_ninja/
+build_tmp/
+test_output.txt
+
+# Local scratch (board perf scripts, logs, dumps)
+.tmp/
+# Scratch that belongs to the user rather than to this project (round 35 decision): the board disk
+# cleanup scripts live in .tmp-firefly-disk/, and that scratch tree stays ignored. Its plan note used
+# to be ignored too (the board cleanup plan); the 2026-10-09 documentation cleanup put the ledger under
+# version control, and the later cut removed it again -- its content lives in git history and in
+# docs/OBSOLETE-LEDGER-INDEX.md.
+.tmp-firefly-disk/
+
+# Python shell: generated or staged by python/tools/build_native.py, never tracked
+# (`docs/DECISIONS.md` §2.1 -- note the package directory itself
+# must stay tracked, so these are file/directory rules, not "python/")
+python/cpp_pinyin2/_version.py
+python/cpp_pinyin2/_native/
+python/cpp_pinyin2/data/dict/
+python/dist/
+# auditwheel's output, written next to the wheel by python/tools/ci_manylinux_aarch64.sh. Same reasoning as
+# python/dist/ above: a build artifact, and running the script on a development machine should not leave an
+# untracked directory behind.
+python/repaired/
+*.egg-info/
+__pycache__/
+*.pyc
+# pytest writes this next to the tests it runs; it was the one generated directory in the tree with no
+# rule at all, so `git add -A` would have committed it (found in the round-35 layout survey).
+.pytest_cache/
+
+# C# shell: generated build info (never tracked -- the version has one source of truth, section
+# 6.8.5) and project output. The generic `build/` rule above would also swallow csharp/build/,
+# which carries the *tracked* .props/.targets skeleton for .NET Framework consumers, so that
+# directory is re-included explicitly -- without these two lines those files cannot be committed
+# at all, and git would say nothing.
+!csharp/build/
+!csharp/build/**
+csharp/CppPinyin/version.props
+csharp/CppPinyin/BuildInfo.g.cs
+csharp/**/bin/
+csharp/**/obj/
+
+# Packed output for the consumer smoke test: a build artifact, and deliberately not a feed that is
+# checked in (the C# pipeline passes the directory to restore as an extra source).
+csharp/nupkg-local/
+pytest-of-*/
+
+# The board (firefly.local) measurement harness: board_baseline.sh, checklist.sh, run_local_gate.sh and their
+# README stay on the machine that runs them (2026-10-23 decision). They drive a specific board's toolchain,
+# container image and core affinity, so a clone cannot run them and the numbers they produce are recorded in
+# docs/PERFORMANCE.md with their dates instead. Same reasoning as .tmp-firefly-disk/ below.
+tools/board/

@@ -1,7 +1,7 @@
 """ctypes declarations for the cpp-pinyin2 C ABI (``include/cpp-pinyin2/ext/c_api.h``).
 
 This file is a transcription of that header and nothing else: no engine behaviour is
-reimplemented here (docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.8.1, rule 1).
+reimplemented here (`docs/DECISIONS.md` §2.1).
 
 Every entry point gets explicit ``argtypes``/``restype`` -- not just the ones that return
 pointers. ctypes defaults ``restype`` to ``c_int``, so a pointer-returning function declared

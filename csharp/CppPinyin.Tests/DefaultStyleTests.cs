@@ -35,7 +35,7 @@ namespace CppPinyin2.Tests
         /// <para>
         /// They used to be missing from this entry point while <c>cppp2_readings</c> honoured them, so a
         /// C# caller got a different answer than a C caller for the same arguments (the gap was recorded
-        /// in <c>docs/PLUGIN_INTERFACE_AND_BINDINGS.md</c> as "待补"). The expectations are measured
+        /// in <c>`docs/DECISIONS.md` §2.1</c> as "待补"). The expectations are measured
         /// against <c>data/dialects</c>; the Python shell asserts the same lists in
         /// <c>python/tests/test_conformance.py</c>, so the two shells are pinned to one answer.
         /// </para>

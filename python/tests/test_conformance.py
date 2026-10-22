@@ -33,7 +33,7 @@ from cpp_pinyin2 import OnError, Style, _ffi
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 FIXTURE_PATH = REPO_ROOT / "conformance" / "cases.json"
 SHA_PATH = REPO_ROOT / "conformance" / "cases.sha256"
-DOC_PATH = REPO_ROOT / "docs" / "PLUGIN_INTERFACE_AND_BINDINGS.md"
+DOC_PATH = REPO_ROOT / "conformance" / "README.md"
 
 DIALECT_WHITELIST = frozenset({"mandarin", "cantonese"})
 KNOWN_OPS = frozenset({"query", "readings", "to_simplified", "is_polyphonic",

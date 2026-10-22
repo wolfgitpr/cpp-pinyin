@@ -2,7 +2,7 @@
 
 What this is not: a second implementation. Splitting, reading selection and style conversion
 all happen inside the library; this package marshals bytes in and copies results out
-(docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.8.1, rule 1).
+(`docs/DECISIONS.md` §2.1).
 
 Invariants kept here (same section):
 

@@ -103,8 +103,8 @@ public sealed class ConformanceTests
             // Reconciliation step 3: the count registered in the document's status cell must equal the
             // fixture's. The status cell (field 2 of the row), not the evidence cell -- that one happens
             // to contain the same digits and would make the check pass even if the registry drifted.
-            string? row = File.ReadAllLines(RepoLayout.PluginDocPath).FirstOrDefault(l => l.Contains("P3 夹具条数", StringComparison.Ordinal));
-            Assert.True(row != null, "no 'P3 夹具条数' row in " + RepoLayout.PluginDocPath);
+            string? row = File.ReadAllLines(RepoLayout.ConformanceDocPath).FirstOrDefault(l => l.Contains("P3 夹具条数", StringComparison.Ordinal));
+            Assert.True(row != null, "no 'P3 夹具条数' row in " + RepoLayout.ConformanceDocPath);
             string[] fields = row!.Split('|');
             Match match = Regex.Match(fields[2], @"\*\*(\d+)\s*（");
             Assert.True(match.Success, "the registry row's status cell has no '**<count>（': " + fields[2]);

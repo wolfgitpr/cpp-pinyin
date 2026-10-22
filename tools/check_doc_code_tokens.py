@@ -141,7 +141,7 @@ def main() -> int:
     # parents[1], NOT parents[2]: this file lives in `<repo>/tools/`, so parents[2] is the DIRECTORY ABOVE the
     # repository. Measured on the firefly board (2026-10-21): the default root was /tmp, the gate scanned whatever
     # else happened to sit there and reported ANOTHER project's documents as this repository's findings -- while on
-    # the dev machine `D:\projects` contains only this repo, so the wrong root looked right. The same off-by-one was
+    # a parent directory that holds only this repo makes the wrong root look right. The same off-by-one was
     # already fixed in check_generation_compat.py, whose comment records it (audit round 2, 2026-10-20).
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--self-test", action="store_true")

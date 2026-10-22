@@ -248,5 +248,5 @@ if (_verdict STREQUAL "OK")
     message(STATUS "ExportGate: OK -- the C ABI surface matches ${EXPECTED}")
 else ()
     message(FATAL_ERROR "ExportGate: the C ABI surface changed. If this is intentional, update "
-            "${EXPECTED} and docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.7 in the same commit.")
+            "${EXPECTED} and `docs/DECISIONS.md` §2.1 in the same commit.")
 endif ()

@@ -1,6 +1,6 @@
 // Proof that the tone model survives a dialect with MORE tones than either built-in has.
 //
-// Section 4 of docs/audit-report.md argued from code that the tone pipeline is extensible, and its own
+// Section 4 of the retired four-domain audit (deleted 2026-10-23) argued from code that the tone pipeline
 // sub-section 4.3.1 admitted the claim had never been executed: nothing in the suite registers a dialect with a
 // tone domain wider than Cantonese's six. This file is that execution.
 //

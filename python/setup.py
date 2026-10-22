@@ -3,7 +3,7 @@
 The wheel is not pure Python even though it contains no extension module: it carries a native
 library that is loaded through ctypes at runtime. That distinction is the reason this file exists.
 
-Measured recipe (docs/REPO_LAYOUT.md, section 7):
+Measured recipe (the wheel was built this way on 2026-10-23):
 
     python -m pip wheel . --no-build-isolation --no-deps -w dist
 

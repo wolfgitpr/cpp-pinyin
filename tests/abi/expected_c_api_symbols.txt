@@ -10,7 +10,10 @@
 # The C++ API symbols are deliberately NOT listed. They are many, they are mangled differently by
 # every compiler, and they are not the contract a binding may use -- bindings call only cppp2_*.
 #
-# Authority: docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.7.8 (D10) and include/cpp-pinyin2/ext/c_api.h.
+# Authority: docs/DECISIONS.md section 2.1 (D10) and include/cpp-pinyin2/ext/c_api.h.
+# Keep this file ASCII. It is read with `file(STRINGS)`, and a non-ASCII character in a comment here
+# was measured to corrupt the parsed list (the token after it was taken for a symbol, so the gate
+# reported one phantom name missing). Prose belongs in the documents, not in this list.
 # Checked by: tests/abi/check_exports.cmake (CTest entry `ExportGate`, shared builds only).
 # (2026-10-18: this block was found shuffled -- the paragraphs were out of order and the prefix read
 # `cppp_*`; restored to the coherent original. No symbol line was touched.)

@@ -3,7 +3,7 @@
 # Why it exists (measured 2026-10-01): copying a third language's dictionary directory into data/dialects/ --
 # the dictionary repository produces out/dict/<lang>/ with exactly the same file layout -- left all 18
 # CTest entries green, because every other gate names its dialects explicitly or only checks "at least
-# two are registered". The hard rule (docs/PLUGIN_INTERFACE_AND_BINDINGS.md 6.7.4 rule 2b: data/dialects,
+# two are registered". The hard rule (`docs/DECISIONS.md` §2.1 6.7.4 rule 2b: data/dialects,
 # package copies, runtime registry and fixture dialects are all exactly {mandarin, cantonese}) had no
 # implementation. This gate is that implementation.
 #

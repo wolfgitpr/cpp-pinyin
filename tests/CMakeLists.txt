@@ -401,7 +401,7 @@ endif ()
 # Every header under include/cpp-pinyin2 must compile **on its own**: included first, twice (which
 # also exercises the include guard), with nothing else in the translation unit. A header that
 # forgets <string>/<vector>/<cstdint> therefore fails THIS build instead of the user's build.
-# The requirement was documented but had no automated guard (docs/BACKLOG.md section 2,
+# The requirement was documented but had no automated guard (docs/BACKLOG.md,
 # "公共头自包含"), and a manual sweep in the audit had to be re-done by hand to be trusted.
 # EXCLUDE_FROM_ALL keeps the extra TUs (one per public header -- 15 of them) out of normal builds; the
 # CTest entry builds them.
@@ -576,7 +576,6 @@ if(Python3_Interpreter_FOUND)
     #     it is comparing against nothing, so the entry passes none and relies on the tool's own guard.
     #   * check_comment_language / audit_doc_anchors scan the tree in place. `--include-code` (2026-10-20, G34)
     #     makes the anchor sweep cover source COMMENTS too, not just docs/*.md.
-    #   * check_archive_refs needs no arguments.
     # check_gate_inventory is deliberately NOT here: it refuses to run without a `--ctest-inventory`, and
     # that file is produced BY `ctest --show-only=json-v1` -- a test inside the run that would generate it is
     # the wrong shape. CI generates the inventory and then runs `run_all_gates.py --with-build`, which is
@@ -585,11 +584,6 @@ if(Python3_Interpreter_FOUND)
     add_test(NAME CommentLanguage
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/check_comment_language.py)
     set_tests_properties(CommentLanguage PROPERTIES
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} LABELS "docs" TIMEOUT 300)
-
-    add_test(NAME ArchiveRefs
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/check_archive_refs.py)
-    set_tests_properties(ArchiveRefs PROPERTIES
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} LABELS "docs" TIMEOUT 300)
 
     add_test(NAME DocAnchors

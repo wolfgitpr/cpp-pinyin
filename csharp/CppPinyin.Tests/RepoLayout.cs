@@ -22,7 +22,7 @@ namespace CppPinyin2.Tests
         internal static string DictDirectory => Path.Combine(Root, "data", "dialects");
 
         /// <summary>The design document, read for the registered fixture count (reconciliation step 3).</summary>
-        internal static string PluginDocPath => Path.Combine(Root, "docs", "PLUGIN_INTERFACE_AND_BINDINGS.md");
+        internal static string ConformanceDocPath => Path.Combine(Root, "conformance", "README.md");
 
         private static string Find()
         {

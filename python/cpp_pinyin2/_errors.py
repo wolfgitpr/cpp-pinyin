@@ -1,7 +1,7 @@
 """Exception hierarchy for the cpp-pinyin2 Python shell.
 
 Every non-``CPPP2_OK`` status becomes one of these. A shell must never turn a failure into an
-empty result or a partial one (docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.8.1, rule 4).
+empty result or a partial one (`docs/DECISIONS.md` §2.1).
 The mapping lives in :func:`cpp_pinyin2._ffi.raise_for_status` and ends with a fallback branch,
 so an unknown status raises rather than passing as success.
 

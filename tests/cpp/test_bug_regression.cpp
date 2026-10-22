@@ -322,7 +322,7 @@ TEST_CASE("broken optional user_dict.txt makes the engine not ready", "[loader][
 }
 
 // The thread contract is written down in Mandarin.h:25-32 (and Cantonese.h) but had NO test --
-// docs/BACKLOG.md section 3 lists it as "无锁无测试". This pins the supported half: after
+// docs/BACKLOG.md lists it as "无锁无测试". This pins the supported half: after
 // construction, concurrent READ-ONLY calls (query/readings/toSimplified/isPolyphonic, the exact
 // list the contract names) on a SHARED object must agree with single-threaded results.
 //

@@ -18,7 +18,7 @@
 // Accuracy v2: the verified corpus (tests/verified/) with strict, per-position judging. It replaces
 // test_batch_accuracy.cpp (deleted 2026-09-29), whose legacy sets were never verified sentence by sentence --
 // their numbers mixed engine quality with annotation quality (the retired T-03/T-04/T-05 caveats, summarised in
-// docs/HISTORY.md section 2) -- and whose Cantonese sets were judged with std::find over the whole row, which
+// docs/HISTORY.md) -- and whose Cantonese sets were judged with std::find over the whole row, which
 // overstates accuracy (T-01, T-02/T-11). Every row carries its own judging rule and a status marker; a position counts
 // as verified only if two independent reviewers decided it (adjudicated when they differed) or the character has
 // exactly ONE reading.
@@ -94,7 +94,7 @@ namespace
     // hide under it, and the counts may only go down -- rows that moved pass -> DICT_GAP/ENGINE_BUG were wrong in the
     // CORPUS (itemised in the ledgers), not regressions. Two independent routes reproduce every row: this test's live
     // run and tools/corpus/check_corpus.py --with-probe (identity=True for all four). The Mandarin rows come from a
-    // regenerated dictionary (C:\python\pinyin-makedict); every reading change had to gain somewhere with no loss
+    // regenerated dictionary; every reading change had to gain somewhere with no loss
     // anywhere across all four frozen corpora, so where no subset can do that the trade is PRICED, not avoided -- the
     // untone rows are spent deliberately, and SET_FIRST_READING changes only the preference ORDER within an
     // asserted-unchanged set. Rows, never wrong-position counts, are the judged unit (position totals can improve while

@@ -12,7 +12,7 @@ copy cannot drift quietly:
 * the two mutating dictionary loaders' docstrings, so the "not thread-safe" warning cannot be
   deleted without a test going red (section 6.8.7 row 6c).
 
-References to the plan doc follow docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.8.
+References to the plan doc follow `docs/DECISIONS.md` §2.1
 """
 
 from __future__ import annotations

@@ -1,7 +1,8 @@
 # `tests/data/corpus/` — the gates over `tests/data/verified/`, and why they are shaped this way
 
 `tests/data/verified/` is the verified test set. Every row carries its own judging rule and a status marker,
-and the dated records under `tests/data/testdata/` say who decided what and why.
+and the frozen accuracy table in `docs/REQUIREMENTS.md` records what each corpus measures. The dated review
+records these scripts once cross-referenced were removed with the other process documents.
 
 **What this directory holds now (2026-10-23):** the five gate scripts, the corpus gate runner, the three
 committed inputs they need, and this README. The other 63 files that used to live here — the one-off review
@@ -9,7 +10,7 @@ pipeline (`assemble.py`, `sample_scan1..9.py`, `audit_apply*.py`, `build_audit*.
 their `.jsonl` payloads) — were **removed**. They were run-once analysis against a scratch tree that was never
 versioned (`.tmp/corpus/`, 70 MB of `rows_*.jsonl` for one dataset), so without that scratch they could not be
 re-run, and every one of them was superseded by the frozen numbers the gates now pin. The waves they carried
-out, and what each concluded, are recorded in `tests/data/testdata/audit_round*.md` and `decisions.md`; those
+out, were recorded in dated review files that have since been removed; the numbers they produced are theions.md`; those
 records still cite the scripts by name, which is correct for a dated record and is why they were left alone.
 
 ## Layout

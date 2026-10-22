@@ -1,6 +1,6 @@
 /*
  * cpp-pinyin2 C ABI -- a flat `extern "C"` surface over `cpp_pinyin::v2::Engine` for callers that cannot use C++
- * headers: C, and the C#/Python FFI shells (closes ISS-005; docs/PLUGIN_INTERFACE_AND_BINDINGS.md 6.1). Contract:
+ * headers: C, and the C#/Python FFI shells (closes ISS-005; `docs/DECISIONS.md` §2.1 6.1). Contract:
  * opaque paired handle; UTF-8 in and out; every string this library hands out is freed BY THIS LIBRARY -- your own
  * CRT's free() is heap corruption on Windows, not a leak; no exception crosses the boundary; `int32_t`, never C++
  * `bool`; versioned structs carry `struct_size` and grow by APPEND after the WHOLE old `sizeof`; `dict_dir` is always

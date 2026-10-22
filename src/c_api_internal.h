@@ -10,7 +10,7 @@
 // typedefs the opaque name, so the definition has to be the same global tag.
 
 // C ABI implementation -- see include/cpp-pinyin2/ext/c_api.h for the contract and the reasons behind
-// each rule, and docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.2.1 for the incidents those rules came
+// each rule, and `docs/DECISIONS.md` §2.1 for the incidents those rules came
 // from. Nothing here changes engine behaviour: every function is a marshalling wrapper around
 // `cpp_pinyin::v2::Engine`, and every allocation it hands out is released by the matching cppp2_*_free.
 
