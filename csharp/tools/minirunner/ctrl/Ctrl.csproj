@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The runner's negative control, used by csharp/tools/run_tests.py when the self-test flag is passed. Two
+       facts, one of which must fail: if the runner reports total 2 / failed 1 and exits non-zero, its failure
+       path works. A runner that only ever reports success is indistinguishable from a runner that never ran
+       anything. (Note for future edits: a double hyphen inside an XML comment is MSB4025, which is how this
+       file first failed to load.) -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Mirror a real test project. Measured: referencing only `xunit` leaves the output with Ctrl.dll and three
+         metadata files and no xunit assemblies at all, and the runner then fails with "Could not find/load
+         xunit.execution.dotnet.dll"; referencing xunit.extensibility.execution alone did not copy it either. -->
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+  </ItemGroup>
+
+</Project>

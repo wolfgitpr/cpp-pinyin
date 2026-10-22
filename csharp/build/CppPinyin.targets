@@ -1,0 +1,27 @@
+<!--
+  csharp/build/CppPinyin.targets: the copy step for .NET Framework consumers.
+
+  STATUS: SKELETON, 未验证（待 CI）. See the header of CppPinyin.props for what that means: this
+  host has no .NET Framework, so this file has never run. It is written down because the alternative
+  (discovering the missing copy step in CI with a redesigned package) is worse.
+
+  The consumer imports it AFTER Microsoft.Common.targets:
+
+      <Import Project="...\CppPinyin.targets" />
+
+  and gets: the recorded native library copied next to the assembly, and a build error (not a runtime
+  DllNotFoundException) when the asset is missing. A missing asset that only fails at run time is the
+  failure mode both the documentation and this repository's discipline reject.
+-->
+<Project>
+
+  <Target Name="CppPinyinCopyNativeLibrary" BeforeTargets="Build">
+    <PropertyGroup>
+      <_CppPinyinNativeSource>$(MSBuildThisFileDirectory)..\runtimes\$(CppPinyinRid)\native\$(CppPinyinNativeLibrary).dll</_CppPinyinNativeSource>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_CppPinyinNativeSource)')"
+           Text="CppPinyin: the native library was not found at '$(_CppPinyinNativeSource)'. Set CppPinyinRid (currently '$(CppPinyinRid)') or CppPinyinNativeLibrary to match the package's runtimes/&lt;rid&gt;/native/ layout." />
+    <Copy SourceFiles="$(_CppPinyinNativeSource)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

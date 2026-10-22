@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CppPinyinNativeDir Condition="'$(CppPinyinNativeDir)' == ''">$(CPPP_NATIVE_DIR)</CppPinyinNativeDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CppPinyin\CppPinyin.csproj" />
+  </ItemGroup>
+
+  <!--
+    The tests are end-to-end: they load the real native library and run the real dictionary. So the
+    library must be in the test output directory, and a run that cannot find it must FAIL with an
+    instruction: a skipped end-to-end test is worse than a red one, because it reports success.
+    (XML comments cannot contain a double hyphen, which is why this file avoids it.)
+
+    Both file-name spellings are globbed rather than assumed: MinGW produces libcpp-pinyin2, MSVC
+    produces cpp-pinyin2 (decision D20=A). The name is not hardcoded anywhere, which is why this item
+    lists candidates instead of one path.
+
+    CI passes it explicitly:  dotnet test -p:CppPinyinNativeDir=<dir with the built library>
+  -->
+  <Target Name="CppPinyinCopyNativeLibrary" BeforeTargets="Build" Condition="'$(TargetFramework)' != ''">
+    <!--
+      The Condition is not decoration: with more than one target framework, MSBuild runs this target
+      once in the outer build as well, where TargetFramework (and therefore OutDir) is empty, and Copy
+      fails with MSB3023 "no destination specified" rather than anything that names the real cause.
+      MEASURED when net10.0 was added to this project (D37 = B).
+    -->
+    <Error Condition="'$(CppPinyinNativeDir)' == ''"
+           Text="CppPinyin.Tests needs the built native library. Pass -p:CppPinyinNativeDir=&lt;dir&gt; or set the CPPP_NATIVE_DIR environment variable. The tests do not skip when it is missing, by design." />
+    <ItemGroup>
+      <!--
+        Wildcards, deliberately. They match both spellings (libcpp-pinyin2.dll from MinGW, cpp-pinyin2.dll
+        from MSVC) and all three platforms, and unlike a literal path they expand to nothing when the
+        file is absent, so the Error below can actually fire. With literal Includes the item exists even
+        when the file does not, which makes Copy fail with a bare "cannot find file" and silently
+        disables the missing-file check.
+      -->
+      <_CppPinyinNative Include="$(CppPinyinNativeDir)\*cpp-pinyin2.dll" />
+      <_CppPinyinNative Include="$(CppPinyinNativeDir)\*cpp-pinyin2.so" />
+      <_CppPinyinNative Include="$(CppPinyinNativeDir)\*cpp-pinyin2.dylib" />
+    </ItemGroup>
+    <Error Condition="'@(_CppPinyinNative)' == ''"
+           Text="No cpp-pinyin2 native library in '$(CppPinyinNativeDir)' (looked for libcpp-pinyin2.dll / cpp-pinyin2.dll / .so / .dylib). Build it with cmake first." />
+    <Copy SourceFiles="@(_CppPinyinNative)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

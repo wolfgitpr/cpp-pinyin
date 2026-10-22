@@ -1,0 +1,15 @@
+# Build configuration for the Python shell.
+#
+# The measured recipe is:
+#     python -m pip wheel . --no-build-isolation --no-deps -w dist
+#
+# `python -m build` is not used (section 6.8.6 of the plan doc), and with --no-build-isolation the
+# requirements below are taken from the ambient environment, so no network access is needed.
+# Everything else -- metadata, package data, the platform tag -- lives in setup.py.
+
+[build-system]
+# setuptools >= 70.1 vendors bdist_wheel, so the separate `wheel` distribution is not needed here
+# (measured: this machine has setuptools 70.2.0 and no `wheel` package). This list only matters for
+# isolated builds; the measured recipe uses --no-build-isolation and the ambient environment.
+requires = ["setuptools>=70.1"]
+build-backend = "setuptools.build_meta"

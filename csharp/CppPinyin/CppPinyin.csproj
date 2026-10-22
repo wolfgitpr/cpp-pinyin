@@ -1,0 +1,231 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- D36 = A (2026-10-01, user): netstandard2.0, not netstandard2.1.
+         netstandard2.1 cannot be consumed by .NET Framework, and D31 chose to keep .NET Framework
+         and 32-bit in scope (PLAN doc). 2.1's one real benefit here was Marshal.PtrToStringUTF8,
+         which Utf8.cs replaces in a few lines.
+         D37 = B (2026-10-01, user): net10.0 joins the list. net7.0 and net10.0 are the targets whose
+         runtime has NativeLibrary.SetDllImportResolver (D18's reason); net7.0 stays even though it is
+         past end of life so existing net7 consumers keep that path, and net10.0 is the newest target
+         this host can actually build and run against (10.0.11 reference pack in the local cache). -->
+    <TargetFrameworks>netstandard2.0;net7.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>CppPinyin2</AssemblyName>
+    <RootNamespace>CppPinyin2</RootNamespace>
+    <PackageId>CppPinyin</PackageId>
+    <!-- The index-facing metadata a package page needs to be EVALUABLE (2026-10-21, release-readiness
+         objective): without ProjectUrl/RepositoryUrl/Tags the listing says what the package does but not where
+         it lives, what it covers, or what changed. Values are the facts README, CHANGELOG and QUICKSTART already
+         state; the URL is written out rather than derived, because a pack that failed on a missing sibling file
+         would be a worse failure than this duplicated constant (same reasoning as python/setup.py's
+         project_urls). Branch is `v2`, which every packaging manifest in this tree used to spell.
+
+         The property name is `PackageProjectUrl`, NOT `ProjectUrl`: the latter is an ordinary MSBuild property
+         that NuGet never reads, and setting it (measured 2026-10-21) produced a package whose nuspec had no
+         <projectUrl> at all while the build reported success, a silent no-op of the kind /pathmap turned out to
+         be. -->
+    <PackageProjectUrl>https://github.com/wolfgitpr/cpp-pinyin</PackageProjectUrl>
+    <!-- Authored explicitly: with no <Authors> the nuspec inherits AssemblyName, so the package was published
+         as "CppPinyin2" while its id is CppPinyin. Same class of drift as the assembly-name gate bug fixed
+         today: the two names are allowed to differ, but the METADATA should not silently follow the one that
+         consumers never see. -->
+    <Authors>CppPinyin</Authors>
+    <RepositoryUrl>https://github.com/wolfgitpr/cpp-pinyin</RepositoryUrl>
+    <PackageTags>pinyin;jyutping;cantonese;mandarin;chinese;nlp;native;csharp</PackageTags>
+    <PackageReleaseNotes>https://github.com/wolfgitpr/cpp-pinyin/blob/v2/CHANGELOG.md</PackageReleaseNotes>
+    <Description>C# binding for cpp-pinyin2 (Mandarin and Cantonese) over its C ABI. The native library is loaded from the package's runtimes/&lt;rid&gt;/native/ directory.</Description>
+    <!-- The package ships THREE licences' worth of material and must say so (2026-10-21, user decision C):
+         the code is Apache-2.0 (LICENSE), the Mandarin tables are CC-CEDICT under CC BY-SA 4.0 and the Cantonese
+         tables are CC-Canto under CC BY-SA 3.0: each dialect's own License.txt says which, and they differ.
+         The expression used to name only Apache-2.0 AND CC-BY-SA-4.0, i.e. it understated the Cantonese half;
+         the packaging manifests had the same bug, and it is now checked against the data itself
+         (check_bindings.py, check_package_licence). It also used to say MIT, which matched neither the
+         repository nor the tables. -->
+    <PackageLicenseExpression>Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <!-- Explicit rather than assumed: netstandard2.0 does not get the compiler's reference assembly by
+         default the way the modern targets do, and the ref/ entry below depends on it existing. -->
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <!--
+    ref/<tfm>/ : the reference assembly (decision D40 = B), delivered by the per-target hook below. How it
+    got here, because five other shapes were measured first and four of them failed:
+      1. ProduceReferenceAssembly=true alone, packaging hook cleared on the command line: pack succeeds,
+         no references element in the nuspec, no ref/ folder. Nothing happens by itself.
+      2. TfmSpecificPackageFile from this hook: NU5131, naming CppPinyin.dll as missing from the reference
+         group of all three target frameworks.
+      3. a plain None item with Pack and PackagePath from inside the same hook: pack succeeds, ref/ empty.
+         The hook does run (probed with a high-importance message), so items added there are not collected.
+      4. BuildOutputTargetFolder=ref: still NU5131, now demanding CppPinyin.xml too.
+      5. ordinary evaluation-time None items gated on TargetFramework: pack succeeds, ref/ still empty.
+         Items evaluated only in the inner per-framework build never reach the package.
+      6. the same hook as 2, with NU5131 allowed through as the warning it is: the package really does
+         contain ref/net7.0|net10.0|netstandard2.0/CppPinyin.dll. So the hook and PackagePath do work, and
+         the warning is the false positive that NoWarn below deals with.
+    What ships now: the hook delivers the reference assembly AND its documentation file, because a
+    reference group expects both, and a real project.assets.json confirms the consumer resolves
+    compile -> ref/<tfm>/CppPinyin.dll and runtime -> lib/<tfm>/CppPinyin.dll.
+  -->
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CppPinyinAddReferenceAssembly</TargetsForTfmSpecificContentInPackage>
+    <!--
+      NU5131 is suppressed here, deliberately and narrowly, because it is a false positive for this
+      project and the alternative is not shipping ref/ at all.
+
+      Measured, not assumed: pack with this warning allowed through (its own text calls it a warning, and
+      TreatWarningsAsErrors is what turns it into an error) produces a package that really does contain
+      ref/net7.0/CppPinyin.dll, ref/net10.0/CppPinyin.dll and ref/netstandard2.0/CppPinyin.dll, and whose
+      nuspec has no references element at all. Adding the documentation file that the warning asks for
+      changes nothing: it still reports both files as missing from every reference group, which means the
+      check is not looking at the files the package actually contains.
+
+      What compensates for the suppression: tools/check_bindings.py requires ref/<tfm>/CppPinyin.dll AND
+      ref/<tfm>/CppPinyin.xml in the package, and has a self test control that fails when they are
+      absent. The requirement is enforced by the gate that this repository owns, not by a check that
+      cannot see its own output.
+    -->
+    <NoWarn>$(NoWarn);NU5131</NoWarn>
+  </PropertyGroup>
+
+  <Target Name="CppPinyinAddReferenceAssembly">
+    <Error Condition="!Exists('$(IntermediateOutputPath)ref/$(TargetFileName)')"
+           Text="no reference assembly at $(IntermediateOutputPath)ref/$(TargetFileName); ProduceReferenceAssembly must stay true for ref/ to be packed" />
+    <Error Condition="!Exists('$(IntermediateOutputPath)$(TargetName).xml')"
+           Text="no documentation file at $(IntermediateOutputPath)$(TargetName).xml; a reference group in the package expects the documentation file next to the reference assembly, so GenerateDocumentationFile must stay true" />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(IntermediateOutputPath)ref/$(TargetFileName)" PackagePath="ref/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(IntermediateOutputPath)$(TargetName).xml" PackagePath="ref/$(TargetFramework)/" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    How ref/<tfm>/ was arrived at (decision D40 = B). Four attempts were made and run, not reasoned
+    about, before the shape that works, and they are recorded here so nobody repeats them:
+
+      1. ProduceReferenceAssembly=true on its own, with the packaging hook cleared on the command line:
+         pack succeeds, the nuspec has no references element, and the package has no ref/ folder at all.
+         Nothing happens by itself. The reference assembly really is produced, though:
+         obj/Release/net7.0/ref/CppPinyin.dll is 11776 bytes against the 18944 byte runtime assembly.
+      2. TfmSpecificPackageFile, the item type that TargetsForTfmSpecificContentInPackage documents,
+         with PackagePath=ref/<tfm>/: pack fails with NU5131, which names CppPinyin.dll as missing from
+         the reference group of net7.0, net10.0 and netstandard2.0.
+      3. a plain None item with Pack and PackagePath from inside that same hook: pack succeeds and ref/
+         is empty. The hook itself does run (probed with a high-importance message: once per target
+         framework, with the correct IntermediateOutputPath), so items added there are not collected.
+      4. BuildOutputTargetFolder=ref: still NU5131, and now it demands CppPinyin.xml as well, because a
+         reference group expects the documentation file too.
+
+    The pattern across 2 and 4 is what pointed at the fix: whatever puts a file under ref/<tfm>/ makes
+    NuGet want a reference group for that framework, holding the assembly AND its documentation file.
+    Attempt 6 showed the files were arriving all along and the warning simply cannot see them, so the
+    resolution is the hook that delivers both files, plus a narrow NoWarn for that one warning, plus a
+    requirement in tools/check_bindings.py for ref/<tfm>/CppPinyin.dll and its .xml. Measured end to end
+    afterwards: a real project.assets.json resolves compile -> ref/<tfm>/CppPinyin.dll and runtime ->
+    lib/<tfm>/CppPinyin.dll, and the consumer smoke passes on both target frameworks.
+  -->
+
+
+  <!-- Generated, never tracked, and required: csharp/tools/emit_build_info.py reads the version from
+       the root CMakeLists.txt (the single source of truth, section 6.8.5) and records the built
+       native library's file name (decision D20=A: no shell may hardcode it). A missing file must
+       fail the build: a silent fallback to 1.0.0 is exactly the failure mode the Python shell
+       avoids by refusing to build without _version.py.
+       (XML comments cannot contain a double hyphen, hence the punctuation here.) -->
+  <Import Project="version.props" Condition="Exists('version.props')" />
+
+  <Target Name="RequireGeneratedBuildInfo" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/version.props')"
+           Text="csharp/CppPinyin/version.props is missing. Run: python csharp/tools/emit_build_info.py --native &lt;built native library&gt; [--commit &lt;sha&gt;]" />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/BuildInfo.g.cs')"
+           Text="csharp/CppPinyin/BuildInfo.g.cs is missing. Run: python csharp/tools/emit_build_info.py --native &lt;built native library&gt; [--commit &lt;sha&gt;] -- it records the native library's actual file name (D20=A), which DllImport needs as a compile-time constant." />
+  </Target>
+
+  <!--
+    PACKAGING (section 6.8.3, decision D20=A). Three things have to land in the nupkg:
+
+    * runtimes/<rid>/native/<the library that was built>: what the loader finds at run time. The rid is
+      REQUIRED, not defaulted, because guessing it produces a package that installs cleanly and then
+      fails on the user's machine, which is the one outcome worth refusing to build for.
+    * lib/<tfm>/: the managed assembly a PackageReference consumer loads at run time.
+    * ref/<tfm>/: the reference assembly a consumer compiles against (decision D40 = B), delivered by the
+      hook and its documentation file together. How it was arrived at, and the six measured shapes along
+      the way, are in the comment near the top of this file.
+
+    The dictionaries go in as contentFiles with copy-to-output, so a consumer that passes no
+    DictionaryDir finds the package's build-time copy of data/dialects next to its own assembly. data/dialects in
+    the repository stays the single source of truth (section 6.7.4 rule 2b); this is a copy, and the
+    caller's override still wins.
+  -->
+  <PropertyGroup>
+    <CppPinyinRid Condition="'$(CppPinyinRid)' == ''">$(CPPP_NATIVE_RID)</CppPinyinRid>
+    <CppPinyinNativeDir Condition="'$(CppPinyinNativeDir)' == ''">$(CPPP_NATIVE_DIR)</CppPinyinNativeDir>
+    <CppPinyinDictDir Condition="'$(CppPinyinDictDir)' == ''">$(MSBuildProjectDirectory)\..\..\data\dialects</CppPinyinDictDir>
+  </PropertyGroup>
+
+  <!--
+    Evaluation-time items, NOT items added inside a target. The first version put them in a target
+    hanging off Pack, and the package came out with no runtimes/ directory at all while pack still
+    exited 0: for a multi-targeted project that target never ran, which also meant its "no native
+    library found" Error was never evaluated. A package that installs cleanly and cannot load its
+    library is the failure this whole section exists to prevent, so the items are unconditional here
+    and the missing-input check lives in its own target below.
+  -->
+  <ItemGroup Condition="'$(CppPinyinRid)' != '' and '$(CppPinyinNativeDir)' != ''">
+    <None Include="$(CppPinyinNativeDir)\*cpp-pinyin2.dll" Pack="true" PackagePath="runtimes/$(CppPinyinRid)/native/" />
+    <None Include="$(CppPinyinNativeDir)\*cpp-pinyin2.so" Pack="true" PackagePath="runtimes/$(CppPinyinRid)/native/" />
+    <None Include="$(CppPinyinNativeDir)\*cpp-pinyin2.dylib" Pack="true" PackagePath="runtimes/$(CppPinyinRid)/native/" />
+  </ItemGroup>
+
+  <Target Name="CppPinyinPackRequiresInputs" BeforeTargets="GenerateNuspec">
+    <Error Condition="'$(CppPinyinRid)' == ''"
+           Text="CppPinyinRid is required to pack: pass -p:CppPinyinRid=win-x64 (or win-x86 / linux-x64 / osx-arm64 / ...). A default would silently ship a package that only works on this machine." />
+    <Error Condition="'$(CppPinyinNativeDir)' == ''"
+           Text="CppPinyinNativeDir is required to pack: pass -p:CppPinyinNativeDir=&lt;dir with the built library&gt;." />
+    <ItemGroup>
+      <_CppPinyinPackCheck Include="$(CppPinyinNativeDir)\*cpp-pinyin2.dll;$(CppPinyinNativeDir)\*cpp-pinyin2.so;$(CppPinyinNativeDir)\*cpp-pinyin2.dylib" />
+    </ItemGroup>
+    <Error Condition="'@(_CppPinyinPackCheck)' == ''"
+           Text="no cpp-pinyin2 native library in '$(CppPinyinNativeDir)' (looked for *cpp-pinyin2.dll / .so / .dylib)" />
+  </Target>
+
+  <ItemGroup Condition="Exists('$(CppPinyinDictDir)')">
+    <!--
+      The *.json line has the same history as the Python shell's packaging list: a dialect manifest joined
+      the dictionaries on 2026-10-02 and both lists said *.txt, so both packages shipped every dialect
+      without its manifest and said nothing, because the checks of the day did not know the file existed.
+      The two shells are changed together on purpose, so neither can drift alone.
+    -->
+    <None Include="$(CppPinyinDictDir)\**\*.txt" Pack="true"
+          PackagePath="contentFiles/any/any/data/dict/%(RecursiveDir)%(Filename)%(Extension)"
+          PackageCopyToOutput="true" />
+    <None Include="$(CppPinyinDictDir)\**\*.json" Pack="true"
+          PackagePath="contentFiles/any/any/data/dict/%(RecursiveDir)%(Filename)%(Extension)"
+          PackageCopyToOutput="true" />
+  </ItemGroup>
+  <!--
+    The readme is packed because pack says so out loud when it is missing ("The package CppPinyin.2.0.0 is
+    missing a readme"), and because a feed listing with no description is a package nobody can evaluate. It
+    points at the repository README rather than a second copy written for the package: one source of truth.
+    The condition guards both the property and the item, since pointing at a file that is not there would turn
+    a missing-README notice into a pack failure for anyone building from a partial checkout.
+  -->
+  <PropertyGroup Condition="Exists('$(MSBuildProjectDirectory)\..\..\README.md')">
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\..\..\README.md')">
+    <None Include="$(MSBuildProjectDirectory)\..\..\README.md" Pack="true" PackagePath="\" />
+    <!-- THIRD_PARTY_NOTICES.md travels with the package (2026-10-21, user decision C): the licence expression
+         above names three licences, and this is the one file that says which material falls under which. Sending
+         an expression without its explanation asks the consumer to trust a summary. Same Exists() guard as the
+         readme, so a partial checkout still packs. -->
+    <None Condition="Exists('$(MSBuildProjectDirectory)\..\..\THIRD_PARTY_NOTICES.md')"
+          Include="$(MSBuildProjectDirectory)\..\..\THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

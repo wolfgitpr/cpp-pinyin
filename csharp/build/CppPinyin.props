@@ -1,0 +1,27 @@
+<!--
+  csharp/build/CppPinyin.props: .NET Framework support glue (PLUGIN doc sections 6.7.4 and 6.8.3).
+
+  STATUS: SKELETON, 未验证（待 CI）. Nothing in this file has been executed on a machine with
+  .NET Framework: this host has .NET 7/10 SDKs only. It is here so the shape is written down and a
+  CI leg can be added without redesigning it, not to claim it works.
+
+  WHY IT EXISTS AT ALL: runtimes/<rid>/native/ is a .NET 5+ convention. A non-SDK PackageReference
+  project targeting .NET Framework (or an AnyCPU non-SDK project) does NOT copy RID assets into the
+  output directory, so the native library is not next to the assembly at run time and loading fails.
+  These two files are the documented workaround: an MSBuild snippet the consumer imports to copy the
+  right RID asset into $(OutDir) (props) and to wire that copy into the build (targets).
+
+  This .props file is meant to be imported by the consumer's project BEFORE Microsoft.Common.props;
+  it only records properties. The copying itself is in CppPinyin.targets.
+-->
+<Project>
+
+  <PropertyGroup>
+    <!-- The consumer may override any of these before importing this file. -->
+    <CppPinyinRid Condition="'$(CppPinyinRid)' == ''">win-x64</CppPinyinRid>
+    <CppPinyinNativeLibrary Condition="'$(CppPinyinNativeLibrary)' == ''">libcpp-pinyin2</CppPinyinNativeLibrary>
+    <!-- The consumer overrides this with its own dictionary root; there is deliberately no default. -->
+    <CppPinyinDictDirectory Condition="'$(CppPinyinDictDirectory)' == ''"></CppPinyinDictDirectory>
+  </PropertyGroup>
+
+</Project>

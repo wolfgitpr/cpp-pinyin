@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The packaging test's consumer, kept in the repository so that the end-to-end proof ("a project that
+    only adds a PackageReference can load the native library out of runtimes/&lt;rid&gt;/native/ and run
+    a real query") is reproducible instead of living in a scratch directory. The C# pipeline drives it.
+
+    Two inputs are deliberately NOT written down here, because a copy of either would be a second
+    source of truth: the version arrives as CppPinyinSmokeVersion (the pipeline takes it from
+    tools/check_bindings.py, so both languages read the same place), and the feed arrives as
+    RestoreAdditionalProjectSources, because the packed directory is a build artifact and stays ignored
+    rather than being a feed checked into the tree.
+
+    A missing version is an error, not a silent fallback: a consumer that quietly restores some other
+    build of the package would make this test pass while proving nothing at all.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net7.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>CppPinyin.ConsumerSmoke</AssemblyName>
+    <RootNamespace>CppPinyin.ConsumerSmoke</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <Target Name="CppPinyinConsumerSmokeRequiresInputs" BeforeTargets="Restore">
+    <Error Condition="'$(CppPinyinSmokeVersion)' == ''"
+           Text="CppPinyinSmokeVersion is not set. Pass -p:CppPinyinSmokeVersion=VERSION, where VERSION is what 'python tools/check_bindings.py --print-version' prints." />
+    <!--
+      Measured, not theoretical: without this the test can pass while proving nothing. A run during the
+      P3c work packed nothing (the pack guard refused, because CppPinyinNativeDir was missing) and the
+      consumer still reported RESULT: OK, because the default NuGet cache already held the same version
+      from an earlier round. Restoring into an empty directory makes the packed file the only possible
+      source of this package identity, so a missing package is a hard NU1101 instead of a stale pass.
+    -->
+    <Error Condition="'$(RestorePackagesPath)' == ''"
+           Text="RestorePackagesPath is not set. Pass -p:RestorePackagesPath=DIR, pointing at an empty directory, so that this project cannot be satisfied by a copy of the same version left in the default NuGet cache." />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="CppPinyin" Version="$(CppPinyinSmokeVersion)" />
+  </ItemGroup>
+
+</Project>

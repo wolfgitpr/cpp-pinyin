@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The minimal xunit runner used by csharp/tools/run_tests.py.
+       Why it exists: VSTest's testhost cannot start in this environment, measured as
+       "Unhandled exception. System.ComponentModel.Win32Exception (5): Access is denied" from
+       ProcessManager.OpenProcess while DefaultEngineInvoker sets its parent-exit callback, reproduced through
+       `dotnet test` and through `dotnet vstest` alike, and independent of the TMP/TEMP overrides this project
+       uses elsewhere. A gate that cannot be run is not a gate, so this uses xunit's own execution engine to
+       run the same test assemblies that VSTest would run. It does not implement VSTest's host protocol, which
+       is the only part that is broken here. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net7.0;net10.0</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <AssemblyName>Runner</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.runner.utility" Version="2.9.3" />
+  </ItemGroup>
+
+  <!-- The control project lives under this directory, and the SDK's default glob would otherwise compile its test
+       source into the runner itself: measured as CS0246 on [Fact] before this line existed. -->
+  <ItemGroup>
+    <Compile Remove="ctrl/**/*.cs" />
+  </ItemGroup>
+
+</Project>
