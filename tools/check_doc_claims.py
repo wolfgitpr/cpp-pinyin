@@ -173,7 +173,14 @@ def measure_selftests(root):
                                    cwd=root, capture_output=True, text=True, timeout=600,
                                    env=environment)
         if completed.returncode != 0:
-            unmeasurable[name] = f"its --self-test exits {completed.returncode}"
+            # Carry the tool's OWN last words. "exits 1" is a fact that names nothing, and on the linux job it
+            # cost two rounds: the count that could not be measured belonged to `check_wheel`, whose self-test
+            # was failing for a reason only it knew (measured 2026-10-22).
+            tail = [line for line in (completed.stdout + completed.stderr).splitlines() if line.strip()]
+            reason = f"its --self-test exits {completed.returncode}"
+            if tail:
+                reason += " -- last line: " + tail[-1].strip()[:160]
+            unmeasurable[name] = reason
         cases = len(re.findall(r"^(?:PASS|FAIL)\s+self-test:", completed.stdout, flags=re.M))
         if cases:
             measured[name] = cases
