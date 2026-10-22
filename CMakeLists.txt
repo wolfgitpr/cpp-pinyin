@@ -359,7 +359,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:cpp-pinyin2_dev_
 #
 # The library is warning-free under the strict set below (verified for both
 # GCC and MSVC-style flag names); PRIVATE so consumers never inherit them.
-#   GCC:   17 flags, -Wall -Wextra -Wpedantic ... -Wnull-dereference
+#   GCC:   16 flags, -Wall -Wextra -Wpedantic ... (no -Wnull-dereference: see below)
 #   Clang: the same set minus these 5 GCC-only flags:
 #          -Wmisleading-indentation -Wextra-semi -Wlogical-op -Wsuggest-override -Wzero-as-null-pointer-constant
 #   MSVC:  /W4
@@ -392,7 +392,12 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Woverloaded-virtual
             -Wcast-qual -Wdouble-promotion -Wformat=2 -Wundef -Wredundant-decls
             -Wmisleading-indentation -Wextra-semi -Wlogical-op -Wsuggest-override
-            -Wzero-as-null-pointer-constant -Wnull-dereference)
+            -Wzero-as-null-pointer-constant)
+    # NO -Wnull-dereference ON GCC (measured on the first CI run, 2026-10-22, job `linux`): GCC 13 reports
+    # "potential null pointer dereference" from INSIDE libstdc++'s own `/usr/include/c++/13/streambuf:492`,
+    # reached from `src/dict/DictManifest.cpp`. With -Werror that turns a header we do not own into a build
+    # failure, and the warning cannot be satisfied from this tree. Clang keeps the flag below: it does not
+    # produce that report, so the check still runs where it means something.
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(cpp-pinyin2_warnings INTERFACE
             -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Woverloaded-virtual
@@ -492,10 +497,12 @@ if (WIN32)
 endif ()
 
 if (APPLE)
-    # The floor is 10.14, and it is a requirement rather than a preference: C++17's std::filesystem is
-    # only <experimental/filesystem> on 10.13, and this tree uses std::filesystem throughout
-    # (PLUGIN_INTERFACE_AND_BINDINGS.md section 6.5 item 2, which also records that the plan's macOS wheel
-    # is meant to be universal2 with an explicit deployment target, which is also not implemented).
+    # The floor is 10.15, and it is a requirement rather than a preference: libc++ only publishes
+    # <filesystem> -- the non-experimental one, with `std::filesystem::path` usable in a public signature --
+    # from macOS 10.15. The first CI run (2026-10-22: jobs `macos`, `csharp (macos-latest)` and
+    # `python (macos-latest)`) failed on exactly that: "'path' is unavailable: introduced in macOS 10.15"
+    # from `include/cpp-pinyin2/core/Engine.h`. This tree uses std::filesystem throughout and puts
+    # `std::filesystem::path` in a public header, so 10.15 is the honest floor.
     #
     # It lives here, in the tree, rather than only in a workflow: every consumer of this project -- the
     # Python wheel, the C# package, a downstream `find_package` -- then inherits one answer instead of each
@@ -506,30 +513,30 @@ if (APPLE)
     # CMake only sets MACOSX_DEPLOYMENT_TARGET itself when CMAKE_OSX_DEPLOYMENT_TARGET is non-empty, and
     # the cache is what makes that value survive into targets created by add_subdirectory. An explicit
     # -DCMAKE_OSX_DEPLOYMENT_TARGET=... on the command line still wins, so an experiment can raise it
-    # without touching this file; lowering it below 10.14 is what the guard below refuses.
+    # without touching this file; lowering it below 10.15 is what the guard below refuses.
     if (NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET OR CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-        # The floor depends on the ARCHITECTURE, and applying one value to both was wrong: 10.14 is what
-        # C++17 std::filesystem needs on x86_64, but arm64 does not exist before macOS 11. A single 10.14
-        # either gets silently raised by the toolchain (so the declared value is not the artifact's) or
-        # produces a dylib that cannot load. Measured on neither leg -- this is the value the toolchain
-        # documents, and the message below prints the one actually chosen.
+        # The floor depends on the ARCHITECTURE: libc++ needs 10.15 for <filesystem>, and arm64 does not
+        # exist before macOS 11. A single value for both either gets silently raised by the toolchain (so
+        # the declared value is not the artifact's) or produces a dylib that cannot load. The message below
+        # prints the one actually chosen.
         if (CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
             set(_cpp_pinyin2_osx_floor "11.0")
         else()
-            set(_cpp_pinyin2_osx_floor "10.14")
+            set(_cpp_pinyin2_osx_floor "10.15")
         endif()
         set(CMAKE_OSX_DEPLOYMENT_TARGET "${_cpp_pinyin2_osx_floor}" CACHE STRING
-            "Minimum macOS version (x86_64: 10.14 for std::filesystem; arm64: 11.0, the architecture floor)" FORCE)
+            "Minimum macOS version (x86_64: 10.15 for libc++ <filesystem>; arm64: 11.0, the architecture floor)" FORCE)
         message(STATUS "macOS deployment target: ${CMAKE_OSX_DEPLOYMENT_TARGET} (architectures: ${CMAKE_OSX_ARCHITECTURES})")
     endif ()
 
-    if (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.14)
+    if (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.15)
         # Refused rather than warned about: a wheel tagged for an older macOS than the library can run on
         # is exactly the wheel this setting exists to prevent, and a warning in a 12,000-line CI log is not
         # a gate.
         message(FATAL_ERROR
-                "CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} is below 10.14, but this "
-                "project needs C++17 std::filesystem (PLUGIN doc section 6.5 item 2). Use 10.14 or newer.")
+                "CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} is below 10.15, but this "
+                "project puts std::filesystem::path in a public header, and libc++ only has <filesystem> from "
+                "macOS 10.15. Use 10.15 or newer.")
     endif ()
     message(STATUS "macOS deployment target: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 

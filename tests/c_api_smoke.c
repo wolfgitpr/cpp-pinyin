@@ -145,6 +145,9 @@ int main(int argc, char **argv) {
             CHECK(cppp2_style_list(can, &cstyles, &cstyle_count) == CPPP2_OK, "cantonese style list returns OK");
             CHECK(cstyle_count == 3, "cantonese declares three styles (0 normal, 3 first-letter, 8 tone3)");
             cppp2_style_list_free(cstyles, cstyle_count);
+            /* The handle owns the engine; LeakSanitizer reported this block on the first CI run
+             * (2026-10-22, job `linux-sanitizers`) as a 48-byte direct leak plus 1 MiB of phrase index. */
+            cppp2_destroy(can);
         }
     }
     /* No readiness probe any more (N4b): a handle `cppp2_open` returned is always usable, and the

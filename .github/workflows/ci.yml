@@ -136,7 +136,8 @@ jobs:
       # Same reason as the Linux job: run the registered CTest entries, not one binary.
       - name: Run tests
         run: ctest --test-dir build -j $(sysctl -n hw.logicalcpu) --output-on-failure
-      # macOS 10.14 x64 is a declared floor (plan section 5), and the step above does NOT check it: it
+      # macOS 10.15 x64 is a declared floor (the value `CMakeLists.txt` sets and refuses to go below), and
+      # the step above does NOT check it: it
       # pins neither a deployment target nor an architecture, so its binaries silently inherit the
       # runner's own minimum. This leg pins both. It is BUILD-ONLY on purpose: the runners are arm64
       # and executing an x86_64 binary there needs Rosetta, which is not guaranteed -- a test run here
@@ -144,11 +145,11 @@ jobs:
       # against the declared floor.
       #
       # UNVERIFIED: no macOS toolchain on the machine this was written on.
-      - name: Build the declared macOS floor (10.14, x86_64, library only)
+      - name: Build the declared macOS floor (10.15, x86_64, library only)
         run: |
           cmake -S . -B build-floor \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
             -DCMAKE_OSX_ARCHITECTURES=x86_64 \
             -DCPP_PINYIN2_BUILD_TESTS=OFF
           cmake --build build-floor --config Release

@@ -65,7 +65,15 @@ def tracked_by_basename(root):
     an actionable "now at ...". The listing comes from the git index rather than a filesystem walk so that
     build trees and installed prefixes cannot be mistaken for the source location.
     """
-    out = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True)
+    try:
+        out = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True)
+    except FileNotFoundError:
+        # No git on PATH (measured: the `mingw` job, 2026-10-22, where the MSYS2 environment has no git).
+        # Losing this table only costs the "this file moved to ..." hint; every anchor is still adjudicated,
+        # so a missing git must not turn the gate into a crash.
+        return {}
+    if out.returncode != 0:
+        return {}
     table = {}
     for line in out.stdout.split("\n"):
         line = line.strip()

@@ -110,6 +110,18 @@ def long_description() -> str:
     )
 
 
+# The two licence files live at the repository root, and setuptools only honours a `../` entry in
+# `license_files` when the build runs from the repository root -- the manylinux script does `cd python` first,
+# and the wheel it produced had no <dist-info>/LICENSE at all (measured on the first CI run, 2026-10-22, job
+# "Python wheel (linux aarch64)"). Staging copies next to setup.py fixes that without a second authority: the
+# copies are build artefacts, gitignored, and regenerated on every build.
+for _licence in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
+    _source = Path(__file__).resolve().parents[1] / _licence
+    _target = Path(__file__).resolve().parent / _licence
+    if _source.is_file():
+        _target.write_bytes(_source.read_bytes())
+
+
 setup(
     name="cpp-pinyin2",
     version=dynamic_version(),
@@ -127,7 +139,7 @@ setup(
     # notices tell them TO WHAT. Both land in <dist-info>/licenses/; the per-dialect License.txt files already
     # travel inside the package, so an installed copy carries the primary texts too.
     license="Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0",
-    license_files=["../LICENSE", "../THIRD_PARTY_NOTICES.md"],
+    license_files=["LICENSE", "THIRD_PARTY_NOTICES.md"],
     # The single authority for the Python floor; python/tools/check_wheel.py reads THIS line rather than
     # carrying a copy of the number, and the wheel's METADATA is what setuptools derives from it.
     #

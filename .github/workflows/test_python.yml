@@ -72,6 +72,10 @@ jobs:
 
       # The shell, the C ABI contract and the conformance fixture. 91 assertions, and the count matters:
       # a silently skipped case is the failure mode this gate exists to catch.
+      - name: Install the test runner
+        # Measured on the first CI run (2026-10-22): every Python job died at the next step with
+        # "No module named pytest". The shell's tests need pytest and nothing else.
+        run: python -m pip install --quiet --disable-pip-version-check pytest
       - name: Run the shell tests
         working-directory: python
         run: python -m pytest tests -q

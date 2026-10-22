@@ -18,6 +18,8 @@ cannot pass as current.
 
     python csharp/tools/emit_build_info.py --native <path to built library> [--commit <sha>]
     python csharp/tools/emit_build_info.py --check --native <path>      # CI: verify, do not write
+    python csharp/tools/emit_build_info.py --version-props-only         # configure time: version.props alone
+
 
 ``--check`` is the self-test the tooling discipline asks for: it recomputes both files and reports a
 mismatch instead of rewriting them, so a tree that was built from a different version fails loudly.
@@ -96,12 +98,21 @@ def render_build_info(library: str, commit: str) -> str:
 
 def main(argv: Optional[list] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--native", required=True, help="the native library that was built")
+    parser.add_argument("--native", help="the native library that was built (required unless "
+                                         "--version-props-only is given)")
     parser.add_argument("--commit", default="unknown", help="recorded commit (not required to be HEAD)")
+    parser.add_argument("--version-props-only", action="store_true",
+                        help="write just version.props (configure-time use: it needs nothing but the version)")
     parser.add_argument("--check", action="store_true", help="verify instead of writing; exit 1 on drift")
     options = parser.parse_args(argv)
 
     version = version_from_cmake(ROOT / "CMakeLists.txt")
+    if options.version_props_only:
+        VERSION_PROPS.write_text(render_version_props(version), encoding="utf-8", newline="\n")
+        print(f"wrote {VERSION_PROPS.relative_to(ROOT)} (version {version}, from CMakeLists.txt)")
+        return 0
+    if not options.native:
+        parser.error("--native is required unless --version-props-only is given")
     library = library_name_from(Path(options.native))
     commit = options.commit.strip() or "unknown"
 

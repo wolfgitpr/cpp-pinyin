@@ -16,7 +16,7 @@
    |---|---|
    | Windows x64 | ✅ 已实测（含现成 wheel / nupkg） |
    | Linux x86_64 / aarch64 | ✅ 能构建，脚本已在板上跑过；**CI 尚未在 GitHub 上跑过** |
-   | macOS | ⚠️ **未实测**——本仓没有 Mac；部署目标（10.14）与验收脚本已进树 |
+   | macOS | ⚠️ **未实测**——本仓没有 Mac；部署目标（10.15）与验收脚本已进树 |
 3. **词典要能被找到**：库本身**不含**默认词典路径（`Engine::open` / `cppp2_open` 都要求显式路径）。
    谁能替决定，优先级是固定的：
 
@@ -203,7 +203,7 @@ Chinese above, English below. The two halves correspond one to one.
 2. **Platform status** (as of 2026-10-09; details in `docs/DECISIONS.md` §2.1 `docs/RELEASE_CHECKLIST.md`（原 §6.7.11）):
    Windows x64 is measured end to end; Linux x86_64/aarch64 build and have run on real hardware (the CI legs
    themselves have not run on GitHub yet); **macOS is not measured** -- there is no Mac in this project, though
-   the deployment target (10.14) and a verification script are in the tree.
+   the deployment target (10.15) and a verification script are in the tree.
 3. **The dictionaries have to be findable**: the library ships no implicit dictionary path. Through
    `find_package` it is `CPP_PINYIN2_DICT_DIR` (set by `cpp-pinyin2Config.cmake` to `share/cpp-pinyin2/dict`);
    the Python and C# packages carry a copy; a source build has to

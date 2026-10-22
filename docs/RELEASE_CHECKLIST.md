@@ -57,7 +57,7 @@ Linux 两条腿**必须在各自架构的 manylinux 容器内**跑同一条脚�
 - **裸 `check_wheel.py` 今天没有 macOS 那一半**（2026-10-09 实测档位）：非 Linux 轮子上它**只留一句 note**——"no ELF shared objects in this wheel, so the glibc surface was not measured"（Windows 轮子上实测如此），而 PE/DLL 成员按"原生库成员但非 ELF/Mach-O，故未测动态面"记；**Mach-O 成员根本不会被解析**。要补这一半，前置是四项、且都是未验证面：① 一个走遍 `LC_LOAD_DYLIB`/`LC_RPATH` 的 Mach-O 读取器（薄二进制与 `FAT_MAGIC` 通用二进制两种形态）；② 6.7.10 那两行 macOS 设置（`MACOSX_DEPLOYMENT_TARGET` / `-arch`）；③ 一条"装载时不依赖 libstdc++（macOS 只有 libc++）+ 必须有 `@loader_path` 相对 rpath"的判据；④ 一台能跑它的 macOS 机器（6.7.9 记"无机器、无 osxcross"）。**没有第 ④ 项，前三项只能写成未验证**——本轮试过写①②③，在本机既跑不了真 dylib 又只能靠合成夹具自证，故**整体未入库**，只把踩到的形态学坑留在这里见 3d。
 
 **3c. macOS 的部署目标与验收脚本已进树（2026-10-09）**：部分回应上一条列的第 ②③ 项——① `CMakeLists.txt`
-的 `if (APPLE)` 分支把 `CMAKE_OSX_DEPLOYMENT_TARGET` 定为 **10.14**（依据 6.5 第 2 条：C++17 的
+的 `if (APPLE)` 分支把 `CMAKE_OSX_DEPLOYMENT_TARGET` 定为 **10.15**（libc++ 自 10.15 才有 `<filesystem>`，
 `std::filesystem` 在 10.13 只有 `<experimental/filesystem>`），对更低值**硬拒**（`FATAL_ERROR` 而非警告），
 命令行 `-D` 仍可抬高；放在树里而非某个 workflow，是为了让 Python 轮子 / C# 包 / 下游 `find_package` 拿到
 **同一个答案**（同一数值多处写，正是本项目禁止的那类漂移）。② `python/tools/ci_macos_verify.sh` 在 Mac 上对
@@ -155,7 +155,7 @@ import 就会执行 `setup()`），并新增两条自检：METADATA 里写别的
 | Linux x86_64 轮子（`linux_x86_64` + auditwheel 盖章） | **脚本已板测 / CI 未跑** | 同一条脚本的 aarch64 腿在真板上 `RESULT: OK`（含盖章与盖章后复检，ledger V110）；x86_64 腿只换了 `uname -m` | 6.7.12（原 6.7.11 顺延）、`python/tools/ci_manylinux_aarch64.sh` |
 | Linux aarch64 轮子 | **板测已实测 / CI 未跑** | 板上 `RESULT: OK`；盖章后标签为压缩标签集（auditwheel 判 2_26 更宽） | 6.7.9 / 6.7.10 行内 |
 | Linux 原生构建 + **全量 ctest 50/50**（当时注册 50 条；现为 49 条） | **已实测** | 2026-10-21 在 firefly 板（aarch64 / glibc 2.31 / gcc 9.4 / cmake 3.21.3 / python 3.8.10 / binutils 2.34，快照 `4772b3f`（压缩前提交，克隆内不可达））：configure、build、`ctest` **50/50**、install 全过；README 的前置是词典仓检出在 `../pinyin-makedict` 且先跑一次 `emit_build_info.py` | 提交历史 |
-| macOS 轮子 | **未实测（缺机器）** | 只有：部署目标进树（`CMakeLists.txt` 的 `if (APPLE)`，硬拒 < 10.14）、验收脚本进树（`ci_macos_verify.sh`，五项问句）、以及"非 Apple 路径不受影响"的本机回归 | §3c |
+| macOS 轮子 | **未实测（缺机器）** | 只有：部署目标进树（`CMakeLists.txt` 的 `if (APPLE)`，硬拒 < 10.15）、验收脚本进树（`ci_macos_verify.sh`，五项问句）、以及"非 Apple 路径不受影响"的本机回归 | §3c |
 | 一个轮子覆盖多解释器 | **板测已实测 + CI 检查点已建（未跑）** | 板上 cp39/cp310/cp311/cp312/cp313 各 91 passed 且同一 wheel 都能装能冒烟；CI 侧 `python_versions` job | §3b、§5 |
 | Python 下限这个数字 | **单一真相源已收敛** | `setup.py` 的 `python_requires` 是唯一权威，`check_wheel.py` 解析它并比对 METADATA，两条自检一红一绿（2026-10-09） | §5 末段、`python/tools/check_wheel.py` |
 | 版本链六处一致（发版前提） | **①②③机械化为用例，④⑤⑥在 `check_bindings.py`，数据下限在 `check_version_tokens` 的第七轴，⑥ 的 tag 检项待 CI 传参** | `python/tests/test_contract.py::test_version_chain_three_of_six`；`check_bindings.py --self-test 77/77` | 本节第 1 条 |

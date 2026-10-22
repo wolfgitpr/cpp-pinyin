@@ -99,3 +99,7 @@ pytest-of-*/
 # container image and core affinity, so a clone cannot run them and the numbers they produce are recorded in
 # docs/PERFORMANCE.md with their dates instead. Same reasoning as .tmp-firefly-disk/ below.
 tools/board/
+
+# Staged by python/setup.py so `license_files` can name files inside the project root.
+python/LICENSE
+python/THIRD_PARTY_NOTICES.md

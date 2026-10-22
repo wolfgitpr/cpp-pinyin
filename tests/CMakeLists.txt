@@ -548,6 +548,24 @@ if(Python3_Interpreter_FOUND)
     # checker can fail (dozens of fixtures, most of them negative; the tool prints its own N/N). The counts live in the three
     # frozen lists -- read from there, never restated here: a restated count drifts, and this comment
     # kept saying sixteen/sixteen/sixteen long after the surfaces had moved on.
+    # `BindingGates` checks the version chain, and place 5 of that chain is
+    # `csharp/CppPinyin/version.props` -- a GENERATED, gitignored file. Nothing generated it before `ctest`
+    # ran, so a clean tree (measured: the `mingw` CI job, 2026-10-22) failed the gate for a file the release
+    # flow produces elsewhere. Generating it here costs nothing (it needs only the version) and keeps the
+    # check honest: the chain is verified rather than skipped.
+    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/csharp/CppPinyin/version.props")
+        execute_process(
+            COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/csharp/tools/emit_build_info.py"
+                    --version-props-only
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            RESULT_VARIABLE _version_props_result
+            OUTPUT_QUIET ERROR_QUIET)
+        if (NOT _version_props_result EQUAL 0)
+            message(WARNING "could not pre-generate csharp/CppPinyin/version.props; "
+                            "the BindingGates entry will report it missing")
+        endif ()
+    endif ()
+
     add_test(NAME BindingGates
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/check_bindings.py)
     set_tests_properties(BindingGates PROPERTIES
