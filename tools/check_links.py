@@ -53,13 +53,16 @@ SKIP_PARTS = {".git", ".tmp", ".tmp-firefly-disk", "build", "bin", "obj", "__pyc
 
 
 def tracked_markdown(root: Path) -> List[str]:
-    completed = subprocess.run(["git", "ls-files", "*.md"], cwd=root,
-                               capture_output=True, text=True)
+    # NO PATHSPEC GLOB: `git ls-files "*.md"` asks git to interpret a pattern, and on the msys2 job that list came
+    # back with one file in it while the index held three (measured 2026-10-22, `LinkChecksSelfTest`). Listing
+    # everything with `-z` and filtering by suffix here takes the question away from git, and `-z` also removes the
+    # quoting rules that make a path with a space arrive as `"docs/with space.md"`.
+    completed = subprocess.run(["git", "ls-files", "-z"], cwd=root, capture_output=True)
     if completed.returncode != 0:
         raise SystemExit("ERROR: `git ls-files` failed, refusing to report a clean audit of nothing")
-    names = [line for line in completed.stdout.splitlines() if line]
+    names = [name for name in completed.stdout.decode("utf-8", "replace").split("\0") if name]
     return [name for name in names
-            if not any(part in SKIP_PARTS for part in Path(name).parts)]
+            if name.endswith(".md") and not any(part in SKIP_PARTS for part in Path(name).parts)]
 
 
 def declares_history(root: Path, name: str) -> bool:

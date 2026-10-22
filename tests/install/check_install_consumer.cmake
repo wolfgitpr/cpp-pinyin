@@ -297,6 +297,10 @@ endif ()
 set(_env "PATH=${_prefix}/bin;$ENV{PATH}")
 set(_env "${_env};LD_LIBRARY_PATH=${_prefix}/${INSTALL_LIBDIR};$ENV{LD_LIBRARY_PATH}")
 set(_env "${_env};DYLD_LIBRARY_PATH=${_prefix}/${INSTALL_LIBDIR};$ENV{DYLD_LIBRARY_PATH}")
+# The phase banners below exist because a TIMEOUT is invisible to this script: the consumer's configure/build
+# output is captured into variables and printed only when the build FAILS, so a run that stalls prints the last
+# banner and nothing after it -- which is what a reader of the Windows job needed (2026-10-22).
+message(STATUS "install consumer smoke: phase 4a (configuring the out-of-tree consumer)")
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E env "${_env}" "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
     RESULT_VARIABLE _run_rc OUTPUT_VARIABLE _run_out ERROR_VARIABLE _run_err)

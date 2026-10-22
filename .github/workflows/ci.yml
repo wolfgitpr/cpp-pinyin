@@ -100,6 +100,11 @@ jobs:
           # the count, and the copy drifted (49 here vs 50 in `tools/run_all_gates.py`): the two would run
           # back to back in this job and one of them had to be red. The count assertion lives in
           # `run_all_gates` alone (audit round 3, H16).
+          # The gate suite MEASURES some claims by running the tools, and `check_wheel --self-test` builds
+          # its fixtures from the staged package. Without this the measurement returns nothing and
+          # `check_doc_claims` calls every claim about it a mismatch -- reproduced in a clean checkout
+          # (2026-10-22): "MISMATCH measurement/check_wheel:0 [unmeasurable]".
+          python3 python/tools/build_native.py --build-dir .tmp/build-python --config Release
           python3 tools/run_all_gates.py --with-build
 
   # Sanitizer Job
