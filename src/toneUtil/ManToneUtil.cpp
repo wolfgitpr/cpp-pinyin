@@ -1,132 +1,213 @@
 #include "ManToneUtil.h"
 
 #include <algorithm>
-#include <unordered_map>
+#include <array>
 #include <vector>
 
-namespace Pinyin
+namespace cpp_pinyin::v2
 {
-    // 定义 phonetic_symbol_reverse 映射表
-    static const std::unordered_map<std::u16string, char16_t> phoneticSymbolReverse = {
-        {u"a1", u'ā'}, {u"a2", u'á'}, {u"a3", u'ǎ'}, {u"a4", u'à'},
-        {u"e1", u'ē'}, {u"e2", u'é'}, {u"e3", u'ě'}, {u"e4", u'è'},
-        {u"i1", u'ī'}, {u"i2", u'í'}, {u"i3", u'ǐ'}, {u"i4", u'ì'},
-        {u"o1", u'ō'}, {u"o2", u'ó'}, {u"o3", u'ǒ'}, {u"o4", u'ò'},
-        {u"u1", u'ū'}, {u"u2", u'ú'}, {u"u3", u'ǔ'}, {u"u4", u'ù'},
-        {u"v1", u'ǖ'}, {u"v2", u'ǘ'}, {u"v3", u'ǚ'}, {u"v4", u'ǜ'},
-    };
+    // Direct lookup: (vowel, tone_digit) -> tone diacritic char16_t.
+    // Encodes vowel index (a=0,e=1,i=2,o=3,u=4,v=5) * 4 + (digit-1) into a flat array of 24 entries.
+    static constexpr size_t VOWEL_TONE_TABLE_SIZE = 24;
+
+    static constexpr auto buildVowelToneTable() {
+        std::array<char16_t, VOWEL_TONE_TABLE_SIZE> t{};
+        // a: ā á ǎ à
+        t[0 * 4 + 0] = 0x0101;
+        t[0 * 4 + 1] = 0x00E1;
+        t[0 * 4 + 2] = 0x01CE;
+        t[0 * 4 + 3] = 0x00E0;
+        // e: ē é ě è
+        t[1 * 4 + 0] = 0x0113;
+        t[1 * 4 + 1] = 0x00E9;
+        t[1 * 4 + 2] = 0x011B;
+        t[1 * 4 + 3] = 0x00E8;
+        // i: ī í ǐ ì
+        t[2 * 4 + 0] = 0x012B;
+        t[2 * 4 + 1] = 0x00ED;
+        t[2 * 4 + 2] = 0x01D0;
+        t[2 * 4 + 3] = 0x00EC;
+        // o: ō ó ǒ ò
+        t[3 * 4 + 0] = 0x014D;
+        t[3 * 4 + 1] = 0x00F3;
+        t[3 * 4 + 2] = 0x01D2;
+        t[3 * 4 + 3] = 0x00F2;
+        // u: ū ú ǔ ù
+        t[4 * 4 + 0] = 0x016B;
+        t[4 * 4 + 1] = 0x00FA;
+        t[4 * 4 + 2] = 0x01D4;
+        t[4 * 4 + 3] = 0x00F9;
+        // v: ǖ ǘ ǚ ǜ
+        t[5 * 4 + 0] = 0x01D6;
+        t[5 * 4 + 1] = 0x01D8;
+        t[5 * 4 + 2] = 0x01DA;
+        t[5 * 4 + 3] = 0x01DC;
+        return t;
+    }
+
+    static constexpr auto vowelToneTable = buildVowelToneTable();
+
+    // Returns tone diacritic for (vowel, digit 1-4), or 0 if not a valid combination.
+    static inline char16_t lookupPhoneticSymbol(const char16_t vowel, const char16_t digit) {
+        int vi;
+        switch (vowel) {
+        case u'a':
+            vi = 0;
+            break;
+        case u'e':
+            vi = 1;
+            break;
+        case u'i':
+            vi = 2;
+            break;
+        case u'o':
+            vi = 3;
+            break;
+        case u'u':
+            vi = 4;
+            break;
+        case u'v':
+            vi = 5;
+            break;
+        default:
+            return 0;
+        }
+        if (digit < u'1' || digit > u'4')
+            return 0;
+        return vowelToneTable[static_cast<std::size_t>(vi * 4 + (digit - u'1'))];
+    }
 
     // https://github.com/mozillazg/python-pinyin/blob/master/pypinyin/style/_tone_rule.py
-    int rightMarkIndex(const std::u16string &pinyin_no_tone) {
-        // 'iou', 'uei', 'uen': 根据还原前的拼音进行标记
-        if (pinyin_no_tone.find(u"iou") != std::string::npos) {
-            return pinyin_no_tone.find('u');
+    //
+    // An internal function with no header declaration: explicitly static so it stays out of the symbol
+    // table -- the v1.7 lesson is that an exported symbol blocks cross-TU inlining.
+    static int rightMarkIndex(const std::u16string &pinyin_no_tone) {
+        // 'iou', 'uei', 'uen': marked according to the pinyin BEFORE it was restored to canonical form
+        if (pinyin_no_tone.find(u"iou") != std::u16string::npos) {
+            return static_cast<int>(pinyin_no_tone.find('u'));
         }
-        if (pinyin_no_tone.find(u"uei") != std::string::npos) {
-            return pinyin_no_tone.find('i');
+        if (pinyin_no_tone.find(u"uei") != std::u16string::npos) {
+            return static_cast<int>(pinyin_no_tone.find('i'));
         }
-        if (pinyin_no_tone.find(u"uen") != std::string::npos) {
-            return pinyin_no_tone.find('u');
+        if (pinyin_no_tone.find(u"uen") != std::u16string::npos) {
+            return static_cast<int>(pinyin_no_tone.find('u'));
         }
 
-        // 有 'a' 不放过, 没 'a' 找 'o'、'e'
-        static const std::vector<char16_t> vowels = {u'a', u'o', u'e'};
+        // The tables below are compile-time constants of fixed length (3-4 entries): constexpr arrays rather
+        // than std::vector/std::u16string, to avoid the heap allocation and the first-call guard that a
+        // function-local static container brings. The ORDER must not change: this function places the tone
+        // mark at the FIRST hit in table order, which is not find_first_of's semantics.
+
+        // An 'a' is never passed over; without one, look for 'o' or 'e'
+        constexpr char16_t vowels[] = {u'a', u'o', u'e'};
         for (const char16_t c : vowels) {
             const auto pos = pinyin_no_tone.find(c);
             if (pos != std::u16string::npos) {
-                return pos;
+                return static_cast<int>(pos);
             }
         }
 
-        // 'i'、'u' 若是连在一起，谁在后面就标谁
-        static const std::vector<std::u16string> combos = {u"iu", u"ui"};
-        for (const std::u16string &combo : combos) {
-            const auto pos = pinyin_no_tone.find(combo);
-            if (pos != std::u16string::npos) {
-                return pos + 1;
-            }
+        // With 'i' and 'u' adjacent, the later one takes the mark
+        const auto iuPos = pinyin_no_tone.find(u"iu");
+        if (iuPos != std::u16string::npos) {
+            return static_cast<int>(iuPos) + 1;
+        }
+        const auto uiPos = pinyin_no_tone.find(u"ui");
+        if (uiPos != std::u16string::npos) {
+            return static_cast<int>(uiPos) + 1;
         }
 
-        // 'i'、'u'、'v'、'ü'
-        static const std::vector<char16_t> other_vowels = {u'i', u'u', u'v', u'ü'};
+        // 'i', 'u', 'v', 'ü'
+        constexpr char16_t other_vowels[] = {u'i', u'u', u'v', u'ü'};
         for (const char16_t c : other_vowels) {
             const auto pos = pinyin_no_tone.find(c);
             if (pos != std::u16string::npos) {
-                return pos;
+                return static_cast<int>(pos);
             }
         }
 
         // 'n', 'm', 'ê'
-        static const std::vector<char16_t> final_chars = {u'n', u'm', u'ê'};
+        constexpr char16_t final_chars[] = {u'n', u'm', u'ê'};
         for (const char16_t c : final_chars) {
             const auto pos = pinyin_no_tone.find(c);
             if (pos != std::u16string::npos) {
-                return pos;
+                return static_cast<int>(pos);
             }
         }
 
-        // 如果没有找到合适的位置，则返回-1表示没有可以标记的位置
+        // When no suitable position is found, return -1 to mean there is nowhere to put a mark
         return -1;
     }
 
-    static bool isToneNumber(const char16_t c) {
-        return c >= u'0' && c <= u'4';
-    }
+    static bool isToneNumber(const char16_t c) { return c >= u'1' && c <= u'5'; }
 
     static bool isPhoneticSymbol(const char16_t c) {
-        return std::u16string(u"aeiouüv").find(c) != std::u16string::npos;
+        static const std::u16string vowels = u"aeiouüv";
+        return vowels.find(c) != std::u16string::npos;
     }
 
     static std::u16string toneToTone(const std::u16string &tone2) {
-        // 替换 "ü" 为 "v" 并去掉 5 和 0
+        // Replace "ü" with "v" and drop any 5 or 0
         std::u16string string;
-        for (const char16_t c : tone2)
-            string += c == u'ü' ? u'v' : c;
+        string.reserve(tone2.size());
+        for (const char16_t c : tone2) {
+            if (c != u'5' && c != u'0')
+                string += (c == u'ü') ? u'v' : c;
+        }
 
-        string.erase(std::remove(string.begin(), string.end(), u'5'), string.end());
-        string.erase(std::remove(string.begin(), string.end(), u'0'), string.end());
+        std::u16string result;
+        result.reserve(string.size());
 
-        std::vector<char16_t> result;
-
-        int pos = 0;
+        size_t pos = 0;
         while (pos < string.size()) {
             const char16_t &currentChar = string[pos];
             if (isPhoneticSymbol(currentChar)) {
-                if (pos + 1 < string.length() && isToneNumber(string[pos + 1])) {
-                    const auto str = string.substr(pos, 2);
-                    const auto it = phoneticSymbolReverse.find(str);
-                    if (it != phoneticSymbolReverse.end()) {
-                        result.emplace_back(it->second);
+                if (pos + 1 < string.size() && isToneNumber(string[pos + 1])) {
+                    const char16_t mapped = lookupPhoneticSymbol(currentChar, string[pos + 1]);
+                    if (mapped != 0) {
+                        result += mapped;
                         pos += 2;
                     } else {
-                        result.emplace_back(currentChar);
+                        result += currentChar;
                         pos++;
                     }
                 } else {
-                    result.emplace_back(currentChar);
+                    result += currentChar;
                     pos++;
                 }
             } else {
-                result.emplace_back(currentChar);
+                result += currentChar;
                 pos++;
             }
         }
 
-        std::u16string result_str;
-        for (const char16_t c : result)
-            result_str += c == u'ü' ? u'v' : c;
+        // Replace any remaining ü with v
+        for (char16_t &c : result) {
+            if (c == u'ü')
+                c = u'v';
+        }
 
-        return result_str;
+        return result;
     }
 
     static std::u16string tone3ToTone2(const std::u16string &pinyin) {
-        const auto no_number_tone3 = pinyin.substr(0, pinyin.size() - 1);
+        // An empty string must return early: pinyin.substr(size()-1) below would be substr(SIZE_MAX) on an
+        // empty string, throwing std::out_of_range -- and an exception crossing this boundary is not allowed.
+        // (The rule was written down as decision D2 of the old REFACTORING ledger, which is retired; the rule
+        // itself survives as "invalid input must not throw" in docs/DECISIONS.md section 4.1.) A word
+        // list never carries an empty reading, but tone3ToTone is an exported function and can be called
+        // from outside.
+        if (pinyin.empty())
+            return {};
+
+        const auto no_number_tone3 =
+            pinyin.size() > 1 && isToneNumber(pinyin.back()) ? pinyin.substr(0, pinyin.size() - 1) : pinyin;
         auto mark_index = rightMarkIndex(no_number_tone3);
         if (mark_index == -1)
-            mark_index = no_number_tone3.size() - 1;
+            mark_index = static_cast<int>(no_number_tone3.size()) - 1;
 
-        const std::u16string before = no_number_tone3.substr(0, mark_index + 1);
-        const std::u16string after = no_number_tone3.substr(mark_index + 1);
+        const std::u16string before = no_number_tone3.substr(0, static_cast<std::size_t>(mark_index) + 1);
+        const std::u16string after = no_number_tone3.substr(static_cast<std::size_t>(mark_index) + 1);
         const std::u16string number = pinyin.substr(pinyin.size() - 1);
 
         return before + number + after;
@@ -138,4 +219,4 @@ namespace Pinyin
     }
 
 
-} // Pinyin
+}  // namespace cpp_pinyin::v2
