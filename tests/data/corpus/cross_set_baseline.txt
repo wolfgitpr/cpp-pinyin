@@ -1,0 +1,9 @@
+了当 :: A=[('le', 'dang'), ('liao', 'dang')] B=[('liao', 'dang')]
+琢磨 :: A=[('zhuo', 'mo'), ('zuo', 'mo')] B=[('zuo', 'mo')]
+都会 :: A=[('dou', 'hui'), ('du', 'hui')] B=[('dou', 'hui')]
+似的 :: cm si4,de5 vs mu shi4,de5   (span split differs: 类似+的 si4 in one set, 似的 shi4de5 in the other; both correct in their own sentence)
+大地 :: cm da4,de5 vs mu da4,di4   (span split differs: 极大地 da4de5 in one set, the word 大地 da4di4 in the other; both correct in their own sentence)
+着手 :: the mu rows are the cross-word 空着手 (zhe), the cm rows the word 着手 zhuo2shou3
+落地 :: the mu row is the cross-word 失落地重来 (de), the cm rows the word 落地 luo4di4
+地面 :: the mu row is the cross-word 似水地面容 (de), the cm rows the word 地面 di4mian4
+了事 :: the mu rows are the particle 了 (le), the cm rows the word 了事 liao3shi4

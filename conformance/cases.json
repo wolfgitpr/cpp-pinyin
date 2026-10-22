@@ -1,0 +1,718 @@
+{
+  "schema": 1,
+  "cases_count": 49,
+  "generated_by_commit": "1e896672082ce9e9885fe1ab350beb46b69fe2de",
+  "dialects": ["cantonese", "mandarin"],
+  "scale": {
+    "seed": 20261001,
+    "multiplier": 1103515245,
+    "increment": 12345,
+    "modulus": 2147483648,
+    "mask": 4294967295,
+    "length": 4096,
+    "algorithm": "x = (x * multiplier + increment) mod modulus; repeat length times; character = alphabet[x mod alphabet_size]",
+    "dialect": "mandarin",
+    "op": "query",
+    "style": 8,
+    "alphabet": ["你", "好", "中", "国", "人", "民", "行", "a", "b", "1", ",", "!"],
+    "expect_span_count": 3981,
+    "expect_head": [",", "ab", "1", ",", "!", "b", "hao3", "zhong1"],
+    "expect_tail": ["1", "xing2", "ab", "min2", "xing2", "!", "ren2", "hao3"]
+  },
+  "cases": [
+    {
+      "id": "m-normal-hello",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "你好世界",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "ni", "failed": false, "candidates": []},
+        {"text": "好", "reading": "hao", "failed": false, "candidates": []},
+        {"text": "世", "reading": "shi", "failed": false, "candidates": []},
+        {"text": "界", "reading": "jie", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone-hello",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "你好世界",
+      "style": 1,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "nǐ", "failed": false, "candidates": []},
+        {"text": "好", "reading": "hǎo", "failed": false, "candidates": []},
+        {"text": "世", "reading": "shì", "failed": false, "candidates": []},
+        {"text": "界", "reading": "jiè", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-hello",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "你好世界",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "ni3", "failed": false, "candidates": []},
+        {"text": "好", "reading": "hao3", "failed": false, "candidates": []},
+        {"text": "世", "reading": "shi4", "failed": false, "candidates": []},
+        {"text": "界", "reading": "jie4", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-firstletter-hello",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "你好世界",
+      "style": 3,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "n", "failed": false, "candidates": []},
+        {"text": "好", "reading": "h", "failed": false, "candidates": []},
+        {"text": "世", "reading": "s", "failed": false, "candidates": []},
+        {"text": "界", "reading": "j", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-people",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "中国人民",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "中", "reading": "zhong1", "failed": false, "candidates": []},
+        {"text": "国", "reading": "guo2", "failed": false, "candidates": []},
+        {"text": "人", "reading": "ren2", "failed": false, "candidates": []},
+        {"text": "民", "reading": "min2", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-people",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "中国人民",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "中", "reading": "zhong", "failed": false, "candidates": []},
+        {"text": "国", "reading": "guo", "failed": false, "candidates": []},
+        {"text": "人", "reading": "ren", "failed": false, "candidates": []},
+        {"text": "民", "reading": "min", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-hang-plain",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "行",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "行", "reading": "xing2", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-hang-candidates",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "行",
+      "style": 8,
+      "candidates": true,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "行", "reading": "xing2", "failed": false, "candidates": ["xing2", "hang2", "xing", "heng2"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-lve-plain",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "略",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "略", "reading": "lve", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-lve-as-u",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "略",
+      "style": 0,
+      "candidates": false,
+      "vToU": true,
+      "expect_syllables": [
+        {"text": "略", "reading": "lüe", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-lve-plain",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "略",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "略", "reading": "lve4", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-lve-as-u",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "略",
+      "style": 8,
+      "candidates": false,
+      "vToU": true,
+      "expect_syllables": [
+        {"text": "略", "reading": "lüe4", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-normal-lve-plain",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "略",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "略", "reading": "loek", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-normal-lve-as-u",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "略",
+      "style": 0,
+      "candidates": false,
+      "vToU": true,
+      "expect_syllables": [
+        {"text": "略", "reading": "loek", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-ascii",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "abc",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "abc", "reading": "abc", "failed": true, "candidates": ["abc"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-digits",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "abc123",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "abc", "reading": "abc", "failed": true, "candidates": ["abc"]},
+        {"text": "1", "reading": "1", "failed": true, "candidates": ["1"]},
+        {"text": "2", "reading": "2", "failed": true, "candidates": ["2"]},
+        {"text": "3", "reading": "3", "failed": true, "candidates": ["3"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-mixed",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "abc你,!?",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "abc", "reading": "abc", "failed": true, "candidates": ["abc"]},
+        {"text": "你", "reading": "ni", "failed": false, "candidates": []},
+        {"text": ",", "reading": ",", "failed": true, "candidates": [","]},
+        {"text": "!", "reading": "!", "failed": true, "candidates": ["!"]},
+        {"text": "?", "reading": "?", "failed": true, "candidates": ["?"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-empty",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-normal-failed-span",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "abc你",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "abc", "reading": "abc", "failed": true, "candidates": ["abc"]},
+        {"text": "你", "reading": "ni", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-tone3-traditional",
+      "dialect": "mandarin",
+      "op": "query",
+      "text": "學習",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "學", "reading": "xue2", "failed": false, "candidates": []},
+        {"text": "習", "reading": "xi2", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-normal-hello",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "你好",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "nei", "failed": false, "candidates": []},
+        {"text": "好", "reading": "hou", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-tone3-hello",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "你好",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "nei5", "failed": false, "candidates": []},
+        {"text": "好", "reading": "hou2", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-firstletter-hello",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "你好",
+      "style": 3,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "你", "reading": "n", "failed": false, "candidates": []},
+        {"text": "好", "reading": "h", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-tone3-hang-candidates",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "行",
+      "style": 8,
+      "candidates": true,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "行", "reading": "haang4", "failed": false, "candidates": ["haang4", "hang4", "hong4", "hang6", "hong2"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-normal-digits",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "123",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "1", "reading": "1", "failed": true, "candidates": ["1"]},
+        {"text": "2", "reading": "2", "failed": true, "candidates": ["2"]},
+        {"text": "3", "reading": "3", "failed": true, "candidates": ["3"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-normal-mixed",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "中国人民abc",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "中", "reading": "zung", "failed": false, "candidates": []},
+        {"text": "国", "reading": "gwok", "failed": false, "candidates": []},
+        {"text": "人", "reading": "jan", "failed": false, "candidates": []},
+        {"text": "民", "reading": "man", "failed": false, "candidates": []},
+        {"text": "abc", "reading": "abc", "failed": true, "candidates": ["abc"]}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-normal-empty",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "c-tone3-traditional",
+      "dialect": "cantonese",
+      "op": "query",
+      "text": "學習",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [
+        {"text": "學", "reading": "hok6", "failed": false, "candidates": []},
+        {"text": "習", "reading": "zaap6", "failed": false, "candidates": []}
+      ],
+      "expect_readings": []
+    }
+,
+    {
+      "id": "m-readings-hang-normal",
+      "dialect": "mandarin",
+      "op": "readings",
+      "text": "行",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": ["xing", "hang", "heng"]
+    }
+,
+    {
+      "id": "m-readings-hang-tone3",
+      "dialect": "mandarin",
+      "op": "readings",
+      "text": "行",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": ["xing2", "hang2", "xing", "heng2"]
+    }
+,
+    {
+      "id": "m-readings-ni-tone3",
+      "dialect": "mandarin",
+      "op": "readings",
+      "text": "你",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": ["ni3"]
+    }
+,
+    {
+      "id": "m-readings-ascii-normal",
+      "dialect": "mandarin",
+      "op": "readings",
+      "text": "a",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": ["a"]
+    }
+,
+    {
+      "id": "c-readings-hang-tone3",
+      "dialect": "cantonese",
+      "op": "readings",
+      "text": "行",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": ["haang4", "hang4", "hong4", "hang6", "hong2"]
+    }
+,
+    {
+      "id": "c-readings-ni-normal",
+      "dialect": "cantonese",
+      "op": "readings",
+      "text": "你",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": ["nei"]
+    }
+,
+    {
+      "id": "m-simplify-traditional",
+      "dialect": "mandarin",
+      "op": "to_simplified",
+      "text": "學",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "学"
+    }
+,
+    {
+      "id": "m-simplify-pair",
+      "dialect": "mandarin",
+      "op": "to_simplified",
+      "text": "學習",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "学"
+    }
+,
+    {
+      "id": "m-simplify-plain",
+      "dialect": "mandarin",
+      "op": "to_simplified",
+      "text": "你",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "你"
+    }
+,
+    {
+      "id": "m-simplify-ascii",
+      "dialect": "mandarin",
+      "op": "to_simplified",
+      "text": "a",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "a"
+    }
+,
+    {
+      "id": "c-simplify-traditional",
+      "dialect": "cantonese",
+      "op": "to_simplified",
+      "text": "學",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "學"
+    }
+,
+    {
+      "id": "m-poly-hang",
+      "dialect": "mandarin",
+      "op": "is_polyphonic",
+      "text": "行",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": true
+    }
+,
+    {
+      "id": "m-poly-ni",
+      "dialect": "mandarin",
+      "op": "is_polyphonic",
+      "text": "你",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": false
+    }
+,
+    {
+      "id": "m-poly-ascii",
+      "dialect": "mandarin",
+      "op": "is_polyphonic",
+      "text": "a",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": false
+    }
+,
+    {
+      "id": "c-poly-hang",
+      "dialect": "cantonese",
+      "op": "is_polyphonic",
+      "text": "行",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": true
+    }
+,
+    {
+      "id": "m-styles",
+      "dialect": "mandarin",
+      "op": "style_list",
+      "text": "",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect_styles": ["normal", "tone", "tone2", "first-letter", "bopomofo", "initials", "finals", "finals-tone3", "tone3"]
+    }
+,
+    {
+      "id": "c-styles",
+      "dialect": "cantonese",
+      "op": "style_list",
+      "text": "",
+      "style": 0,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect_styles": ["normal", "first-letter", "tone3"]
+    }
+,
+    {
+      "id": "m-render-tone",
+      "dialect": "mandarin",
+      "op": "render_syllable",
+      "text": "你",
+      "style": 1,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "nǐ"
+    }
+,
+    {
+      "id": "c-render-tone",
+      "dialect": "cantonese",
+      "op": "render_syllable",
+      "text": "行",
+      "style": 1,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect": "haang4"
+    }
+,
+    {
+      "id": "m-sandhi-nihao",
+      "dialect": "mandarin",
+      "op": "apply_tone_sandhi",
+      "text": "你好",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect_changed": 1,
+      "expect_rendered": ["ni2", "hao3"]
+    }
+,
+    {
+      "id": "m-sandhi-queries",
+      "dialect": "mandarin",
+      "op": "apply_tone_sandhi",
+      "text": "中国人民",
+      "style": 8,
+      "candidates": false,
+      "vToU": false,
+      "expect_syllables": [],
+      "expect_readings": [],
+      "expect_changed": 0,
+      "expect_rendered": ["zhong1", "guo2", "ren2", "min2"]
+    }
+
+  ]
+}

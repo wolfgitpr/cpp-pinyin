@@ -1,0 +1,22 @@
+# The frozen set of public headers, relative to include/ (see tools/check_bindings.py, check 5).
+#
+# Adding, removing or moving a public header changes what every consumer includes, so it is a
+# deliberate edit of this list in the same commit rather than something that happens quietly. The
+# same reasoning as the C ABI symbol list next to this file, one level up: there the frozen thing is
+# the exported symbols, here it is the installed file set.
+#
+cpp-pinyin2/core/Engine.h
+cpp-pinyin2/core/G2pglobal.h
+cpp-pinyin2/core/Global.h
+cpp-pinyin2/core/PinyinGlobal.h
+cpp-pinyin2/core/Syllable.h
+cpp-pinyin2/core/ToneConverter.h
+cpp-pinyin2/core/ToneSandhi.h
+cpp-pinyin2/core/Types.h
+cpp-pinyin2/core/U16Str.h
+cpp-pinyin2/core/Version.h
+cpp-pinyin2/dialects/CanTone.h
+cpp-pinyin2/dialects/ManTone.h
+cpp-pinyin2/ext/c_api.h
+cpp-pinyin2/ext/Dialect.h
+cpp-pinyin2/ext/Registry.h

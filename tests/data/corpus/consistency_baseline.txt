@@ -1,0 +1,80 @@
+当时 :: dang1,shi2 x109 | dang4,shi2 x6
+中的 :: zhong1,de5 x108 | zhong4,de5 x5
+为了 :: wei4,le5 x47 | wei2,le5 x13 | wei2,liao3 x1
+明朝 :: ming2,chao2 x48 | ming2,zhao1 x2
+地方 :: di4,fang5 x33 | di4,fang1 x9
+得了 :: de2,le5 x33 | de5,liao3 x1
+分子 :: fen1,zi3 x20 | fen4,zi3 x13 | fen5,zi3 x1
+东西 :: dong1,xi1 x17 | dong1,xi5 x11
+夫人 :: fu1,ren5 x23 | fu1,ren2 x1
+为人 :: wei2,ren2 x21 | wei4,ren2 x2
+西藏 :: xi1,zang4 x20 | xi1,cang2 x2 | xi5,cang2 x1
+丈夫 :: zhang4,fu5 x22 | zhang4,fu1 x1
+琢磨 :: zhuo2,mo2 x20 | zuo2,mo5 x3
+目的 :: mu4,di4 x13 | mu4,de5 x8
+当年 :: dang1,nian2 x10 | dang4,nian2 x8
+太阳 :: tai4,yang5 x8 | tai4,yang2 x7
+大都 :: da4,du1 x13 | da4,dou1 x1
+上都 :: shang4,du1 x8 | shang4,dou1 x4
+女人 :: nv3,ren2 x7 | nv3,ren5 x4
+都会 :: dou1,hui4 x9 | du1,hui4 x2
+分地 :: fen5,di4 x8 | fen1,di4 x2
+国都 :: guo2,du1 x6 | guo2,dou1 x4
+两边 :: liang3,bian1 x5 | liang3,bian5 x4
+刚刚 :: gang1,gang5 x5 | gang1,gang1 x4
+大王 :: da4,wang2 x3 | dai4,wang5 x3
+累累 :: lei3,lei3 x5 | lei2,lei2 x1
+中都 :: zhong1,du1 x4 | zhong1,dou1 x2
+黄柏 :: huang2,bo4 x3 | huang2,bai3 x2
+转动 :: zhuan4,dong4 x4 | zhuan3,dong4 x1
+娘娘 :: niang2,niang2 x3 | niang2,niang5 x2
+穿着 :: chuan1,zhuo2 x2 | chuan1,zhe5 x2
+南边 :: nan2,bian1 x2 | nan2,bian5 x2
+好处 :: hao3,chu5 x2 | hao3,chu3 x1
+当日 :: dang4,ri4 x2 | dang1,ri4 x1
+得当 :: de2,dang4 x2 | de5,dang4 x1
+澄清 :: cheng2,qing1 x2 | deng4,qing1 x1
+磨碎 :: mo2,sui4 x2 | mo4,sui4 x1
+曲江 :: qu1,jiang1 x2 | qu3,jiang1 x1
+叨叨 :: dao1,dao5 x2 | dao5,dao5 x1
+变相 :: bian4,xiang1 x1 | bian4,xiang4 x1
+过当 :: guo4,dang4 x1 | guo4,dang1 x1
+了当 :: liao3,dang4 x3 | le5,dang4 x2   (the word 了当 liao3dang4 and the cross-word 达到了+当时)
+为重 :: wei2,zhong4 x7 | wei2,chong2 x1   (the cross-word 层为 + 重檐攒尖, not the word 为重)
+科长 :: ke1,zhang3 x2 | ke1,chang2 x2   (the cross-word 豆科 + 长柄山蚂蟥, not the word 科长)
+当地 :: dang1,di4 x47 | dang4,de5 x1   (the cross-word 适当地 de, not the word 当地 dang1di4)
+受降 :: shou4,xiang2 x2 | shou4,jiang4 x1   (the cross-word 受 + 降雪, not the word 受降 shou4xiang2)
+中牟 :: zhong1,mu4 x1 | zhong1,mou2 x1   (中牟县 Zhong1mu4 and the cross-word 从中牟利 mou2)
+总长 :: zong3,zhang3 x5 | zong3,chang2 x1   (the title zong3zhang3 and 总长...米 = total length)
+任重 :: ren4,chong2 x1 | ren4,zhong4 x1   (cross-word 任 + 重庆 in 任重庆铸造厂, not the word 任重)
+似的 :: shi4,de5 x10 | si4,de5 x4   (cross-word 近似/类似/相似 + 的, not the word 似的 shi4de5)
+市长 :: shi4,zhang3 x4 | shi4,chang2 x1   (cross-word 上海市 + 长宁区, not the word 市长 shi4zhang3)
+州长 :: zhou1,chang2 x1 | zhou1,zhang3 x2   (cross-word 高州 + 长坡, not the word 州长 zhou1zhang3)
+县长 :: xian4,zhang3 x7 | xian4,chang2 x1   (cross-word 六县 + 长汀县, not the word 县长 xian4zhang3)
+成长 :: cheng2,zhang3 x3 | cheng2,chang2 x1   (cross-word 勒成 + 长编, not the word 成长 cheng2zhang3)
+命中 :: ming4,zhong4 x1 | ming4,zhong1 x1   (cross-word 革命 + 中, not the word 命中 ming4zhong4)
+师长 :: shi1,chang2 x2 | shi1,zhang3 x3   (cross-word 京师 + 长安, not the word 师长 shi1zhang3)
+校正 :: xiao4,zheng4 x2 | jiao4,zheng4 x2   (cross-word 学校 + 正常/正式, not the word 校正 jiao4zheng4)
+上当 :: shang4,dang1 x1 | shang4,dang4 x1   (cross-word 大会上 + 当选, not the word 上当 shang4dang4)
+所长 :: suo3,zhang3 x3 | suo3,chang2 x1   (cross-word 各有所长 suo3chang2, and the title suo3zhang3)
+排长 :: pai2,chang2 x1 | pai2,zhang3 x1   (cross-word 一排 + 长板凳, not the word 排长 pai2zhang3)
+大地 :: da4,de5 x1 | da4,di4 x2   (cross-word 极大地 + 地, not the word 大地 da4di4)
+说中 :: shuo1,zhong4 x5 | shuo1,zhong1 x1   (cross-word 传说/小说 + 中, and 说中的 shuo1zhong4 = to hit the mark; every reading is correct in context)
+相声 :: xiang4,sheng5 x2 | xiang4,sheng1 x1   (the word 相声 xiang4sheng5 has a neutral second syllable, while cm:74421 is the cross-word 互相 + 声援 sheng1; both correct)
+
+# ---- 2026-10-01 追加区（见上方三行说明）----
+# 2026-10-01: e03a772 改动词组键之后，扫描范围（= phrases_dict 的 2-4 字键）扩大而暴露的 12 条。
+#   每条都逐处看过语料上下文：绝大多数是跨词边界或异读（逐条括注理由），个别是语料侧的孤立读音。
+#   同时删掉 适当 —— 现行语料 3 处全为 shi4,dang4，该冲突已不存在（历史见 git）。
+黄陂 :: huang2,pi2 x66 | huang2,bei1 x5   (two different places sharing the characters: 武汉市黄陂区 / 黎黄陂路 read pi2, 黄陂镇 / 黄陂桥乡 in 江西 read bei1 -- both correct)
+大将 :: da4,jiang4 x16 | da4,jiang1 x12   (the word 大将 da4jiang4, and the cross-word 大 + 将军 in 大将军)
+大厦 :: da4,sha4 x5 | da4,xia4 x1   (the word 大厦 da4sha4; one corpus row is 大厦大学 read xia4 -- a corpus-side outlier, left alone because editing the corpus moves the frozen accuracy counts)
+名将 :: ming2,jiang4 x5 | ming2,jiang1 x2   (the word 名将 ming2jiang4, and the cross-word 名 + 将/将军 in 两名将进入 / 又名将军坟)
+中将 :: zhong1,jiang4 x5 | zhong1,jiang1 x4   (the rank 中将 zhong1jiang4, and the cross-word 中 + 将/将军 in 其中将 / 途中将 / 中将军衔)
+活塞 :: huo2,sai1 x4 | huo2,sai4 x1   (the word 活塞 huo2sai1; one corpus row reads sai4 for the same word -- a corpus-side outlier, same reason)
+变更 :: bian4,geng1 x2 | bian4,geng4 x1   (the word 变更 bian4geng1, and the cross-word 变 + 更为 geng4 in 变更为国民革命军)
+上将 :: shang4,jiang1 x2 | shang4,jiang4 x2 | shang5,jiang1 x1   (the rank 上将 shang4jiang4, and the cross-word 上 + 将军 in 号上将军 / 当上将军, with the neutral 当上 shang5)
+徐继畲 :: xu2,ji4,yu2 x2 | xu2,ji4,she1 x2   (the name 徐继畬, which the corpus spells 畲 and reads both she1 and yu2)
+武将 :: wu3,jiang4 x2 | wu3,jiang1 x2   (the word 武将 wu3jiang4, and the cross-word 武 + 将军 in 显武将军 / 超武将军)
+卷起 :: juan4,qi3 x1 | juan3,qi3 x1   (the word 卷起 juan3qi3, and the cross-word 卷 + 起 in 第X卷起改为月刊)
+孩儿 :: hai2,er2 x1 | hai2,er5 x1   (the word 孩儿 with er2 in 元亶孩儿 and the neutral er5 in 女孩儿)

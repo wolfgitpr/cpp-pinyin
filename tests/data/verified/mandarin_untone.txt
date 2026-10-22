@@ -1,0 +1,1139 @@
+#!meta {"datasetId": "mandarin_untone", "version": "1.0.0", "dialect": "mandarin", "style": "NORMAL", "derivedFrom": "tests/verified/source/op_lab.txt", "source": "derived from the repository's tests/verified/source/ corpora; upstream references per README.md 'Open-source references' (opencpop, M4Singer, cc-edict, CPP_Dataset) -- the README does not map an individual test file onto an individual upstream corpus", "license": "UNRESOLVED (audit T-09): the in-repo corpora carry no licence record", "reviewedAt": "2026-10-05", "reviewer": "two independent LLM review passes + third-reviewer adjudication of every position where they differed; rounds 8-13 (docs/testdata/audit_round8.md .. audit_round12.md) re-read the corpus sentence by sentence against the dictionary and the corpus's own usage, one adjudicator per claim; screening (not deciding) of the review surface by dictionary candidate count", "toneConvention": "one value per character, TONE3 style (neutral tone = 5, no erhua/diminuitive rewriting); Mandarin 一/不 are normally written with their citation tone (yi1/bu4) and sandhi is NOT applied systematically -- query() is pre-sandhi by design (sandhi is a separate post-processor, src/ToneSandhi.h); the 19 positions that do carry sandhi or neutral 不 (一行人 yi4, 这一地区 yi2, 差不多 bu5 ...) are reviewed and kept, see docs/testdata/decisions.md", "note": "status markers: OK/ALT_OK/DATA_FIX enter the denominator; ENGINE_BUG/DICT_GAP/EXCLUDED are counted and listed separately; a/b means either reading is accepted; stratum: dispute|sample|scan; no_findings means both reviewers scanned the row and flagged nothing; coverage and residual-error caveat: docs/testdata/decisions.md"}
+面对浩瀚的星海我们微小得像尘埃	mian dui hao han de xing hai wo men wei xiao de xiang chen ai	OK	no_findings;stratum=sample;id=mu:5
+山崩海啸没有你根本不想逃	shan beng hai xiao mei you ni gen ben bu xiang tao	OK	no_findings;stratum=sample;id=mu:23
+脉搏心跳没有你根本不重	mai bo xin tiao mei you ni gen ben bu zhong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:25
+让我铺天盖地琢磨不停想象	rang wo pu tian gai di zuo mo bu ting xiang xiang	OK	no_findings;stratum=sample;id=mu:37
+在铺垫着对你的奢望	zai pu dian zhe dui ni de she wang	OK	no_findings;stratum=sample;id=mu:40
+越想遗忘越是反复挂牵	yue xiang yi wang yue shi fan fu gua qian	OK	no_findings;stratum=sample;id=mu:95
+有些从前太尖锐谁脚步太遥远	you xie cong qian tai jian rui shei jiao bu tai yao yuan	OK	no_findings;stratum=sample;id=mu:101
+长这么大还没	zhang zhe me da hai mei	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:115
+想问为什么	xiang wen wei shen me	OK	no_findings;stratum=sample;id=mu:140
+谁忘了那就是承诺谁自顾自地走	shei wang le na jiu shi cheng nuo shei zi gu zi de zou	OK	no_findings;stratum=sample;id=mu:165
+我还有想要爱你的冲动	wo hai you xiang yao ai ni de chong dong	OK	no_findings;stratum=sample;id=mu:169
+海之角也不再遥远	hai zhi jiao ye bu zai yao yuan	OK	no_findings;stratum=sample;id=mu:247
+你骄傲的飞远我栖息的叶片	ni jiao ao de fei yuan wo qi xi de ye pian	OK	no_findings;stratum=sample;id=mu:253
+沧海月的想念羽化我昨天	cang hai yue de xiang nian yu hua wo zuo tian	OK	no_findings;stratum=sample;id=mu:255
+今天是星期几	jin tian shi xing qi ji	OK	no_findings;stratum=sample;id=mu:259
+温柔的他单膝跪地钻戒缓缓戴进	wen rou de ta dan xi gui di zuan jie huan huan dai jin	OK	no_findings;stratum=sample;id=mu:277
+这不堪入目的剧情	zhe bu kan ru mu de ju qing	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:291
+笑我耳朵失灵的笑我放你走了走了走了	xiao wo er duo shi ling de xiao wo fang ni zou le zou le zou le	OK	no_findings;stratum=sample;id=mu:324
+你就在对岸走得好慢	ni jiu zai dui an zou de hao man	OK	no_findings;stratum=sample;id=mu:333
+空荡荡的自我莫名地焦灼	kong dang dang de zi wo mo ming de jiao zhuo	OK	no_findings;stratum=sample;id=mu:338
+抵挡这红尘的狂流	di dang zhe hong chen de kuang liu	OK	no_findings;stratum=sample;id=mu:424
+好想再回到那些年的时光	hao xiang zai hui dao na xie nian de shi guang	OK	no_findings;stratum=sample;id=mu:464
+紧紧抱着你	jin jin bao zhe ni	OK	no_findings;stratum=sample;id=mu:479
+刻着你我的青春白色的约定	ke zhe ni wo de qing chun bai se de yue ding	OK	no_findings;stratum=sample;id=mu:489
+为何爱判处众生孤寂	wei he ai pan chu zhong sheng gu ji	OK	no_findings;stratum=sample;id=mu:519
+恍惚中又和你相见	huang hu zhong you he ni xiang jian	OK	no_findings;stratum=sample;id=mu:549
+你在回忆里留下的脚印	ni zai hui yi li liu xia de jiao yin	OK	no_findings;stratum=sample;id=mu:561
+告白气球风吹到对街微笑在天上飞	gao bai qi qiu feng chui dao dui jie wei xiao zai tian shang fei	OK	no_findings;stratum=sample;id=mu:576
+从那天起甜蜜的很轻易	cong na tian qi tian mi de hen qing yi	OK	no_findings;stratum=sample;id=mu:581
+全都有你搅拌在一起	quan dou you ni jiao ban zai yi qi	OK	no_findings;stratum=sample;id=mu:593
+东京下雨淋湿巴黎收音机	dong jing xia yu lin shi ba li shou yin ji	OK	no_findings;stratum=sample;id=mu:597
+秒针转动滴滴答小小时差滴滴答	miao zhen zhuan dong di di da xiao xiao shi cha di di da	OK	no_findings;stratum=sample;id=mu:603
+睡着的大提琴	shui zhao de da ti qin	OK	no_findings;stratum=sample;id=mu:629
+原来你生来就属于天际	yuan lai ni sheng lai jiu shu yu tian ji	OK	no_findings;stratum=sample;id=mu:725
+而一切终将汇聚成最充盈的景象	er yi qie zhong jiang hui ju cheng zui chong ying de jing xiang	OK	no_findings;stratum=sample;id=mu:743
+那么离别时也一定要微笑着回忆放心中	na me li bie shi ye yi ding yao wei xiao zhe hui yi fang xin zhong	OK	no_findings;stratum=sample;id=mu:749
+亲爱的旅人你仍是记忆中的模样	qin ai de lv ren ni reng shi ji yi zhong de mu yang	OK	no_findings;stratum=sample;id=mu:753
+熬过失去你漫长的等待	ao guo shi qu ni man chang de deng dai	OK	no_findings;stratum=sample;id=mu:799
+我猜你一定也会想念我	wo cai ni yi ding ye hui xiang nian wo	OK	no_findings;stratum=sample;id=mu:802
+也怕我失落在茫茫人海	ye pa wo shi luo zai mang mang ren hai	OK	no_findings;stratum=sample;id=mu:803
+会发现我一直都在	hui fa xian wo yi zhi dou zai	OK	no_findings;stratum=sample;id=mu:805
+难道是一种自由自在	nan dao shi yi zhong zi you zi zai	OK	no_findings;stratum=sample;id=mu:825
+是曾与你躲过	shi ceng yu ni duo guo	OK	no_findings;stratum=sample;id=mu:835
+檐	yan	OK	no_findings;stratum=sample;id=mu:853
+他只希望有个机会能被你爱上	ta zhi xi wang you ge ji hui neng bei ni ai shang	OK	no_findings;stratum=sample;id=mu:866
+眺望碧海和蓝天	tiao wang bi hai he lan tian	OK	no_findings;stratum=sample;id=mu:881
+有什么故事好想了解	you shen me gu shi hao xiang liao jie	OK	no_findings;stratum=sample;id=mu:891
+一怀温暖是否愈合你	yi huai wen nuan shi fou yu he ni	OK	no_findings;stratum=sample;id=mu:949
+夏天的风我永远记得	xia tian de feng wo yong yuan ji de	OK	no_findings;stratum=sample;id=mu:962
+温的风山的峰吹成了山风	wen de feng shan de feng chui cheng le shan feng	OK	no_findings;stratum=sample;id=mu:975
+让现在的我可怜到底	rang xian zai de wo ke lian dao di	OK	no_findings;stratum=sample;id=mu:1021
+我喜欢你是我独家的记忆	wo xi huan ni shi wo du jia de ji yi	OK	no_findings;stratum=sample;id=mu:1030
+忙着快乐忙着感动从彼此陌生到熟	mang zhe kuai le mang zhe gan dong cong bi ci mo sheng dao shu	OK	no_findings;stratum=sample;id=mu:1063
+会是我们从没想过真爱到现在不敢期待	hui shi wo men cong mei xiang guo zhen ai dao xian zai bu gan qi dai	OK	no_findings;stratum=sample;id=mu:1064
+你说你不懂我为何在这时牵手	ni shuo ni bu dong wo wei he zai zhe shi qian shou	OK	no_findings;stratum=sample;id=mu:1086
+我晒干了沉默悔得很冲动	wo shai gan le chen mo hui de hen chong dong	OK	no_findings;stratum=sample;id=mu:1087
+哦越过你划的线我定了勇气的终点	o yue guo ni hua de xian wo ding le yong qi de zhong dian	OK	no_findings;stratum=sample;id=mu:1098
+离开旧爱像坐慢车	li kai jiu ai xiang zuo man che	OK	no_findings;stratum=sample;id=mu:1122
+我的心脏砰砰跳	wo de xin zang peng peng tiao	OK	no_findings;stratum=sample;id=mu:1131
+都可以随便的你说的我都愿意去	dou ke yi sui bian de ni shuo de wo dou yuan yi qu	OK	no_findings;stratum=sample;id=mu:1155
+而我已经分不清	er wo yi jing fen bu qing	OK	no_findings;stratum=sample;id=mu:1229
+我们都因为折磨而厌倦了生活	wo men dou yin wei zhe mo er yan juan le sheng huo	OK	no_findings;stratum=sample;id=mu:1263
+它让我在夜里不会冷	ta rang wo zai ye li bu hui leng	OK	no_findings;stratum=sample;id=mu:1271
+再给我看看你受伤的尾巴	zai gei wo kan kan ni shou shang de wei ba	OK	no_findings;stratum=sample;id=mu:1309
+你说你爱过的人都已经离去	ni shuo ni ai guo de ren dou yi jing li qu	OK	no_findings;stratum=sample;id=mu:1340
+你只是隐藏的比较深而已	ni zhi shi yin cang de bi jiao shen er yi	OK	no_findings;stratum=sample;id=mu:1342
+我看着路梦的入口有点窄	wo kan zhe lu meng de ru kou you dian zhai	OK	no_findings;stratum=sample;id=mu:1373
+日子那么长	ri zi na me chang	OK	no_findings;stratum=sample;id=mu:1396
+怕措手不及风华凄凄	pa cuo shou bu ji feng hua qi qi	OK	no_findings;stratum=sample;id=mu:1432
+我想我更有权利关心你	wo xiang wo geng you quan li guan xin ni	OK	no_findings;stratum=sample;id=mu:1462
+盼着你	pan zhe ni	OK	no_findings;stratum=sample;id=mu:1477
+黎明	li ming	OK	no_findings;stratum=sample;id=mu:1520
+猜不透是你瞳孔的颜色	cai bu tou shi ni tong kong de yan se	OK	no_findings;stratum=sample;id=mu:1526
+有你在的地方	you ni zai de di fang	OK	no_findings;stratum=sample;id=mu:1577
+我总感觉很窝心	wo zong gan jue hen wo xin	OK	no_findings;stratum=sample;id=mu:1578
+日子像旋转木马	ri zi xiang xuan zhuan mu ma	OK	no_findings;stratum=sample;id=mu:1579
+你说你会哭不是因为在乎	ni shuo ni hui ku bu shi yin wei zai hu	OK	no_findings;stratum=sample;id=mu:1623
+书中曾有的故事	shu zhong ceng you de gu shi	OK	no_findings;stratum=sample;id=mu:1639
+是不尽的思念	shi bu jin de si nian	OK	no_findings;stratum=sample;id=mu:1646
+小而温馨的空间	xiao er wen xin de kong jian	OK	no_findings;stratum=sample;id=mu:1651
+不愿说再见	bu yuan shuo zai jian	OK	no_findings;stratum=sample;id=mu:1662
+白云挂在那蓝天像你的微笑	bai yun gua zai na lan tian xiang ni de wei xiao	OK	no_findings;stratum=sample;id=mu:1674
+悠	you	OK	no_findings;stratum=sample;id=mu:1691
+不知道时光是本小说而我是你一旁的角色	bu zhi dao shi guang shi ben xiao shuo er wo shi ni yi pang de jue se	OK	no_findings;stratum=sample;id=mu:1706
+与你席地对座饮茶	yu ni xi di dui zuo yin cha	OK	no_findings;stratum=sample;id=mu:1728
+剑出鞘恩怨了	jian chu qiao en yuan liao	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:1737
+说你不爱我	shuo ni bu ai wo	OK	no_findings;stratum=sample;id=mu:1750
+我用几行字形容你是我的谁	wo yong ji hang zi xing rong ni shi wo de shei	DATA_FIX	annotation corrected;stratum=dispute;id=mu:1817;was=5:hang
+夸我含苞待放还夸我欲盖弥彰	kua wo han bao dai fang hai kua wo yu gai mi zhang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:1885
+赐我盛放还赐我缺氧乖张	ci wo sheng fang hai ci wo que yang guai zhang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:1887
+捧着你是不是我的	peng zhe ni shi bu shi wo de	OK	no_findings;stratum=sample;id=mu:1898
+你在世俗里的名字被人用了	ni zai shi su li de ming zi bei ren yong le	OK	no_findings;stratum=sample;id=mu:1911
+又不用说感言	you bu yong shuo gan yan	OK	no_findings;stratum=sample;id=mu:1936
+分开就平淡些	fen kai jiu ping dan xie	OK	no_findings;stratum=sample;id=mu:1937
+如果还能看出我有爱你的那面	ru guo hai neng kan chu wo you ai ni de na mian	OK	no_findings;stratum=sample;id=mu:1953
+当我开始学会做蛋饼	dang wo kai shi xue hui zuo dan bing	OK	no_findings;stratum=sample;id=mu:1963
+喔你又擦肩而过	o ni you ca jian er guo	OK	no_findings;stratum=sample;id=mu:1965
+学校旁的广场我在这等钟声响	xue xiao pang de guang chang wo zai zhe deng zhong sheng xiang	OK	no_findings;stratum=sample;id=mu:1978
+弹着琴唱你爱的歌暗恋一点都不痛苦	tan zhe qin chang ni ai de ge an lian yi dian dou bu tong ku	OK	no_findings;stratum=sample;id=mu:1980
+在人来人往寻找着你	zai ren lai ren wang xun zhao zhe ni	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:1983
+捏成你的形状随风跟着我	nie cheng ni de xing zhuang sui feng gen zhe wo	OK	no_findings;stratum=sample;id=mu:1989
+你一定	ni yi ding	OK	no_findings;stratum=sample;id=mu:2045
+佩戴上一克拉的梦想	pei dai shang yi ke la de meng xiang	OK	no_findings;stratum=sample;id=mu:2054
+吹着前奏望着天空	chui zhe qian zou wang zhe tian kong	OK	no_findings;stratum=sample;id=mu:2069
+你站的方位	ni zhan de fang wei	OK	no_findings;stratum=sample;id=mu:2127
+风在山路吹	feng zai shan lu chui	OK	no_findings;stratum=sample;id=mu:2135
+因为你总会提醒过去总不会过去	yin wei ni zong hui ti xing guo qu zong bu hui guo qu	OK	no_findings;stratum=sample;id=mu:2150
+在瓶底书汉隶仿前朝的飘逸	zai ping di shu han li fang qian chao de piao yi	OK	no_findings;stratum=sample;id=mu:2166
+月色被打捞起晕开了结局	yue se bei da lao qi yun kai le jie ju	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:2168
+色白花青的锦鲤跃然入碗底	se bai hua qing de jin li yue ran ru wan di	OK	no_findings;stratum=sample;id=mu:2171
+剪接的风景爱	jian jie de feng jing ai	OK	no_findings;stratum=sample;id=mu:2190
+始终年轻	shi zhong nian qing	OK	no_findings;stratum=sample;id=mu:2191
+凄美而动听	qi mei er dong ting	OK	no_findings;stratum=sample;id=mu:2205
+雨的声音	yu de sheng yin	OK	no_findings;stratum=sample;id=mu:2211
+我每天睡不着想念你的微笑	wo mei tian shui bu zhao/zhuo xiang nian ni de wei xiao	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:2221
+成千上万个门口	cheng qian shang wan ge men kou	OK	no_findings;stratum=sample;id=mu:2234
+十年之前我不认识你	shi nian zhi qian wo bu ren shi ni	OK	no_findings;stratum=sample;id=mu:2239
+还可以问候只是那种温柔	hai ke yi wen hou zhi shi na zhong wen rou	OK	no_findings;stratum=sample;id=mu:2244
+过了某个路口你就会感到	guo le mou ge lu kou ni jiu hui gan dao	OK	no_findings;stratum=sample;id=mu:2256
+彻夜陪你聊天的	che ye pei ni liao tian de	OK	no_findings;stratum=sample;id=mu:2257
+愿意走完一生的更	yuan yi zou wan yi sheng de geng	OK	no_findings;stratum=sample;id=mu:2263
+是否刻骨铭心并没那么重要	shi fou ke gu ming xin bing mei na me zhong yao	OK	no_findings;stratum=sample;id=mu:2265
+终于等到你差点要错过	zhong yu deng dao ni cha dian yao cuo guo	OK	no_findings;stratum=sample;id=mu:2275
+爱情来不及变老	ai qing lai bu ji bian lao	OK	no_findings;stratum=sample;id=mu:2284
+我也要让生活永远充满着色彩	wo ye yao rang sheng huo yong yuan chong man zhe se cai	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:2393
+我们的未来该有多酷	wo men de wei lai gai you duo ku	OK	no_findings;stratum=sample;id=mu:2408
+我要把自己打扫把破旧的全部卖掉	wo yao ba zi ji da sao ba po jiu de quan bu mai diao	OK	no_findings;stratum=sample;id=mu:2414
+我们的生活甜得像糖	wo men de sheng huo tian de xiang tang	OK	no_findings;stratum=sample;id=mu:2418
+哼你的晚安	heng ni de wan an	OK	no_findings;stratum=sample;id=mu:2427
+再数一回	zai shu yi hui	OK	no_findings;stratum=sample;id=mu:2468
+恩一二三岁四五六岁	en yi er san sui si wu liu sui	OK	no_findings;stratum=sample;id=mu:2472
+水管在开花	shui guan zai kai hua	OK	no_findings;stratum=sample;id=mu:2627
+那座桥断了我们还去吗	na zuo qiao duan le wo men hai qu ma	OK	no_findings;stratum=sample;id=mu:2655
+起一阵抽偶动	qi yi zhen chou ou dong	OK	no_findings;stratum=sample;id=mu:2680
+天亮了天晴了事情就会解决若再见面	tian liang le tian qing le shi qing jiu hui jie jue ruo zai jian mian	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:2690;audit76=fix:5:liao;audit104=fix:5:le
+烦有完没完无尽的昏暗	fan you wan mei wan wu jin de hun an	OK	no_findings;stratum=sample;id=mu:2692
+空沿着时钟一圈圈臃红肿	kong yan zhe shi zhong yi quan quan yong hong zhong	OK	no_findings;stratum=sample;id=mu:2698
+我也只能这样	wo ye zhi neng zhe yang	OK	no_findings;stratum=sample;id=mu:2728
+你将离场我也只能这样	ni jiang li chang wo ye zhi neng zhe yang	OK	no_findings;stratum=sample;id=mu:2731
+等无边的黑夜输给地平线	deng wu bian de hei ye shu gei di ping xian	OK	no_findings;stratum=sample;id=mu:2739
+揭开一切悬念	jie kai yi qie xuan nian	OK	no_findings;stratum=sample;id=mu:2749
+恩回忆筑成空欲望凝成洞	en hui yi zhu cheng kong yu wang ning cheng dong	OK	no_findings;stratum=sample;id=mu:2769
+回一组成封遗忘组成梦	hui yi zu cheng feng yi wang zu cheng meng	OK	no_findings;stratum=sample;id=mu:2777
+一个古老的行绒	yi ge gu lao de xing rong	OK	no_findings;stratum=sample;id=mu:2778
+大概就是这个	da gai jiu shi zhe ge	OK	no_findings;stratum=sample;id=mu:2804
+窗外雨都停了屋里灯还黑着数着你的冷漠把玩着寂寞	chuang wai yu dou ting le wu li deng hai hei zhe shu zhe ni de leng mo ba wan zhe ji mo	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:2821
+像大人那样安静沉稳的	xiang da ren na yang an jing chen wen de	OK	no_findings;stratum=sample;id=mu:2859
+城市啊有点脏路人行色匆忙孤单	cheng shi a you dian zang lu ren xing se cong mang gu dan	OK	no_findings;stratum=sample;id=mu:2883
+妄想都没痕迹我们	wang xiang dou mei hen ji wo men	OK	no_findings;stratum=sample;id=mu:2892
+住进混沌深海你开始无望等待	zhu jin hun dun shen hai ni kai shi wu wang deng dai	OK	no_findings;stratum=sample;id=mu:2897
+这一天竟然每件事情都失算	zhe yi tian jing ran mei jian shi qing dou shi suan	OK	no_findings;stratum=sample;id=mu:2899
+茫茫人海却又想	mang mang ren hai que you xiang	OK	no_findings;stratum=sample;id=mu:2940
+明白什么才让我骄傲不	ming bai shen me cai rang wo jiao ao bu	OK	no_findings;stratum=sample;id=mu:2970
+明白你	ming bai ni	OK	no_findings;stratum=sample;id=mu:2971
+恩哒啦哒啦哒	en da la da la da	OK	no_findings;stratum=sample;id=mu:2981
+我的宝贝宝贝给你一点甜甜让你今夜很好眠我的小鬼小鬼	wo de bao bei bao bei gei ni yi dian tian tian rang ni jin ye hen hao mian wo de xiao gui xiao gui	OK	no_findings;stratum=sample;id=mu:2988
+倦的时候有个人陪	juan de shi hou you ge ren pei	OK	no_findings;stratum=sample;id=mu:2990
+大恩大大	da en da da	OK	no_findings;stratum=sample;id=mu:2994
+怀念你	huai nian ni	OK	no_findings;stratum=sample;id=mu:3009
+想你算是安慰还是悲哀而现在	xiang ni suan shi an wei hai shi bei ai er xian zai	OK	no_findings;stratum=sample;id=mu:3012
+我们是不是还是深爱着对方像开始时那样	wo men shi bu shi hai shi shen ai zhe dui fang xiang kai shi shi na yang	OK	no_findings;stratum=sample;id=mu:3035
+那个时候我恨你是一个好人	na ge shi hou wo hen ni shi yi ge hao ren	OK	no_findings;stratum=sample;id=mu:3050
+心还是会疼想你在零点零一分	xin hai shi hui teng xiang ni zai ling dian ling yi fen	OK	no_findings;stratum=sample;id=mu:3051
+痛苦的人都醒着被冰疼	tong ku de ren dou xing zhe bei bing teng	OK	no_findings;stratum=sample;id=mu:3055
+与冒险成全了我的碧海	yu mao xian cheng quan le wo de bi hai	OK	no_findings;stratum=sample;id=mu:3083
+成全了我的下个夏天	cheng quan le wo de xia ge xia tian	OK	no_findings;stratum=sample;id=mu:3086
+虽然寂寞这会是我	sui ran ji mo zhe hui shi wo	OK	no_findings;stratum=sample;id=mu:3102
+是不是回忆就是淡淡柠檬草	shi bu shi hui yi jiu shi dan dan ning meng cao	OK	no_findings;stratum=sample;id=mu:3150
+明天自己负责给昨天的我一个拥抱	ming tian zi ji fu ze gei zuo tian de wo yi ge yong bao	OK	no_findings;stratum=sample;id=mu:3165
+错过的请你	cuo guo de qing ni	OK	no_findings;stratum=sample;id=mu:3170
+知道太爱又如何	zhi dao tai ai you ru he	OK	no_findings;stratum=sample;id=mu:3194
+恩你的回忆开始沉没哦哦	en ni de hui yi kai shi chen mo o o	OK	no_findings;stratum=sample;id=mu:3222
+我很想飞多远都不会累	wo hen xiang fei duo yuan dou bu hui lei	OK	no_findings;stratum=sample;id=mu:3229
+枯坐到清晨	ku zuo dao qing chen	OK	no_findings;stratum=sample;id=mu:3245
+一杯被当做证据的红酒后	yi bei bei dang zuo zheng ju de hong jiu hou	OK	no_findings;stratum=sample;id=mu:3264
+还不够吗我要飞走	hai bu gou ma wo yao fei zou	OK	no_findings;stratum=sample;id=mu:3266
+我要用最温柔的	wo yao yong zui wen rou de	OK	no_findings;stratum=sample;id=mu:3268
+世界孤立我任它奚落我只保持我的沉默明白什么才是	shi jie gu li wo ren ta xi luo wo zhi bao chi wo de chen mo ming bai shen me cai shi	OK	no_findings;stratum=sample;id=mu:3281
+我的青春	wo de qing chun	OK	no_findings;stratum=sample;id=mu:3288
+什么特征人缘还是眼神	shen me te zheng ren yuan hai shi yan shen	OK	no_findings;stratum=sample;id=mu:3291
+懂得永恒得要我们	dong de yong heng dei yao wo men	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3299
+恩懂得永恒恩得要我们	en dong de yong heng en dei yao wo men	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3309
+恩懂她爱永恒恩得要我们	en dong ta ai yong heng en dei yao wo men	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3312
+懂她问恒得要	dong ta wen heng dei yao	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3313
+只能够你我两个人	zhi neng gou ni wo liang ge ren	OK	no_findings;stratum=sample;id=mu:3362
+像风一样你靠近云都下降	xiang feng yi yang ni kao jin yun dou xia jiang	OK	no_findings;stratum=sample;id=mu:3387
+我也就没什么可	wo ye jiu mei shen me ke	OK	no_findings;stratum=sample;id=mu:3390
+夜夜陪着你的海心情又如何	ye ye pei zhe ni de hai xin qing you ru he	OK	no_findings;stratum=sample;id=mu:3393
+这片海未免也太多情悲泣到天明	zhe pian hai wei mian ye tai duo qing bei qi dao tian ming	OK	no_findings;stratum=sample;id=mu:3406
+车窗上的雾气仿佛是	che chuang shang de wu qi fang fu shi	OK	no_findings;stratum=sample;id=mu:3414
+明天也慢慢地慢慢清晰我喜欢你还我的心	ming tian ye man man de man man qing xi wo xi huan ni huan wo de xin	ENGINE_BUG	correct reading was available as a candidate;stratum=sample;id=mu:3428
+它在诉说着你	ta zai su shuo zhe ni	OK	no_findings;stratum=sample;id=mu:3431
+随时间的海浪漂流	sui shi jian de hai lang piao liu	OK	no_findings;stratum=sample;id=mu:3438
+想念的还是你望着我的眼波	xiang nian de hai shi ni wang zhe wo de yan bo	OK	no_findings;stratum=sample;id=mu:3442
+不要什么诺言	bu yao shen me nuo yan	OK	no_findings;stratum=sample;id=mu:3496
+心甘情愿感染你的气一息	xin gan qing yuan gan ran ni de qi yi xi	OK	no_findings;stratum=sample;id=mu:3500
+说走就走我有的是时间我不想在未来的日子里	shuo zou jiu zou wo you de shi shi jian wo bu xiang zai wei lai de ri zi li	OK	no_findings;stratum=sample;id=mu:3514
+追究什么对错	zhui jiu shen me dui cuo	OK	no_findings;stratum=sample;id=mu:3599
+要如何再搜索相拥着寂寞	yao ru he zai sou suo xiang yong zhe ji mo	OK	no_findings;stratum=sample;id=mu:3624
+我的心里呀啊	wo de xin li ya a	OK	no_findings;stratum=sample;id=mu:3673
+我新条被妹呀揍三关	wo xin tiao bei mei ya zou san guan	OK	no_findings;stratum=sample;id=mu:3690
+温柔的晚风啊	wen rou de wan feng a	OK	no_findings;stratum=sample;id=mu:3717
+此时此刻你身在何方	ci shi ci ke ni shen zai he fang	OK	no_findings;stratum=sample;id=mu:3721
+这一首简单的歌并没有什么独特好象我	zhe yi shou jian dan de ge bing mei you shen me du te hao xiang wo	OK	no_findings;stratum=sample;id=mu:3746
+最美的愿望	zui mei de yuan wang	OK	no_findings;stratum=sample;id=mu:3772
+她也像我一样睡不着	ta ye xiang wo yi yang shui bu zhao	OK	no_findings;stratum=sample;id=mu:3797
+可是再见吧再见吧喵小姐	ke shi zai jian ba zai jian ba miao xiao jie	OK	no_findings;stratum=sample;id=mu:3801
+喵小姐	miao xiao jie	OK	no_findings;stratum=sample;id=mu:3816
+我开始在人世间漂流选择过大大小小的梦想	wo kai shi zai ren shi jian piao liu xuan ze guo da da xiao xiao de meng xiang	OK	no_findings;stratum=sample;id=mu:3836
+你是我甘心瞑目的遗憾	ni shi wo gan xin ming mu de yi han	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3840
+长大后世界像一张网网住我们的翅膀	zhang da hou shi jie xiang yi zhang wang wang zhu wo men de chi bang	OK	no_findings;stratum=sample;id=mu:3852
+总是会在碰撞中回望脆弱累积成担当	zong shi hui zai peng zhuang zhong hui wang cui ruo lei ji cheng dan dang	OK	no_findings;stratum=sample;id=mu:3867
+当时看见彩虹就笑开一无窒碍在胸怀带妳抛下课堂	dang shi kan jian cai hong jiu xiao kai yi wu zhi ai zai xiong huai dai 妳 pao xia ke tang	DICT_GAP	engine cannot produce the correct reading;stratum=dispute;id=mu:3871
+沮丧反复失落地重来不能放弃勇敢去爱	ju sang fan fu shi luo de chong lai bu neng fang qi yong gan qu ai	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3874;audit76=fix:6:di;audit105=fix:6:de
+泛滥的欲望无邪却沦为成烂醉	fan lan de yu wang wu xie que lun wei cheng lan zui	OK	no_findings;stratum=sample;id=mu:3890
+被混乱的双眼或是听觉卑微不前	bei hun luan de shuang yan huo shi ting jue bei wei bu qian	OK	no_findings;stratum=sample;id=mu:3900
+不可能撑不下去	bu ke neng cheng bu xia qu	OK	no_findings;stratum=sample;id=mu:3902
+玩笑已过半安	wan xiao yi guo ban an	OK	no_findings;stratum=sample;id=mu:3909
+我知道吹过的牛逼也会随青春一笑哦了之	wo zhi dao chui guo de niu bi ye hui sui qing chun yi xiao o liao zhi	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:3918
+温柔的实验恋爱的肢体语言	wen rou de shi yan lian ai de zhi ti yu yan	OK	no_findings;stratum=sample;id=mu:3952
+疲惫了放手了	pi bei le fang shou le	OK	no_findings;stratum=sample;id=mu:3955
+真是让人不服气啊越是相爱的两个人	zhen shi rang ren bu fu qi a yue shi xiang ai de liang ge ren	OK	no_findings;stratum=sample;id=mu:3957
+我闭上了眼	wo bi shang le yan	OK	no_findings;stratum=sample;id=mu:3969
+谁在太过自恋的对嘴	shei zai tai guo zi lian de dui zui	OK	no_findings;stratum=sample;id=mu:3979
+孤单不怎样	gu dan bu zen yang	OK	no_findings;stratum=sample;id=mu:4016
+测试他对我有多疯狂原来只是形	ce shi ta dui wo you duo feng kuang yuan lai zhi shi xing	OK	no_findings;stratum=sample;id=mu:4023
+就能找到聊得来的伴	jiu neng zhao dao liao de lai de ban	OK	no_findings;stratum=sample;id=mu:4050
+变得实际也许好也许坏各	bian de shi ji ye xu hao ye xu huai ge	OK	no_findings;stratum=sample;id=mu:4069
+一半	yi ban	OK	no_findings;stratum=sample;id=mu:4070
+感觉快乐就忙东忙西	gan jue kuai le jiu mang dong mang xi	OK	no_findings;stratum=sample;id=mu:4074
+关上了手机舒服窝在沙发里	guan shang le shou ji shu fu wo zai sha fa li	OK	no_findings;stratum=sample;id=mu:4078
+每个人有他的脾气	mei ge ren you ta de pi qi	OK	no_findings;stratum=sample;id=mu:4083
+入秋微凉的海	ru qiu wei liang de hai	OK	no_findings;stratum=sample;id=mu:4092
+我的心已超载	wo de xin yi chao zai	OK	no_findings;stratum=sample;id=mu:4095
+公车上我睡过了车站	gong che shang wo shui guo le che zhan	OK	no_findings;stratum=sample;id=mu:4119
+把我丢在这个拥挤的人潮	ba wo diu zai zhe ge yong ji de ren chao	OK	no_findings;stratum=sample;id=mu:4122
+鼓楼的夜晚时间匆匆陌生的人	gu lou de ye wan shi jian cong cong mo sheng de ren	OK	no_findings;stratum=sample;id=mu:4150
+所以那些可能都不是真的	suo yi na xie ke neng dou bu shi zhen de	OK	no_findings;stratum=sample;id=mu:4152
+董小姐你才不是一个没有故事的女同学	dong xiao jie ni cai bu shi yi ge mei you gu shi de nv tong xue	OK	no_findings;stratum=sample;id=mu:4153
+不顾那些所以	bu gu na xie suo yi	OK	no_findings;stratum=sample;id=mu:4165
+为你我也可以	wei ni wo ye ke yi	OK	no_findings;stratum=sample;id=mu:4170
+你是否心酸	ni shi fou xin suan	OK	no_findings;stratum=sample;id=mu:4261
+我想大言不惭卑微奢求来世	wo xiang da yan bu can bei wei she qiu lai shi	OK	no_findings;stratum=sample;id=mu:4291
+光熄灭来不及再轰轰	guang xi mie lai bu ji zai hong hong	OK	no_findings;stratum=sample;id=mu:4308
+一个远远的微笑就掀起汹涌波涛	yi ge yuan yuan de wei xiao jiu xian qi xiong yong bo tao	OK	no_findings;stratum=sample;id=mu:4324
+到时候你就知道有多痛	dao shi hou ni jiu zhi dao you duo tong	OK	no_findings;stratum=sample;id=mu:4329
+明明你也最爱我没理由爱不到结果	ming ming ni ye zui ai wo mei li you ai bu dao jie guo	OK	no_findings;stratum=sample;id=mu:4336
+你让我流泪放下了所有罪	ni rang wo liu lei fang xia le suo you zui	OK	no_findings;stratum=sample;id=mu:4359
+月亮它在天空看过多少次	yue liang ta zai tian kong kan guo duo shao ci	OK	no_findings;stratum=sample;id=mu:4372
+为一想脸去养一身伤	wei yi xiang lian qu yang yi shen shang	OK	no_findings;stratum=sample;id=mu:4380
+我想依赖而你却都不在	wo xiang yi lai er ni que dou bu zai	OK	no_findings;stratum=sample;id=mu:4384
+还在人海里浮沉	hai zai ren hai li fu chen	OK	no_findings;stratum=sample;id=mu:4409
+像我这样迷茫的人	xiang wo zhe yang mi mang de ren	OK	no_findings;stratum=sample;id=mu:4414
+世界上有多少人	shi jie shang you duo shao ren	OK	no_findings;stratum=sample;id=mu:4428
+预留的伏线以为在你身边那也算	yu liu de fu xian yi wei zai ni shen bian na ye suan	OK	no_findings;stratum=sample;id=mu:4446
+感谢那是你牵过我的手	gan xie na shi ni qian guo wo de shou	OK	no_findings;stratum=sample;id=mu:4452
+我也是偶尔翻相片	wo ye shi ou er fan xiang pian	OK	no_findings;stratum=sample;id=mu:4467
+后来	hou lai	OK	no_findings;stratum=sample;id=mu:4484
+那个永恒的夜晚	na ge yong heng de ye wan	OK	no_findings;stratum=sample;id=mu:4490
+容我往后的时光	rong wo wang hou de shi guang	OK	no_findings;stratum=sample;id=mu:4492
+如何去爱可惜你早已远去消失在人海	ru he qu ai ke xi ni zao yi yuan qu xiao shi zai ren hai	OK	no_findings;stratum=sample;id=mu:4506
+真的想谈恋爱	zhen de xiang tan lian ai	OK	no_findings;stratum=sample;id=mu:4537
+听呼吸频率	ting hu xi pin lv	OK	no_findings;stratum=sample;id=mu:4539
+是你的决定每句话在我心里	shi ni de jue ding mei ju hua zai wo xin li	OK	no_findings;stratum=sample;id=mu:4552
+一方	yi fang	OK	no_findings;stratum=sample;id=mu:4560
+大鱼在梦境的缝隙里	da yu zai meng jing de feng xi li	OK	no_findings;stratum=sample;id=mu:4583
+游过凝望你沉睡的轮廓	you guo ning wang ni chen shui de lun kuo	OK	no_findings;stratum=sample;id=mu:4584
+我用	wo yong	OK	no_findings;stratum=sample;id=mu:4603
+脚边的空气	jiao bian de kong qi	OK	no_findings;stratum=sample;id=mu:4640
+就算整个世界被寂寞绑票我也不会奔跑	jiu suan zheng ge shi jie bei ji mo bang piao wo ye bu hui ben pao	OK	no_findings;stratum=sample;id=mu:4649
+情歌唱着我们心头的白鸽	qing ge chang zhe wo men xin tou de bai ge	OK	no_findings;stratum=sample;id=mu:4652
+你是白云我是蓝天	ni shi bai yun wo shi lan tian	OK	no_findings;stratum=sample;id=mu:4669
+直到看见平凡才是唯一的答案	zhi dao kan jian ping fan cai shi wei yi de da an	OK	no_findings;stratum=sample;id=mu:4694
+像那野草野花冥冥中这是我	xiang na ye cao ye hua ming ming zhong zhe shi wo	OK	no_findings;stratum=sample;id=mu:4700
+唯一要走的路啊	wei yi yao zou de lu a	OK	no_findings;stratum=sample;id=mu:4701
+丰富地过每一天快乐地看每一天	feng fu de guo mei yi tian kuai le de kan mei yi tian	OK	no_findings;stratum=sample;id=mu:4743
+你会闻的幸福晴朗的	ni hui wen de xing fu qing lang de	OK	no_findings;stratum=sample;id=mu:4749
+球鞋手表袜子和衬衫都已经烫好放行李箱	qiu xie shou biao wa zi he chen shan dou yi jing tang hao fang xing li xiang	OK	no_findings;stratum=sample;id=mu:4779
+慢慢喜欢你慢慢的回忆慢慢的陪你慢慢的老去	man man xi huan ni man man de hui yi man man de pei ni man man de lao qu	OK	no_findings;stratum=sample;id=mu:4782
+晚	wan	OK	no_findings;stratum=sample;id=mu:4784
+太自由谁过头太远了	tai zi you shei guo tou tai yuan le	OK	no_findings;stratum=sample;id=mu:4805
+你就这样出现在我的世界里	ni jiu zhe yang chu xian zai wo de shi jie li	OK	no_findings;stratum=sample;id=mu:4824
+绚烂后枯萎经过几个圆缺	xuan lan hou ku wei jing guo ji ge yuan que	OK	no_findings;stratum=sample;id=mu:4844
+有我在	you wo zai	OK	no_findings;stratum=sample;id=mu:4845
+你什么都已记不清	ni shen me dou yi ji bu qing	OK	no_findings;stratum=sample;id=mu:4853
+虽然很甜却没有了那种晶莹	sui ran hen tian que mei you le na zhong jing ying	OK	no_findings;stratum=sample;id=mu:4857
+甜蜜怎么会忘了情	tian mi zen me hui wang le qing	OK	no_findings;stratum=sample;id=mu:4860
+反反复复给你温习	fan fan fu fu gei ni wen xi	OK	no_findings;stratum=sample;id=mu:4868
+满脸的皱	man lian de zhou	OK	no_findings;stratum=sample;id=mu:4882
+每次怒放都是心中喷发的爱	mei ci nu fang dou shi xin zhong pen fa de ai	OK	no_findings;stratum=sample;id=mu:4896
+生命如水有时平静也有时澎湃	sheng ming ru shui you shi ping jing ye you shi peng pai	OK	no_findings;stratum=sample;id=mu:4908
+的城市千里之外	de cheng shi qian li zhi wai	OK	no_findings;stratum=sample;id=mu:4932
+别融化了眼泪你妆都花了	bie rong hua le yan lei ni zhuang dou hua le	OK	no_findings;stratum=sample;id=mu:4975
+剩下倔强剩下合照	sheng xia jue jiang sheng xia he zhao	OK	no_findings;stratum=sample;id=mu:4990
+红橙黄绿蓝	hong cheng huang lv lan	OK	no_findings;stratum=sample;id=mu:5020
+吸引我轨迹	xi yin wo gui ji	OK	no_findings;stratum=sample;id=mu:5027
+做个梦给你做个梦给你	zuo ge meng gei ni zuo ge meng gei ni	OK	no_findings;stratum=sample;id=mu:5047
+全都是泡沫	quan dou shi pao mo	OK	no_findings;stratum=sample;id=mu:5080
+当初炽热的心	dang chu chi re de xin	OK	no_findings;stratum=sample;id=mu:5083
+的流	de liu	OK	no_findings;stratum=sample;id=mu:5096
+顺应时代的改变	shun ying shi dai de gai bian	OK	no_findings;stratum=sample;id=mu:5117
+把一个人的温暖转移到另一个的胸膛	ba yi ge ren de wen nuan zhuan yi dao ling yi ge de xiong tang	OK	no_findings;stratum=sample;id=mu:5135
+微笑着说回去吧转身泪湿眼底	wei xiao zhe shuo hui qu ba zhuan shen lei shi yan di	OK	no_findings;stratum=sample;id=mu:5144
+我愿那妒我的无	wo yuan na du wo de wu	OK	no_findings;stratum=sample;id=mu:5159
+无人的地方再打开	wu ren de di fang zai da kai	OK	stratum=sample;id=mu:5178
+疼痛来得更痛快	teng tong lai de geng tong kuai	OK	no_findings;stratum=sample;id=mu:5188
+搞来搞去好像也就这样不如花点时间想想琢磨一下模	gao lai gao qu hao xiang ye jiu zhe yang bu ru hua dian shi jian xiang xiang zuo mo yi xia mu	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:5219
+不如花点时间想声琢磨一下模	bu ru hua dian shi jian xiang sheng zuo mo yi xia mo	DATA_FIX	annotation corrected;stratum=dispute;id=mu:5234;was=8:zhuo
+我做我的改变又何必纠结	wo zuo wo de gai bian you he bi jiu jie	OK	no_findings;stratum=sample;id=mu:5237
+如果再看你一眼是否还会有感觉最真实的喜怒哀乐全都埋藏在昨	ru guo zai kan ni yi yan shi fou hai hui you gan jue zui zhen shi de xi nu ai le quan dou mai cang zai zuo	OK	no_findings;stratum=sample;id=mu:5239
+不住像手腕上散发的	bu zhu xiang shou wan shang san fa de	OK	no_findings;stratum=sample;id=mu:5257
+红色高跟鞋	hong se gao gen xie	OK	no_findings;stratum=sample;id=mu:5259
+雨啦我能给你个拥抱像朋友一样可以吗	yu la wo neng gei ni ge yong bao xiang peng you yi yang ke yi ma	OK	no_findings;stratum=sample;id=mu:5283
+善解人意的	shan jie ren yi de	OK	no_findings;stratum=sample;id=mu:5289
+当你低头的瞬间	dang ni di tou de shun jian	OK	no_findings;stratum=sample;id=mu:5321
+穿过幽暗的岁月也曾感到彷徨	chuan guo you an de sui yue ye ceng gan dao pang huang	OK	no_findings;stratum=sample;id=mu:5327
+我告诉我自己感情就是这样	wo gao su wo zi ji gan qing jiu shi zhe yang	OK	no_findings;stratum=sample;id=mu:5352
+人生已经如此的艰难	ren sheng yi jing ru ci de jian nan	OK	no_findings;stratum=sample;id=mu:5382
+有些事情就不要拆穿	you xie shi qing jiu bu yao chai chuan	OK	no_findings;stratum=sample;id=mu:5383
+它带你来骗我说渴望的有可能有	ta dai ni lai pian wo shuo ke wang de you ke neng you	OK	no_findings;stratum=sample;id=mu:5385
+如云般游走	ru yun ban you zou	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:5396;audit3=narrow:2:ban
+某一刻你的光照亮了我	mou yi ke ni de guang zhao liang le wo	OK	no_findings;stratum=sample;id=mu:5419
+问君此去几时还	wen jun ci qu ji shi huan	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:5454
+黑距离像影子	hei ju li xiang ying zi	OK	no_findings;stratum=sample;id=mu:5477
+被拉拖	bei la tuo	OK	no_findings;stratum=sample;id=mu:5478
+带我飞给我希望	dai wo fei gei wo xi wang	OK	no_findings;stratum=sample;id=mu:5498
+留一个愿望让自己	liu yi ge yuan wang rang zi ji	OK	no_findings;stratum=sample;id=mu:5504
+能一直延续我相信我将	neng yi zhi yan xu wo xiang xin wo jiang	OK	no_findings;stratum=sample;id=mu:5528
+如果不是你我不会相信	ru guo bu shi ni wo bu hui xiang xin	OK	no_findings;stratum=sample;id=mu:5541
+只是骂我几句	zhi shi ma wo ji ju	OK	no_findings;stratum=sample;id=mu:5553
+人如海车成行	ren ru hai che cheng hang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:5567
+想和你铺纸笔写余生的篇章	xiang he ni pu zhi bi xie yu sheng de pian zhang	OK	no_findings;stratum=sample;id=mu:5578
+你是我偶然听闻铭感于心的歌唱	ni shi wo ou ran ting wen ming gan yu xin de ge chang	OK	no_findings;stratum=sample;id=mu:5581
+日出又日落深处再深处	ri chu you ri luo shen chu zai shen chu	OK	no_findings;stratum=sample;id=mu:5587
+模样穿过人群	mu yang chuan guo ren qun	OK	no_findings;stratum=sample;id=mu:5645
+爱对热烈认真付出的画面	ai dui re lie ren zhen fu chu de hua mian	OK	no_findings;stratum=sample;id=mu:5662
+生劫易渡情劫难了折旧的心还有	sheng jie yi du qing jie nan liao zhe jiu de xin hai you	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:5712
+凉凉夜色为你思念成河	liang liang ye se wei ni si nian cheng he	OK	no_findings;stratum=sample;id=mu:5723
+凉凉三生三世恍然如风	liang liang san sheng san shi huang ran ru feng	OK	no_findings;stratum=sample;id=mu:5725
+你扔下的习惯还顽强活在我身上	ni reng xia de xi guan hai wan qiang huo zai wo shen shang	OK	no_findings;stratum=sample;id=mu:5758
+告别我自己	gao bie wo zi ji	OK	no_findings;stratum=sample;id=mu:5781
+因为我不知道	yin wei wo bu zhi dao	OK	no_findings;stratum=sample;id=mu:5782
+茫茫人海中遇见你	mang mang ren hai zhong yu jian ni	OK	no_findings;stratum=sample;id=mu:5803
+想起天台可笑的自己	xiang qi tian tai ke xiao de zi ji	OK	no_findings;stratum=sample;id=mu:5807
+越折磨回忆还在煽风点火	yue zhe mo hui yi hai zai shan feng dian huo	OK	no_findings;stratum=sample;id=mu:5830
+没能忘记你	mei neng wang ji ni	OK	no_findings;stratum=sample;id=mu:5855
+她静悄悄地来过	ta jing qiao qiao de lai guo	OK	no_findings;stratum=sample;id=mu:5856
+给的照片	gei de zhao pian	OK	no_findings;stratum=sample;id=mu:5867
+等着落山风吹过	deng zhe luo shan feng chui guo	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:5895
+快乐的事想跟你分享难过想给你肩膀	kuai le de shi xiang gen ni fen xiang nan guo xiang gei ni jian bang	OK	no_findings;stratum=sample;id=mu:5916
+留到十年以后再跟你说给你买最大的房子	liu dao shi nian yi hou zai gen ni shuo gei ni mai zui da de fang zi	OK	no_findings;stratum=sample;id=mu:5925
+不敢回看左顾右盼不自然的暗自喜欢	bu gan hui kan zuo gu you pan bu zi ran de an zi xi huan	OK	no_findings;stratum=sample;id=mu:5931
+在原地打转的小丑伤心不断	zai yuan di da zhuan de xiao chou shang xin bu duan	OK	no_findings;stratum=sample;id=mu:5935
+有个地方睡觉吃饭	you ge di fang shui jiao chi fan	OK	no_findings;stratum=sample;id=mu:5975
+懂得什么是珍贵那些美梦	dong de shen me shi zhen gui na xie mei meng	OK	no_findings;stratum=sample;id=mu:5984
+不然怎么一直牵我的手不放	bu ran zen me yi zhi qian wo de shou bu fang	OK	no_findings;stratum=sample;id=mu:6008
+你攥着我的手	ni zuan zhe wo de shou	OK	no_findings;stratum=sample;id=mu:6024
+分别总是在九月回忆是思念的愁	fen bie zong shi zai jiu yue hui yi shi si nian de chou	OK	no_findings;stratum=sample;id=mu:6037
+你问他	ni wen ta	OK	no_findings;stratum=sample;id=mu:6088
+它可曾单薄地承载了	ta ke ceng dan bo de cheng zai le	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:6113
+还与我蹉跎无慈悲爱我纯粹	hai yu wo cuo tuo wu ci bei ai wo chun cui	OK	no_findings;stratum=sample;id=mu:6134
+还图我眼波销魂与我私奔还与我做不二臣夸我含苞待放还夸我欲盖弥彰	hai tu wo yan bo xiao hun yu wo si ben hai yu wo zuo bu er chen kua wo han bao dai fang hai kua wo yu gai mi zhang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:6140
+还与我做不二臣夸我含苞待放还夸我欲盖弥彰	hai yu wo zuo bu er chen kua wo han bao dai fang hai kua wo yu gai mi zhang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:6146
+让我爱你	rang wo ai ni	OK	no_findings;stratum=sample;id=mu:6192
+都快要失去形状	dou kuai yao shi qu xing zhuang	OK	no_findings;stratum=sample;id=mu:6271
+火车呼啸着驶过驶过寂寞或繁华	huo che hu xiao zhe shi guo shi guo ji mo huo fan hua	OK	no_findings;stratum=sample;id=mu:6283
+外面它太复杂	wai mian ta tai fu za	OK	no_findings;stratum=sample;id=mu:6289
+总催着人长大	zong cui zhe ren zhang da	OK	no_findings;stratum=sample;id=mu:6298
+总是停不下就慢慢的忘了吧	zong shi ting bu xia jiu man man de wang le ba	OK	no_findings;stratum=sample;id=mu:6300
+却又不太了解	que you bu tai liao jie	OK	no_findings;stratum=sample;id=mu:6343
+被子里的舒服却又像风捉摸不住	bei zi li de shu fu que you xiang feng zhuo mo bu zhu	OK	no_findings;stratum=sample;id=mu:6344
+就当那双最后	jiu dang na shuang zui hou	OK	no_findings;stratum=sample;id=mu:6351
+你永远的童真	ni yong yuan de tong zhen	OK	no_findings;stratum=sample;id=mu:6354
+人间不过是你寄身之处银河里	ren jian bu guo shi ni ji shen zhi chu yin he li	OK	no_findings;stratum=sample;id=mu:6368
+滥用沉默在咆哮爱情来不及变老	lan yong chen mo zai pao xiao ai qing lai bu ji bian lao	OK	no_findings;stratum=sample;id=mu:6385
+如果全世界我也可以放弃至少还有你	ru guo quan shi jie wo ye ke yi fang qi zhi shao hai you ni	OK	no_findings;stratum=sample;id=mu:6407
+董小姐鼓楼的夜晚时间匆匆	dong xiao jie gu lou de ye wan shi jian cong cong	OK	no_findings;stratum=sample;id=mu:6414
+抱一抱就当作从没有在一起	bao yi bao jiu dang zuo cong mei you zai yi qi	OK	no_findings;stratum=sample;id=mu:6427
+那个我不像话一直奋不顾身	na ge wo bu xiang hua yi zhi fen bu gu shen	OK	no_findings;stratum=sample;id=mu:6432
+我等的人大在多远的未来	wo deng de ren da zai duo yuan de wei lai	OK	no_findings;stratum=sample;id=mu:6475
+这是我对旧时光最温暖的回忆	zhe shi wo dui jiu shi guang zui wen nuan de hui yi	OK	no_findings;stratum=sample;id=mu:6492
+一步步向前走她给的永远不重	yi bu bu xiang qian zou ta gei de yong yuan bu zhong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:6520
+睁开了眼睛漫天的雪无情	zheng kai le yan jing man tian de xue wu qing	OK	no_findings;stratum=sample;id=mu:6535
+在冬季盼望	zai dong ji pan wang	OK	no_findings;stratum=sample;id=mu:6545
+想起你轻柔的话语曾打湿我眼眶	xiang qi ni qing rou de hua yu ceng da shi wo yan kuang	OK	no_findings;stratum=sample;id=mu:6551
+却没能等到阳光下这秋天的景象	que mei neng deng dao yang guang xia zhe qiu tian de jing xiang	OK	no_findings;stratum=sample;id=mu:6552
+心里总会好过	xin li zong hui hao guo	OK	no_findings;stratum=sample;id=mu:6563
+也是因为你	ye shi yin wei ni	OK	no_findings;stratum=sample;id=mu:6633
+当爱偷偷靠近	dang ai tou tou kao jin	OK	no_findings;stratum=sample;id=mu:6648
+一直想帮你换	yi zhi xiang bang ni huan	OK	no_findings;stratum=sample;id=mu:6672
+是尽头是你离去后的长空	shi jin tou shi ni li qu hou de chang kong	OK	no_findings;stratum=sample;id=mu:6693
+现在你表情好像在嘲弄	xian zai ni biao qing hao xiang zai chao nong	OK	no_findings;stratum=sample;id=mu:6701
+让我保持等的姿势继续期待哎	rang wo bao chi deng de zi shi ji xu qi dai ai	OK	no_findings;stratum=sample;id=mu:6730
+不忍心损坏那是因为爱爱爱爱	bu ren xin sun huai na shi yin wei ai ai ai ai	OK	no_findings;stratum=sample;id=mu:6731
+一触碰就放不下	yi chu peng jiu fang bu xia	OK	no_findings;stratum=sample;id=mu:6752
+太多的回忆	tai duo de hui yi	OK	no_findings;stratum=sample;id=mu:6816
+消瘦月下惟有我的身影投该与谁厮守	xiao shou yue xia wei you wo de shen ying tou gai yu shei si shou	OK	no_findings;stratum=sample;id=mu:6873
+望断门前隔岸的杨柳寂寞仍不休	wang duan men qian ge an de yang liu ji mo reng bu xiu	OK	no_findings;stratum=sample;id=mu:6877
+抬起头梦然间才发现	tai qi tou meng ran jian cai fa xian	OK	no_findings;stratum=sample;id=mu:6895
+我只要沿着记忆的路线	wo zhi yao yan zhe ji yi de lu xian	OK	no_findings;stratum=sample;id=mu:6907
+耳边誓言	er bian shi yan	OK	no_findings;stratum=sample;id=mu:6913
+那里有人在歌唱那里有满天星光	na li you ren zai ge chang na li you man tian xing guang	OK	no_findings;stratum=sample;id=mu:6926
+两人对坐半句话都没有不是在暗斗	liang ren dui zuo ban ju hua dou mei you bu shi zai an dou	OK	no_findings;stratum=sample;id=mu:6940
+是真等没话说	shi zhen deng mei hua shuo	OK	no_findings;stratum=sample;id=mu:6941
+真的很崩溃宝贵的时间被瓦解脑袋空	zhen de hen beng kui bao gui de shi jian bei wa jie nao dai kong	OK	no_findings;stratum=sample;id=mu:6956
+倔强的尽头没有人等我	jue jiang de jin tou mei you ren deng wo	OK	no_findings;stratum=sample;id=mu:6979
+的黄昏	de huang hun	OK	no_findings;stratum=sample;id=mu:6997
+不敢让你看见嘴角那颗没落下的泪	bu gan rang ni kan jian zui jiao na ke mei luo xia de lei	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:7002
+把故事重写	ba gu shi chong xie	OK	no_findings;stratum=sample;id=mu:7005
+嘴角那颗没落下的泪	zui jiao na ke mei luo xia de lei	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:7015
+不想睡觉再也没人跟我吵	bu xiang shui jiao zai ye mei ren gen wo chao	OK	no_findings;stratum=sample;id=mu:7037
+脸上带口罩你听不到	lian shang dai kou zhao ni ting bu dao	OK	no_findings;stratum=sample;id=mu:7052
+真的什么都不要只要	zhen de shen me dou bu yao zhi yao	OK	no_findings;stratum=sample;id=mu:7061
+错过惊世的	cuo guo jing shi de	OK	no_findings;stratum=sample;id=mu:7086
+此生不换要分散不习惯	ci sheng bu huan yao fen san bu xi guan	OK	no_findings;stratum=sample;id=mu:7092
+曾经最掏心所以最开心	ceng jing zui tao xin suo yi zui kai xin	OK	no_findings;stratum=sample;id=mu:7112
+不如花点时间想想琢磨一下模样	bu ru hua dian shi jian xiang xiang zuo mo yi xia mu yang	DATA_FIX	annotation corrected;stratum=dispute;id=mu:7139;was=8:zhuo
+如果再看你一眼是否还会有感觉最真实的喜怒哀乐全都埋葬在	ru guo zai kan ni yi yan shi fou hai hui you gan jue zui zhen shi de xi nu ai le quan dou mai zang zai	OK	no_findings;stratum=sample;id=mu:7142
+被子里的舒服却又像风捉磨不住	bei zi li de shu fu que you xiang feng zhuo mo bu zhu	OK	no_findings;stratum=sample;id=mu:7160
+就等那双最后唯一的哈	jiu deng na shuang zui hou wei yi de ha	OK	no_findings;stratum=sample;id=mu:7161
+你们如今在何方我曾经爱过的人啊	ni men ru jin zai he fang wo ceng jing ai guo de ren a	OK	no_findings;stratum=sample;id=mu:7180
+春风觅香穿过谁家庭院捎周谁的收获自处寻开心	chun feng mi xiang chuan guo shei jia ting yuan shao zhou shei de shou huo zi chu xun kai xin	OK	stratum=sample;id=mu:7198
+在以后你少不免想起我后	zai yi hou ni shao bu mian xiang qi wo hou	OK	no_findings;stratum=sample;id=mu:7219
+在我二十二岁时回想起当时多么想谈恋爱	zai wo er shi er sui shi hui xiang qi dang shi duo me xiang tan lian ai	OK	no_findings;stratum=sample;id=mu:7245
+就算是自我安慰	jiu suan shi zi wo an wei	OK	no_findings;stratum=sample;id=mu:7261
+以为遇上了就会明白但每次它只留下惊鸿一瞥的感慨	yi wei yu shang le jiu hui ming bai dan mei ci ta zhi liu xia jing hong yi pie de gan kai	OK	no_findings;stratum=sample;id=mu:7266
+偶遇也像换季也像爱情	ou yu ye xiang huan ji ye xiang ai qing	OK	no_findings;stratum=sample;id=mu:7270
+别让我独自守候	bie rang wo du zi shou hou	OK	no_findings;stratum=sample;id=mu:7354
+我对你情那么深	wo dui ni qing na me shen	OK	no_findings;stratum=sample;id=mu:7364
+意那么浓	yi na me nong	OK	no_findings;stratum=sample;id=mu:7365
+两个人不过萍水相逢	liang ge ren bu guo ping shui xiang feng	OK	no_findings;stratum=sample;id=mu:7414
+明天又答应了明年我们将不需要多余的前言	ming tian you da ying le ming nian wo men jiang bu xu yao duo yu de qian yan	OK	no_findings;stratum=sample;id=mu:7435
+我想告诉他我是谁	wo xiang gao su ta wo shi shei	OK	no_findings;stratum=sample;id=mu:7437
+香烟请再为我点一颗	xiang yan qing zai wei wo dian yi ke	OK	no_findings;stratum=sample;id=mu:7471
+不必在意我的哀与乐	bu bi zai yi wo de ai yu le	OK	no_findings;stratum=sample;id=mu:7498
+火车上的情侣也不多	huo che shang de qing lv ye bu duo	OK	no_findings;stratum=sample;id=mu:7499
+就该错过	jiu gai cuo guo	OK	no_findings;stratum=sample;id=mu:7526
+哦你该快乐	o ni gai kuai le	OK	no_findings;stratum=sample;id=mu:7637
+大地母亲地乳汁	da di mu qin de ru zhi	OK	no_findings;stratum=sample;id=mu:7654
+生来就属于天际	sheng lai jiu shu yu tian ji	OK	no_findings;stratum=sample;id=mu:7667
+请让我拥有你	qing rang wo yong you ni	OK	no_findings;stratum=sample;id=mu:7705
+人事纷纷	ren shi fen fen	OK	no_findings;stratum=sample;id=mu:7709
+大地沿河流	da di yan he liu	OK	stratum=sample;id=mu:7737
+已尽收眼底	yi jin shou yan di	OK	no_findings;stratum=sample;id=mu:7749
+时间瞬间凝结了	shi jian shun jian ning jie le	OK	no_findings;stratum=sample;id=mu:7787
+让我亲一亲像过去一样	rang wo qin yi qin xiang guo qu yi yang	OK	no_findings;stratum=sample;id=mu:7801
+关系虽然不再一样	guan xi sui ran bu zai yi yang	OK	no_findings;stratum=sample;id=mu:7815
+枫叶红了满面秋霜	feng ye hong le man mian qiu shuang	OK	no_findings;stratum=sample;id=mu:7835
+再聊聊若是非得分	zai liao liao ruo shi fei dei fen	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:7858
+空着手	kong zhe shou	ENGINE_BUG	correct reading was available as a candidate;stratum=sample;id=mu:7869;audit76=fix:1:zhuo;audit105=fix:1:zhe
+眼皮难免会沉重你没错	yan pi nan mian hui chen zhong ni mei cuo	OK	no_findings;stratum=sample;id=mu:7874
+别说话	bie shuo hua	OK	no_findings;stratum=sample;id=mu:7880
+筑成一道围墙也敌不过夜里	zhu cheng yi dao wei qiang ye di bu guo ye li	OK	no_findings;stratum=sample;id=mu:7935
+没时间去看	mei shi jian qu kan	OK	no_findings;stratum=sample;id=mu:7946
+女儿扎着马尾辫跑进了校园	nv er za zhe ma wei/yi bian pao jin le xiao yuan	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:7965
+那时的女儿一定会美得	na shi de nv er yi ding hui mei de	OK	no_findings;stratum=sample;id=mu:7968
+好叫我留住芳华	hao jiao wo liu zhu fang hua	OK	no_findings;stratum=sample;id=mu:7981
+只是没抵达的存在	zhi shi mei di da de cun zai	OK	no_findings;stratum=sample;id=mu:8005
+靠嬉笑来虚度聚散得慷慨	kao xi xiao lai xu du ju san de kang kai	OK	no_findings;stratum=sample;id=mu:8007
+爱人你可感到明天已经来临	ai ren ni ke gan dao ming tian yi jing lai lin	OK	no_findings;stratum=sample;id=mu:8058
+歌声里的你和我会永远在一起	ge sheng li de ni he wo hui yong yuan zai yi qi	OK	no_findings;stratum=sample;id=mu:8076
+你们如今在何方我曾经爱过的人呐	ni men ru jin zai he fang wo ceng jing ai guo de ren na	OK	no_findings;stratum=sample;id=mu:8091
+怎么能有牵挂	zen me neng you qian gua	OK	no_findings;stratum=sample;id=mu:8097
+我听见一只盲目的蜻蜓	wo ting jian yi zhi mang mu de qing ting	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:8144
+我听不见	wo ting bu jian	OK	no_findings;stratum=sample;id=mu:8158
+她自言自语	ta zi yan zi yu	OK	no_findings;stratum=sample;id=mu:8179
+别叹息别叹息对我说没有不老的红颜	bie tan xi bie tan xi dui wo shuo mei you bu lao de hong yan	OK	no_findings;stratum=sample;id=mu:8204
+行歌在草长鹰飞的季节里喃喃的唱	xing ge zai cao zhang ying fei de ji jie li nan nan de chang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:8223
+两个相爱的人等着对方先说	liang ge xiang ai de ren deng zhe dui fang xian shuo	OK	no_findings;stratum=sample;id=mu:8276
+戴着一双白手套	dai zhe yi shuang bai shou tao	OK	no_findings;stratum=sample;id=mu:8286
+让我们相遇啊	rang wo men xiang yu a	OK	no_findings;stratum=sample;id=mu:8371
+我依旧在想她	wo yi jiu zai xiang ta	OK	no_findings;stratum=sample;id=mu:8383
+失去了冲动	shi qu le chong dong	OK	no_findings;stratum=sample;id=mu:8390
+到那充满可能的国界	dao na chong man ke neng de guo jie	OK	no_findings;stratum=sample;id=mu:8430
+已不能改变每颗眼泪是一万道光最昏暗的地方	yi bu neng gai bian mei ke yan lei shi yi wan dao guang zui hun an de di fang	OK	no_findings;stratum=sample;id=mu:8452
+我化尘埃飞扬	wo hua chen ai fei yang	OK	no_findings;stratum=sample;id=mu:8461
+时间烧灼滚烫	shi jian shao zhuo gun tang	OK	no_findings;stratum=sample;id=mu:8464
+回忆撕毁臆想	hui yi si hui yi xiang	OK	no_findings;stratum=sample;id=mu:8465
+笑是神的伪装笑是强忍的伤	xiao shi shen de wei zhuang xiao shi qiang ren de shang	OK	no_findings;stratum=sample;id=mu:8470
+我想你就站在站在大漠边疆	wo xiang ni jiu zhan zai zhan zai da mo bian jiang	OK	no_findings;stratum=sample;id=mu:8472
+我想你就站在站在七月上	wo xiang ni jiu zhan zai zhan zai qi yue shang	OK	no_findings;stratum=sample;id=mu:8473
+钥匙精美有样子	yao shi jing mei you yang zi	OK	no_findings;stratum=sample;id=mu:8498
+背了六年半	bei le liu nian ban	OK	no_findings;stratum=sample;id=mu:8516
+对我沉重的审判	dui wo chen zhong de shen pan	OK	no_findings;stratum=sample;id=mu:8524
+这般蜜也似的银夜诶	zhe ban mi ye shi de yin ye ei	DATA_FIX	annotation corrected;stratum=dispute;id=mu:8572;was=4:si;5:di
+塞纳河畔左岸的咖啡我手一杯品尝你的	sai na he pan zuo an de ka fei wo shou yi bei pin chang ni de	OK	no_findings;stratum=sample;id=mu:8604
+一方绿草萋萋	yi fang lv cao qi qi	OK	no_findings;stratum=sample;id=mu:8622
+而上与她轻言细语	er shang yu ta qing yan xi yu	OK	no_findings;stratum=sample;id=mu:8628
+和会流泪的眼睛	he hui liu lei de yan jing	OK	no_findings;stratum=sample;id=mu:8638
+也不愿忘记你的眼睛营	ye bu yuan wang ji ni de yan jing ying	OK	no_findings;stratum=sample;id=mu:8650
+我不曾摊开伤口任宰割愈合	wo bu ceng tan kai shang kou ren zai ge yu he	OK	no_findings;stratum=sample;id=mu:8671
+我内心挫折活像个孤独患者自我拉扯	wo nei xin cuo zhe huo xiang ge gu du huan zhe zi wo la che	OK	no_findings;stratum=sample;id=mu:8673
+易碎的骄傲着	yi sui de jiao ao zhe	OK	no_findings;stratum=sample;id=mu:8689
+向前走就想走就算你被给过什么	xiang qian zou jiu xiang zou jiu suan ni bei gei guo shen me	OK	no_findings;stratum=sample;id=mu:8707
+向前走就想走就算你被夺走什么	xiang qian zou jiu xiang zou jiu suan ni bei duo zou shen me	OK	no_findings;stratum=sample;id=mu:8708
+明天已在哎哎	ming tian yi zai ai ai	OK	no_findings;stratum=sample;id=mu:8718
+假如我年少有为不自卑尝过后悔的滋味	jia ru wo nian shao you wei bu zi bei chang guo hou hui de zi wei	OK	stratum=sample;id=mu:8732
+耳不闻恶语闲言	er bu wen e yu xian yan	OK	no_findings;stratum=sample;id=mu:8753
+都流出一首赞歌	dou liu chu yi shou zan ge	OK	no_findings;stratum=sample;id=mu:8778
+华巷口尽管你我是陌生人	hua xiang kou jin guan ni wo shi mo sheng ren	OK	no_findings;stratum=sample;id=mu:8822
+我吃在意有你的消息城堡为爱守着秘密	wo chi zai yi you ni de xiao xi cheng bao wei ai shou zhe mi mi	OK	no_findings;stratum=sample;id=mu:8829
+没有信用卡没有她	mei you xin yong ka mei you ta	OK	stratum=sample;id=mu:8835
+请把我留在	qing ba wo liu zai	OK	no_findings;stratum=sample;id=mu:8843
+总是靠一点酒精的麻痹才能睡去	zong shi kao yi dian jiu jing de ma bi cai neng shui qu	OK	no_findings;stratum=sample;id=mu:8892
+在半醒半在半睡半醒之间仿佛又听见水手说	zai ban xing ban zai ban shui ban xing zhi jian fang fu you ting jian shui shou shuo	OK	no_findings;stratum=sample;id=mu:8893
+当初炽热的心早已沉没	dang chu chi re de xin zao yi chen mo	OK	no_findings;stratum=sample;id=mu:8913
+看着地上的小蚂蚁	kan zhe di shang de xiao ma yi	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:8915
+我不想这样活着我不想这样活着我不想这样活着	wo bu xiang zhe yang huo zhe wo bu xiang zhe yang huo zhe wo bu xiang zhe yang huo zhe	OK	no_findings;stratum=sample;id=mu:8940
+缘分落地生根是我们	yuan fen luo di sheng gen shi wo men	OK	no_findings;stratum=sample;id=mu:8992
+双手撑起我们的家总是竭尽所有把最好的给我	shuang shou cheng qi wo men de jia zong shi jie jin suo you ba zui hao de gei wo	OK	no_findings;stratum=sample;id=mu:9019
+可怜像蠢动的心乐	ke lian xiang chun dong de xin le/yue	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:9026
+只剩下不知疲倦的肩膀担负着简单的满足	zhi sheng xia bu zhi pi juan de jian bang dan fu zhe jian dan de man zu	OK	no_findings;stratum=sample;id=mu:9055
+可能是寂寞	ke neng shi ji mo	OK	no_findings;stratum=sample;id=mu:9071
+满城霓虹开出荒漠	man cheng ni hong kai chu huang mo	OK	no_findings;stratum=sample;id=mu:9073
+这眉头那么重	zhe mei tou na me zhong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:9084
+梦想总是遥不可期是不是应该放弃	meng xiang zong shi yao bu ke qi shi bu shi ying gai fang qi	OK	no_findings;stratum=sample;id=mu:9138
+凝结成了霜	ning jie cheng le shuang	OK	no_findings;stratum=sample;id=mu:9149
+菊花残满地伤你的笑容已泛黄	ju hua can man di shang ni de xiao rong yi fan huang	DATA_FIX	annotation corrected;stratum=dispute;id=mu:9175;was=4:de
+我从来不挣扎	wo cong lai bu zheng zha	OK	no_findings;stratum=sample;id=mu:9182
+也许会普通也许这庸庸碌碌的黑白世界你不懂	ye xu hui pu tong ye xu zhe yong yong lu lu de hei bai shi jie ni bu dong	OK	no_findings;stratum=sample;id=mu:9203
+我走千里我走万地	wo zou qian li wo zou wan di	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:9208
+看万里山河一片锦绣	kan wan li shan he yi pian jin xiu	OK	no_findings;stratum=sample;id=mu:9219
+我们一同喜欢着现在	wo men yi tong xi huan zhe xian zai	OK	no_findings;stratum=sample;id=mu:9224
+我们都有类似的遗憾所以	wo men dou you lei si de yi han suo yi	OK	no_findings;stratum=sample;id=mu:9226;audit76=fix:5:shi;audit105=fix:5:si
+等待日出时最耀眼的瞬间	deng dai ri chu shi zui yao yan de shun jian	OK	no_findings;stratum=sample;id=mu:9264
+问君此时几时还	wen jun ci shi ji shi huan	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:9276
+全都有你	quan dou you ni	OK	no_findings;stratum=sample;id=mu:9330
+成全了你万众宠爱的天后	cheng quan le ni wan zhong chong ai de tian hou	OK	no_findings;stratum=sample;id=mu:9354
+每个眼神触动我的心	mei ge yan shen chu dong wo de xin	OK	no_findings;stratum=sample;id=mu:9378
+最爱你的是我否则你怎么让我	zui ai ni de shi wo fou ze ni zen me rang wo	OK	no_findings;stratum=sample;id=mu:9379
+我才安心	wo cai an xin	OK	no_findings;stratum=sample;id=mu:9387
+忘记我姓名	wang ji wo xing ming	OK	no_findings;stratum=sample;id=mu:9388
+那一面	na yi mian	OK	no_findings;stratum=sample;id=mu:9398
+只是永远我都放不开最后的温暖	zhi shi yong yuan wo dou fang bu kai zui hou de wen nuan	OK	no_findings;stratum=sample;id=mu:9454
+仿佛我的天空失去了颜色	fang fu wo de tian kong shi qu le yan se	OK	no_findings;stratum=sample;id=mu:9492
+赶快背上行囊把家还嘿呀嘿	gan kuai bei shang xing nang ba jia huan hei ya hei	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:9521
+书上是万事顺意	shu shang shi wan shi shun yi	OK	no_findings;stratum=sample;id=mu:9534
+到底谁是歌里这个桃花儿姑娘嘿	dao di shei shi ge li zhe ge tao hua er gu niang hei	OK	no_findings;stratum=sample;id=mu:9539
+是最长的电影	shi zui chang de dian ying	OK	no_findings;stratum=sample;id=mu:9552
+空着手犹如你来的时候	kong zhe shou you ru ni lai de shi hou	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:9560;audit76=fix:1:zhuo;audit105=fix:1:zhe
+鸣笛声	ming di sheng	OK	no_findings;stratum=sample;id=mu:9570
+贯穿我的身体厚重了肩膀	guan chuan wo de shen ti hou zhong le jian bang	OK	no_findings;stratum=sample;id=mu:9598
+东瓶西镜放恨不能遗忘	dong ping xi jing fang hen bu neng yi wang	OK	no_findings;stratum=sample;id=mu:9612
+又是清明雨上	you shi qing ming yu shang	OK	no_findings;stratum=sample;id=mu:9613
+追不到的梦想换个梦不就得了为自己的人生鲜艳上色先把爱涂上喜欢的颜色	zhui bu dao de meng xiang huan ge meng bu jiu de le wei zi ji de ren sheng xian yan shang shai xian ba ai tu shang xi huan de yan se	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:9624
+月阴晴圆缺如你的发梢	yue yin qing yuan que ru ni de fa shao	OK	no_findings;stratum=sample;id=mu:9647
+西湖烟光残照转身撩白袍	xi hu yan guang can zhao zhuan shen liao bai pao	OK	no_findings;stratum=sample;id=mu:9664
+红了樱桃绿了芭蕉	hong le ying tao lv le ba jiao	OK	no_findings;stratum=sample;id=mu:9666
+我也曾经努力的尝试我还是回到海洋	wo ye ceng jing nu li de chang shi wo hai shi hui dao hai yang	OK	no_findings;stratum=sample;id=mu:9676
+不怕多困难那熟悉地方是我的	bu pa duo kun nan na shu xi di fang shi wo de	DATA_FIX	annotation corrected;stratum=dispute;id=mu:9677;was=8:de
+在那地平线另一边呼唤我	zai na di ping xian ling yi bian hu huan wo	OK	no_findings;stratum=sample;id=mu:9693
+几分忧郁几分孤单	ji fen you yu ji fen gu dan	OK	no_findings;stratum=sample;id=mu:9708
+好像厌倦了我重复最熟悉的段落	hao xiang yan juan le wo chong fu zui shu xi de duan luo	OK	no_findings;stratum=sample;id=mu:9725
+没有永远的年轻没有唱不完的歌	mei you yong yuan de nian qing mei you chang bu wan de ge	OK	no_findings;stratum=sample;id=mu:9734
+我只想要拉住流年好好	wo zhi xiang yao la zhu liu nian hao hao	OK	no_findings;stratum=sample;id=mu:9746
+边拥有	bian yong you	OK	no_findings;stratum=sample;id=mu:9799
+明明话那么寒心	ming ming hua na me han xin	OK	no_findings;stratum=sample;id=mu:9808
+樯橹灰飞烟灭	qiang lu hui fei yan mie	OK	no_findings;stratum=sample;id=mu:9907
+心随天地走意被牛羊牵	xin sui tian di zou yi bei niu yang qian	OK	no_findings;stratum=sample;id=mu:9928
+敕勒川阴山下	chi le chuan yin shan xia	OK	no_findings;stratum=sample;id=mu:9940
+夜半三更呦	ye ban san geng you	OK	no_findings;stratum=sample;id=mu:9945
+更美滴是	geng mei di shi	OK	no_findings;stratum=sample;id=mu:10006
+鱼儿难捕租税重	yu er nan bu zu shui zhong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:10017
+你的微笑好像星星	ni de wei xiao hao xiang xing xing	OK	no_findings;stratum=sample;id=mu:10026
+不要忘了你的诺言变了心	bu yao wang le ni de nuo yan bian le xin	DATA_FIX	annotation corrected;stratum=dispute;id=mu:10030;was=3:liao;9:liao
+我是你的你是我的	wo shi ni de ni shi wo de	DATA_FIX	annotation corrected;stratum=dispute;id=mu:10031;was=7:di
+年青滴哈萨克人人羡慕我羡慕我	nian qing di ha sa ke ren ren xian mu wo xian mu wo	OK	no_findings;stratum=sample;id=mu:10039
+那是青春	na shi qing chun	OK	no_findings;stratum=sample;id=mu:10070
+吐芳华	tu fang hua	OK	no_findings;stratum=sample;id=mu:10071
+从前的日子都远去我也将有我得妻	cong qian de ri zi dou yuan qu wo ye jiang you wo de qi	OK	no_findings;stratum=sample;id=mu:10177
+得她讲同桌的你	dei ta jiang tong zhuo de ni	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:10178
+谁告白气球风吹到对街	shei gao bai qi qiu feng chui dao dui jie	OK	no_findings;stratum=sample;id=mu:10186
+为什没没有发现遇见了你	wei shen mei mei you fa xian yu jian le ni	OK	no_findings;stratum=sample;id=mu:10204
+今天的风吹向你	jin tian de feng chui xiang ni	OK	no_findings;stratum=sample;id=mu:10214
+一字一句像圈套耶	yi zi yi ju xiang quan tao ye	OK	no_findings;stratum=sample;id=mu:10261
+我输了累了当你再也	wo shu le lei le dang ni zai ye	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:10287;audit76=fix:4:liao;audit105=fix:4:le
+是不是说	shi bu shi shuo	OK	no_findings;stratum=sample;id=mu:10337
+没有明天	mei you ming tian	OK	no_findings;stratum=sample;id=mu:10339
+还故作不痛不痒不牵强	hai gu zuo bu tong bu yang bu qian qiang	OK	no_findings;stratum=sample;id=mu:10360
+牵尘	qian chen	OK	no_findings;stratum=sample;id=mu:10366
+握紧手中的平凡	wo jin shou zhong de ping fan	OK	no_findings;stratum=sample;id=mu:10383
+只要你的平凡	zhi yao ni de ping fan	OK	no_findings;stratum=sample;id=mu:10392
+我可以偶尔给你带来带来小甜蜜	wo ke yi ou er gei ni dai lai dai lai xiao tian mi	OK	no_findings;stratum=sample;id=mu:10399
+夜空的星	ye kong de xing	OK	no_findings;stratum=sample;id=mu:10418
+在这相似的夜里	zai zhe xiang si de ye li	OK	no_findings;stratum=sample;id=mu:10445;audit76=fix:3:shi;audit105=fix:3:si
+我们的家乡在希望的田野上	wo men de jia xiang zai xi wang de tian ye shang	OK	no_findings;stratum=sample;id=mu:10451
+我们的理想	wo men de li xiang	OK	no_findings;stratum=sample;id=mu:10458
+我们的未来	wo men de wei lai	OK	no_findings;stratum=sample;id=mu:10465
+人们在明媚的阳光下生活生活在人们的劳动中	ren men zai ming mei de yang guang xia sheng huo sheng huo zai ren men de lao dong zhong	DATA_FIX	annotation corrected;stratum=dispute;id=mu:10466;was=16:di
+托起我重生的起点	tuo qi wo chong sheng de qi dian	OK	no_findings;stratum=sample;id=mu:10483
+看到太阳出来妈妈笑了	kan dao tai yang chu lai ma ma xiao le	OK	no_findings;stratum=sample;id=mu:10493
+我在梦里看见	wo zai meng li kan jian	OK	no_findings;stratum=sample;id=mu:10497
+看到太阳出来	kan dao tai yang chu lai	OK	no_findings;stratum=sample;id=mu:10503
+月光地水彩涂亮了明天	yue guang de shui cai tu liang le ming tian	DATA_FIX	annotation corrected;stratum=dispute;id=mu:10513;was=7:liao
+完全信任你	wan quan xin ren ni	OK	no_findings;stratum=sample;id=mu:10528
+我知道暖暖在胸膛	wo zhi dao nuan nuan zai xiong tang	OK	no_findings;stratum=sample;id=mu:10531
+没有伤悲无怨无悔	mei you shang bei wu yuan wu hui	OK	no_findings;stratum=sample;id=mu:10554
+这风暴	zhe feng bao	OK	no_findings;stratum=sample;id=mu:10621
+我也只剩下我自己	wo ye zhi sheng xia wo zi ji	OK	no_findings;stratum=sample;id=mu:10634
+让我能安心在菩提下	rang wo neng an xin zai pu ti xia	OK	no_findings;stratum=sample;id=mu:10652
+轻轻地梵唱	qing qing de fan chang	OK	no_findings;stratum=sample;id=mu:10661
+带到我离去的地方	dai dao wo li qu de di fang	OK	no_findings;stratum=sample;id=mu:10688
+谁都无法揭谜底	shei dou wu fa jie mi di	OK	no_findings;stratum=sample;id=mu:10720
+你知道你是谁	ni zhi dao ni shi shei	OK	no_findings;stratum=sample;id=mu:10761
+和风沙	he feng sha	OK	no_findings;stratum=sample;id=mu:10800
+魔安魔尽是深刻	mo an mo jin shi shen ke	OK	no_findings;stratum=sample;id=mu:10810
+开始倒数岁出万删除我的孤单	kai shi dao shu sui chu wan shan chu wo de gu dan	OK	no_findings;stratum=sample;id=mu:10817
+了喔偶无偶所有一切你需要的爱	le/liao o ou wu ou suo you yi qie ni xu yao de ai	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:10835
+你的发和背	ni de fa he bei	OK	no_findings;stratum=sample;id=mu:10843
+你说有人伤痕累累	ni shuo you ren shang hen lei lei	OK	no_findings;stratum=sample;id=mu:10847
+色喔曾经有那一刻	se o ceng jing you na yi ke	OK	no_findings;stratum=sample;id=mu:10866
+那一刻回头竟然认不得	na yi ke hui tou jing ran ren bu de	OK	no_findings;stratum=sample;id=mu:10873
+分合云等风人等梦爱辗过时光等什么	fen he yun deng feng ren deng meng ai nian guo shi guang deng shen me	DICT_GAP	engine cannot produce the correct reading;stratum=dispute;id=mu:10896
+像溪流像团火焰像星辰像一个迷	xiang xi liu xiang tuan huo yan xiang xing chen xiang yi ge mi	OK	no_findings;stratum=sample;id=mu:10912
+像深冬的雪般铺天漫地	xiang shen dong de xue ban pu tian man di	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:10933
+我才终于明白办不到的承诺就成了枷锁	wo cai zhong yu ming bai ban bu dao de cheng nuo jiu cheng le jia suo	OK	no_findings;stratum=sample;id=mu:10968
+当泪水堵住了胸口就让沉默	dang lei shui du zhu le xiong kou jiu rang chen mo	OK	no_findings;stratum=sample;id=mu:10971
+可能我唱出自己的人生	ke neng wo chang chu zi ji de ren sheng	OK	no_findings;stratum=sample;id=mu:10989
+人们掌声幽暗如林中回声	ren men zhang sheng you an ru lin zhong hui sheng	OK	no_findings;stratum=sample;id=mu:10993
+风到这里就是粘	feng dao zhe li jiu shi nian	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11012
+粘住过客的思念	zhan zhu guo ke de si nian	DATA_FIX	annotation corrected;stratum=dispute;id=mu:11013;was=0:nian
+在这一刹那冻结了时间不懂怎么表现温柔的我们	zai zhe yi cha na dong jie le shi jian bu dong zen me biao xian wen rou de wo men	OK	no_findings;stratum=sample;id=mu:11020
+痛有多浓当梦被埋在江南烟雨中	tong you duo nong dang meng bei mai zai jiang nan yan yu zhong	OK	no_findings;stratum=sample;id=mu:11028
+像不曾去观赏自己的美我看自己的嘴想熬成白的圣洁	xiang bu ceng qu guan shang zi ji de mei wo kan zi ji de zui xiang ao cheng bai de sheng jie	OK	no_findings;stratum=sample;id=mu:11042
+人总要试着学习	ren zong yao shi zhe xue xi	OK	no_findings;stratum=sample;id=mu:11059
+张开双手变成翅膀守护你	zhang kai shuang shou bian cheng chi bang shou hu ni	OK	stratum=sample;id=mu:11082
+写出我们的喜怒哀乐	xie chu wo men de xi nu ai le	OK	no_findings;stratum=sample;id=mu:11120
+但在这一刻写了一个完结篇	dan zai zhe yi ke xie le yi ge wan jie pian	OK	no_findings;stratum=sample;id=mu:11121
+我们在孤单中探索危险世界美丽的渴求	wo men zai gu dan zhong tan suo wei xian shi jie mei li de ke qiu	OK	no_findings;stratum=sample;id=mu:11138
+寂寞中拍打的翅膀终于找到你一起飞翔	ji mo zhong pai da de chi bang zhong yu zhao dao ni yi qi fei xiang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11146
+黑距离像影子被拉拖	hei ju li xiang ying zi bei la tuo	OK	no_findings;stratum=sample;id=mu:11185
+一因为爱跟重你却不想懂只往反方向走	yi yin wei ai gen zhong ni que bu xiang dong zhi wang fan fang xiang zou	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11191
+其实我过的还可以	qi shi wo guo de hai ke yi	OK	no_findings;stratum=sample;id=mu:11197
+我就能记起你的样子哦	wo jiu neng ji qi ni de yang zi o	OK	no_findings;stratum=sample;id=mu:11237
+爱你的原因在这凄美地也诶诶诶	ai ni de yuan yin zai zhe qi mei di ye ei ei ei	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11243
+为何没留下有效地址肆意的消息	wei he mei liu xia you xiao di zhi si yi de xiao xi	DATA_FIX	annotation corrected;stratum=dispute;id=mu:11245;was=11:di
+在这凄美地也诶诶诶在这之前	zai zhe qi mei di ye ei ei ei zai zhe zhi qian	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11252
+就这样	jiu zhe yang	OK	no_findings;stratum=sample;id=mu:11257
+让我坠落在这凄美地	rang wo zhui luo zai zhe qi mei di	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11261
+我也将有我的妻	wo ye jiang you wo de qi	OK	no_findings;stratum=sample;id=mu:11278
+折磨着我也折磨着你	zhe mo zhe wo ye zhe mo zhe ni	OK	no_findings;stratum=sample;id=mu:11301
+回来告诉我	hui lai gao su wo	OK	no_findings;stratum=sample;id=mu:11311
+你破旧的玩偶你的面具你的自我	ni po jiu de wan ou ni de mian ju ni de zi wo	OK	no_findings;stratum=sample;id=mu:11351
+去吗配吗这褴褛的披风战吗	qu ma pei ma zhe lan lv de pi feng zhan ma	OK	no_findings;stratum=sample;id=mu:11358
+我曾经毁了我的一切只想永远地离开我曾经堕入无边黑暗	wo ceng jing hui le wo de yi qie zhi xiang yong yuan de li kai wo ceng jing duo ru wu bian hei an	OK	no_findings;stratum=sample;id=mu:11379
+尝过后悔的滋味金钱地位	chang guo hou hui de zi wei jin qian di wei	OK	no_findings;stratum=sample;id=mu:11397
+持续的提醒我现实的界限	chi xu de ti xing wo xian shi de jie xian	OK	no_findings;stratum=sample;id=mu:11406
+让时间倒转回到从前	rang shi jian dao zhuan hui dao cong qian	OK	no_findings;stratum=sample;id=mu:11411
+我心底藏了好久那最柔软的角落	wo xin di cang le hao jiu na zui rou ruan de jiao luo	OK	stratum=sample;id=mu:11437
+在城市醒来以后你兀自还唱个不休	zai cheng shi xing lai yi hou ni wu zi hai chang ge bu xiu	OK	no_findings;stratum=sample;id=mu:11470
+满身伤口	man shen shang kou	OK	no_findings;stratum=sample;id=mu:11475
+还赖着不走	hai lai zhe bu zou	OK	no_findings;stratum=sample;id=mu:11481
+在他脑海中奔跑	zai ta nao hai zhong ben pao	OK	no_findings;stratum=sample;id=mu:11515
+彷佛走入第五个	fang fu zou ru di wu ge	DATA_FIX	annotation corrected;stratum=dispute;id=mu:11542;was=0:pang;1:fo
+对身体会好一点	dui shen ti hui hao yi dian	OK	no_findings;stratum=sample;id=mu:11559
+这样我还能微笑着和你分别	zhe yang wo hai neng wei xiao zhe he ni fen bie	OK	no_findings;stratum=sample;id=mu:11566
+想念	xiang nian	OK	no_findings;stratum=sample;id=mu:11569
+我曾以为我会永远	wo ceng yi wei wo hui yong yuan	OK	no_findings;stratum=sample;id=mu:11588
+曾陪她们开放	ceng pei ta men kai fang	OK	no_findings;stratum=sample;id=mu:11595
+啦啦啦想她	la la la xiang ta	DATA_FIX	annotation corrected;stratum=dispute;id=mu:11596;was=2:luo
+她们已经被风带走散落在天涯	ta men yi jing bei feng dai zou san luo zai tian ya	OK	no_findings;stratum=sample;id=mu:11608
+我想唱一首歌给	wo xiang chang yi shou ge gei	OK	no_findings;stratum=sample;id=mu:11624
+嫁给我明天有多幸福只想你明白我心甘情愿爱爱爱爱到要吐	jia gei wo ming tian you duo xing fu zhi xiang ni ming bai wo xin gan qing yuan ai ai ai ai dao yao tu	OK	no_findings;stratum=sample;id=mu:11629
+让我断了气铁了心爱的过火一回头就找到出路让我成为了无情的尅歌之王	rang wo duan le qi tie le xin ai de guo huo yi hui tou jiu zhao dao chu lu rang wo cheng wei le/liao wu qing de kei ge zhi wang	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:11630
+我和你啊存在一种危险关系	wo he ni a cun zai yi zhong wei xian guan xi	OK	no_findings;stratum=sample;id=mu:11655
+思念将越来越薄	si nian jiang yue lai yue bao/bo	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:11717
+假装我很痛我也曾经憧憬过后来没结果	jia zhuang wo hen tong wo ye ceng jing chong jing guo hou lai mei jie guo	OK	no_findings;stratum=sample;id=mu:11731
+来麻醉我伤口血流了却未三透	lai ma zui wo shang kou xue liu le/liao que wei san tou	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:11756
+才把你气走自招	cai ba ni qi zou zi zhao	OK	no_findings;stratum=sample;id=mu:11764
+内疚	nei jiu	OK	no_findings;stratum=sample;id=mu:11772
+阳光里她在院子中央晾晒着衣裳	yang guang li ta zai yuan zi zhong yang liang shai zhe yi shang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:11805
+这样下去也不是不可	zhe yang xia qu ye bu shi bu ke	OK	no_findings;stratum=sample;id=mu:11819
+身的可以了我可以了	shen de ke yi le wo ke yi le	OK	no_findings;stratum=sample;id=mu:11824
+我们我们	wo men wo men	OK	no_findings;stratum=sample;id=mu:11835
+只是朋友我们可	zhi shi peng you wo men ke	OK	no_findings;stratum=sample;id=mu:11844
+思念到旺季霓虹扫过喧哗的街	si nian dao wang ji ni hong sao guo xuan hua de jie	OK	no_findings;stratum=sample;id=mu:11848
+眼眶的泪温热冻结望着电视里的无聊节目	yan kuang de lei wen re dong jie wang zhe dian shi li de wu liao jie mu	OK	no_findings;stratum=sample;id=mu:11862
+深秋嫩绿的垂柳亲吻着我额头偶	shen qiu nen lv de chui liu qin wen zhe wo e tou ou	OK	no_findings;stratum=sample;id=mu:11900
+你会挽着我滴衣袖我会把手揣进裤兜	ni hui wan zhe wo di yi xiu wo hui ba shou chuai jin ku dou	OK	no_findings;stratum=sample;id=mu:11903
+梦想是个诺言记在心上写在面前	meng xiang shi ge nuo yan ji zai xin shang xie zai mian qian	OK	no_findings;stratum=sample;id=mu:11925
+偷偷地看着你	tou tou de kan zhe ni	OK	no_findings;stratum=sample;id=mu:11936
+我和我的绝望装得很风趣	wo he wo de jue wang zhuang de hen feng qu	OK	no_findings;stratum=sample;id=mu:11943
+有一秒专属的剧情如果你愿意一层一层一层地剥开我的心	you yi miao zhuan shu de ju qing ru guo ni yuan yi yi ceng yi ceng yi ceng de bo kai wo de xin	OK	no_findings;stratum=sample;id=mu:11946;audit3=fix:20:bao;audit105=fix:20:bo
+没有皱褶你却用离开烫下句点	mei you zhou zhe ni que yong li kai tang xia ju dian	OK	no_findings;stratum=sample;id=mu:11964
+其实并不难是你太悲观	qi shi bing bu nan shi ni tai bei guan	OK	no_findings;stratum=sample;id=mu:12029
+能怎样偶尔抬起头来还好有颗月亮	neng zen yang ou er tai qi tou lai hai hao you ke yue liang	OK	no_findings;stratum=sample;id=mu:12050
+多少原因将我绑在半夜屋顶上	duo shao yuan yin jiang wo bang zai ban ye wu ding shang	OK	no_findings;stratum=sample;id=mu:12059
+于是搁在所谓云湍谁忘不了谁孤单	yu shi ge zai suo wei yun tuan shei wang bu liao shei gu dan	OK	no_findings;stratum=sample;id=mu:12062
+最怕一边忙呀忙一边想那旧时光	zui pa yi bian mang ya mang yi bian xiang na jiu shi guang	OK	no_findings;stratum=sample;id=mu:12066
+听阴天说什么	ting yin tian shuo shen me	OK	no_findings;stratum=sample;id=mu:12081
+哇偶孤单怕成了习惯所以我淡定走在人海中	wa ou gu dan pa cheng le xi guan suo yi wo dan ding zou zai ren hai zhong	OK	no_findings;stratum=sample;id=mu:12097
+就看见了当时的我	jiu kan jian le dang shi de wo	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:12100;audit76=fix:3:liao;audit105=fix:3:le
+却只想为你抚琴从此无牵挂	que zhi xiang wei ni fu qin cong ci wu qian gua	OK	no_findings;stratum=sample;id=mu:12130
+你为他断了指甲换不回他一句牵挂啊啊啊	ni wei ta duan le zhi jia huan bu hui ta yi ju qian gua a a a	OK	no_findings;stratum=sample;id=mu:12140
+原来我一生戎马三国为你	yuan lai wo yi sheng rong ma san guo wei ni	OK	no_findings;stratum=sample;id=mu:12142
+无眠	wu mian	OK	no_findings;stratum=sample;id=mu:12163
+有诗待和有歌待应有心待相系	you shi dai he you ge dai ying you xin dai xiang xi	OK	no_findings;stratum=sample;id=mu:12171
+望长相思望长相守却空留琴与笛	wang chang xiang si wang chang xiang shou que kong liu qin yu di	ENGINE_BUG	correct reading was available as a candidate;stratum=sample;id=mu:12172
+随风摇记	sui feng yao ji	OK	no_findings;stratum=sample;id=mu:12183
+相对落座山口无茶亦无酒	xiang dui luo zuo shan kou wu cha yi wu jiu	OK	no_findings;stratum=sample;id=mu:12186
+你听不出来风声不存在	ni ting bu chu lai feng sheng bu cun zai	OK	no_findings;stratum=sample;id=mu:12215
+迷一离	mi yi li	OK	no_findings;stratum=sample;id=mu:12261
+风一更雪一更聒碎乡心梦不成	feng yi geng xue yi geng guo sui xiang xin meng bu cheng	DATA_FIX	annotation corrected;stratum=dispute;id=mu:12322;was=6:gua
+灯恩风一更雪一更聒碎乡心梦不成	deng en feng yi geng xue yi geng guo sui xiang xin meng bu cheng	DATA_FIX	annotation corrected;stratum=dispute;id=mu:12325;was=8:gua
+两小无猜日夜相随	liang xiao wu cai ri ye xiang sui	OK	no_findings;stratum=sample;id=mu:12331
+锦书来	jin shu lai	OK	no_findings;stratum=sample;id=mu:12360
+花自飘零水自流	hua zi piao ling shui zi liu	OK	no_findings;stratum=sample;id=mu:12363
+可消除才下眉头却上心头	ke xiao chu cai xia mei tou que shang xin tou	OK	no_findings;stratum=sample;id=mu:12366
+风雨着不透	feng yu zhuo bu tou	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:12379
+谁能	shei neng	OK	no_findings;stratum=sample;id=mu:12422
+呀一场欢喜忽悲辛	ya yi chang huan xi hu bei xin	OK	no_findings;stratum=sample;id=mu:12434
+终难定	zhong nan ding	OK	no_findings;stratum=sample;id=mu:12436
+你有病啊我想锤死你	ni you bing a wo xiang chui si ni	OK	no_findings;stratum=sample;id=mu:12441
+游丝软系	you si ruan ji/xi	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:12458;audit3=widen:3:xi
+质本洁来还洁去	zhi ben jie lai hai/huan jie qu	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:12480;audit3=widen:4:hai/huan
+江南可采	jiang nan ke cai	OK	no_findings;stratum=sample;id=mu:12491
+相戏碧波间	xiang xi bi bo jian	OK	no_findings;stratum=sample;id=mu:12495
+劝君惜取少	quan jun xi qu shao	OK	no_findings;stratum=sample;id=mu:12507
+少年时	shao nian shi	OK	no_findings;stratum=sample;id=mu:12514
+如传世的青花瓷自顾自美丽你眼带笑意	ru chuan shi de qing hua ci zi gu zi mei li ni yan dai xiao yi	OK	no_findings;stratum=sample;id=mu:12535
+很多歌我只想要为你唱起咦	hen duo ge wo zhi xiang yao wei ni chang qi yi	OK	no_findings;stratum=sample;id=mu:12576
+你的爱是唯一让我坚强的理由原来	ni de ai shi wei yi rang wo jian qiang de li you yuan lai	OK	no_findings;stratum=sample;id=mu:12606
+是妈妈告诉我的哲理脑袋都是你心里都是你	shi ma ma gao su wo de zhe li nao dai dou shi ni xin li dou shi ni	OK	no_findings;stratum=sample;id=mu:12653
+我终于获得了重生	wo zhong yu huo de le chong sheng	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:12699
+天翻地覆再也踩不到地面	tian fan di fu zai ye cai bu dao di mian	OK	no_findings;stratum=sample;id=mu:12703
+不停的改变忽然脚下的路	bu ting de gai bian hu ran jiao xia de lu	OK	no_findings;stratum=sample;id=mu:12711
+忘了眼泪不过失效药忘了百年无声口号	wang le yan lei bu guo shi xiao yao wang le bai nian wu sheng kou hao	OK	no_findings;stratum=sample;id=mu:12734
+写下我时间和琴声交错的城堡	xie xia wo shi jian he qin sheng jiao cuo de cheng bao	OK	no_findings;stratum=sample;id=mu:12741
+我得眺望下个前往我走开你留下我回忆你升华	wo dei tiao wang xia ge qian wang wo zou kai ni liu xia wo hui yi ni sheng hua	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:12772
+仿佛听见说爱你	fang fu ting jian shuo ai ni	OK	no_findings;stratum=sample;id=mu:12777
+已难以回头却无法往前走	yi nan yi hui tou que wu fa wang qian zou	OK	no_findings;stratum=sample;id=mu:12789
+带走我的心跳逆转时光到一开始	dai zou wo de xin tiao ni zhuan shi guang dao yi kai shi	OK	no_findings;stratum=sample;id=mu:12800
+就当做秘密	jiu dang zuo mi mi	OK	no_findings;stratum=sample;id=mu:12839
+谁忘了想问为什么	shei wang le xiang wen wei shen me	OK	no_findings;stratum=sample;id=mu:12844
+都怪这弹得太凄凉	dou guai zhe tan de tai qi liang	OK	no_findings;stratum=sample;id=mu:12858
+蓝色变成红色因	lan se bian cheng hong se yin	OK	no_findings;stratum=sample;id=mu:12879
+一点一滴都是幸福在发芽	yi dian yi di dou shi xing fu zai fa ya	OK	no_findings;stratum=sample;id=mu:12881
+简单点说话的方式简单点	jian dan dian shuo hua de fang shi jian dan dian	OK	no_findings;stratum=sample;id=mu:12914
+更美丽	geng mei li	OK	no_findings;stratum=sample;id=mu:12918
+爱用尽这一生	ai yong jin zhe yi sheng	OK	no_findings;stratum=sample;id=mu:12952
+心上人你不要为我担心	xin shang ren ni bu yao wei wo dan xin	OK	no_findings;stratum=sample;id=mu:12956
+听说白雪公主在逃跑	ting shuo bai xue gong zhu zai tao pao	OK	no_findings;stratum=sample;id=mu:12976
+灰姑娘丢了心爱的玻璃鞋	hui gu niang diu le xin ai de bo li xie	OK	no_findings;stratum=sample;id=mu:12982
+让那些画面再出现再回到从前旋转跳跃我闭着眼	rang na xie hua mian zai chu xian zai hui dao cong qian xuan zhuan tiao yue wo bi zhe yan	OK	stratum=sample;id=mu:13041
+你为我点的烛火不过是一次邂逅红楼那一场梦	ni wei wo dian de zhu huo bu guo shi yi ci xie hou hong lou na yi chang meng	OK	stratum=sample;id=mu:13060
+不是彻夜为我点的火在那还田在那花田	bu shi che ye wei wo dian de huo zai na hai/huan tian zai na hua tian	ALT_OK	multiple readings accepted;stratum=dispute;id=mu:13080
+一边泪流十年之前我不认识你	yi bian lei liu shi nian zhi qian wo bu ren shi ni	OK	no_findings;stratum=sample;id=mu:13126
+她不需要臃肿的棉衣去遮盖她似水地面容	ta bu xu yao yong zhong de mian yi qu zhe gai ta si shui de mian rong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:13131;audit76=fix:15:di;audit105=fix:15:de
+方姑娘	fang gu niang	OK	no_findings;stratum=sample;id=mu:13136
+呜你该自由	wu ni gai zi you	OK	no_findings;stratum=sample;id=mu:13150
+你消失不见	ni xiao shi bu jian	OK	no_findings;stratum=sample;id=mu:13185
+我用力牵起没温度	wo yong li qian qi mei wen du	OK	no_findings;stratum=sample;id=mu:13230
+修修缝纫机	xiu xiu feng ren ji	OK	no_findings;stratum=sample;id=mu:13240
+就回来吧回来吧有人在等你啊	jiu hui lai ba hui lai ba you ren zai deng ni a	OK	no_findings;stratum=sample;id=mu:13267
+你的舞步划过空空的房间时光就变成了烟	ni de wu bu hua guo kong kong de fang jian shi guang jiu bian cheng le yan	OK	no_findings;stratum=sample;id=mu:13269
+我又回到那老街靠在你们身边	wo you hui dao na lao jie kao zai ni men shen bian	OK	no_findings;stratum=sample;id=mu:13295
+从前轻狂绕过时光	cong qian qing kuang rao guo shi guang	OK	no_findings;stratum=sample;id=mu:13299
+一声万岁一瞬间	yi sheng wan sui yi shun jian	OK	no_findings;stratum=sample;id=mu:13336
+傲寒我们结婚在布满星辰斑斓的黄昏傲寒我们结婚	ao han wo men jie hun zai bu man xing chen ban lan de huang hun ao han wo men jie hun	OK	no_findings;stratum=sample;id=mu:13354
+如果全世界都对你恶语相加我就对你说上一世情话还有	ru guo quan shi jie dou dui ni e yu xiang jia wo jiu dui ni shuo shang yi shi qing hua hai you	OK	no_findings;stratum=sample;id=mu:13356
+淡妆轻抹也能满怀芬芳	dan zhuang qing mo ye neng man huai fen fang	OK	no_findings;stratum=sample;id=mu:13383
+像在她眼睛里看见的孤岛	xiang zai ta yan jing li kan jian de gu dao	OK	no_findings;stratum=sample;id=mu:13389
+阳光里她在院子中央晾晒着衣裳在四季的风中她散着头发	yang guang li ta zai yuan zi zhong yang liang shai zhe yi shang zai si ji de feng zhong ta san zhe tou fa	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:13404
+夜夜陪着你的海	ye ye pei zhe ni de hai	OK	no_findings;stratum=sample;id=mu:13407
+呼你该等我	hu ni gai deng wo	OK	no_findings;stratum=sample;id=mu:13417
+除了你之外的依赖还有谁能来教我勇敢	chu le ni zhi wai de yi lai hai you shei neng lai jiao wo yong gan	OK	no_findings;stratum=sample;id=mu:13442
+有花儿伴着蝴蝶孤雁可以双飞夜深人静独徘回	you hua er ban zhe hu die gu yan ke yi shuang fei ye shen ren jing du pai hui	OK	no_findings;stratum=sample;id=mu:13446
+柏油路跃过山坡	bai you lu yue guo shan po	OK	no_findings;stratum=sample;id=mu:13466
+仅有辆进城的公车还没有咖啡馆和奢	jin you liang jin cheng de gong che hai mei you ka fei guan he she	OK	no_findings;stratum=sample;id=mu:13476
+我不能不感谢你	wo bu neng bu gan xie ni	OK	no_findings;stratum=sample;id=mu:13492
+你会埋藏悲伤装出笑容可是你的身上已有烙印	ni hui mai cang bei shang zhuang chu xiao rong ke shi ni de shen shang yi you lao yin	OK	stratum=sample;id=mu:13502
+飞鸟归山林	fei niao gui shan lin	OK	no_findings;stratum=sample;id=mu:13525
+如果我是快乐的	ru guo wo shi kuai le de	OK	no_findings;stratum=sample;id=mu:13531
+又怎会有寂寞	you zen hui you ji mo	OK	no_findings;stratum=sample;id=mu:13535
+如果还能分享也是一种浪漫	ru guo hai neng fen xiang ye shi yi zhong lang man	OK	no_findings;stratum=sample;id=mu:13562
+能不能我身边有好多像我的人	neng bu neng wo shen bian you hao duo xiang wo de ren	OK	no_findings;stratum=sample;id=mu:13583
+我只要出发不要目的	wo zhi yao chu fa bu yao mu di	OK	no_findings;stratum=sample;id=mu:13616
+不动情的咳嗽至少看起来归途也还可爱	bu dong qing de ke sou zhi shao kan qi lai gui tu ye hai ke ai	OK	no_findings;stratum=sample;id=mu:13651
+青春又醉倒在籍籍无名的坏	qing chun you zui dao zai ji ji wu ming de huai	OK	no_findings;stratum=sample;id=mu:13652
+花开花落又是一季春天啊你在哪里	hua kai hua luo you shi yi ji chun tian a ni zai na li	OK	no_findings;stratum=sample;id=mu:13675
+很乱长又很短暂的岁月现在已经回不去	hen luan chang you hen duan zan de sui yue xian zai yi jing hui bu qu	OK	no_findings;stratum=sample;id=mu:13684
+我听见一池盲目的蜻蜓	wo ting jian yi chi mang mu de qing ting	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:13703
+我听见了你的确定在飞鸟的梦里	wo ting jian le ni de que ding zai fei niao de meng li	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:13706
+星千缕酒一杯	xing qian lv jiu yi bei	OK	no_findings;stratum=sample;id=mu:13781
+夏时梦长秋是昼短	xia shi meng chang qiu shi zhou duan	OK	no_findings;stratum=sample;id=mu:13817
+长情意在夜雨香	chang qing yi zai ye yu xiang	OK	no_findings;stratum=sample;id=mu:13819
+最是此刻不枉	zui shi ci ke bu wang	OK	no_findings;stratum=sample;id=mu:13821
+伴随着歌声飘向远方	ban sui zhe ge sheng piao xiang yuan fang	OK	no_findings;stratum=sample;id=mu:13838
+长了这么大	zhang le zhe me da	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:13840
+是个男孩	shi ge nan hai	OK	no_findings;stratum=sample;id=mu:13850
+可我却不能陪在你身边	ke wo que bu neng pei zai ni shen bian	OK	no_findings;stratum=sample;id=mu:13852
+爱是一种信仰	ai shi yi zhong xin yang	OK	no_findings;stratum=sample;id=mu:13886
+把我带到你的身旁	ba wo dai dao ni de shen pang	OK	no_findings;stratum=sample;id=mu:13887
+来自生命的力量	lai zi sheng ming de li liang	OK	no_findings;stratum=sample;id=mu:13895
+把你带回我的身旁	ba ni dai hui wo de shen pang	OK	no_findings;stratum=sample;id=mu:13898
+是你啊	shi ni a	OK	no_findings;stratum=sample;id=mu:13901
+当我老了	dang wo lao le	OK	no_findings;stratum=sample;id=mu:13952
+捧着一颗不懂计较的认真	peng zhe yi ke bu dong ji jiao de ren zhen	OK	no_findings;stratum=sample;id=mu:13960
+孤独到底让我昏迷	gu du dao di rang wo hun mi	OK	no_findings;stratum=sample;id=mu:13978
+宽重我的身体厚重了肩膀	kuan zhong wo de shen ti hou zhong le jian bang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:13992
+宁愿选择留恋不放手	ning yuan xuan ze liu lian bu fang shou	OK	no_findings;stratum=sample;id=mu:14001
+妈妈说就让它来	ma ma shuo jiu rang ta lai	OK	no_findings;stratum=sample;id=mu:14031
+这无声的夜现在的我需要人陪	zhe wu sheng de ye xian zai de wo xu yao ren pei	OK	no_findings;stratum=sample;id=mu:14046
+就在他眼睛里看到的孤岛	jiu zai ta yan jing li kan dao de gu dao	OK	no_findings;stratum=sample;id=mu:14095
+我已不会再对谁满怀期待	wo yi bu hui zai dui shei man huai qi dai	OK	no_findings;stratum=sample;id=mu:14105
+那是你衣裙漫飞	na shi ni yi qun man fei	OK	no_findings;stratum=sample;id=mu:14127
+有时候相信的	you shi hou xiang xin de	OK	no_findings;stratum=sample;id=mu:14132
+紧紧抱你在雪还没融的早晨	jin jin bao ni zai xue hai mei rong de zao chen	OK	no_findings;stratum=sample;id=mu:14203
+不知道怎么形容给我听	bu zhi dao zen me xing rong gei wo ting	OK	no_findings;stratum=sample;id=mu:14213
+一定能飞往爱仰望的星	yi ding neng fei wang ai yang wang de xing	OK	no_findings;stratum=sample;id=mu:14219
+嘴上一句带过	zui shang yi ju dai guo	OK	no_findings;stratum=sample;id=mu:14220
+在五月的早晨	zai wu yue de zao chen	OK	no_findings;stratum=sample;id=mu:14226
+在你眼中我是谁	zai ni yan zhong wo shi shei	OK	no_findings;stratum=sample;id=mu:14267
+你听过最美的旋律	ni ting guo zui mei de xuan lv	OK	no_findings;stratum=sample;id=mu:14301
+是你的遗憾与我有关	shi ni de yi han yu wo you guan	OK	no_findings;stratum=sample;id=mu:14356
+你最好做好准备	ni zui hao zuo hao zhun bei	OK	no_findings;stratum=sample;id=mu:14379
+不如永远跟你耗来得快乐	bu ru yong yuan gen ni hao lai de kuai le	OK	no_findings;stratum=sample;id=mu:14389
+怎么去拥有一道彩虹	zen me qu yong you yi dao cai hong	OK	no_findings;stratum=sample;id=mu:14393
+足够我天天都品尝着寂寞	zu gou wo tian tian dou pin chang zhe ji mo	OK	no_findings;stratum=sample;id=mu:14400
+也许你不是我的	ye xu ni bu shi wo de	OK	no_findings;stratum=sample;id=mu:14409
+我们之间留了太多空白格	wo men zhi jian liu le tai duo kong bai ge	OK	no_findings;stratum=sample;id=mu:14413
+但你再也不回头	dan ni zai ye bu hui tou	OK	no_findings;stratum=sample;id=mu:14433
+重重地靠着我睡	chong/zhong chong/zhong de kao zhe wo shui	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:14557
+那天听你在电话里	na tian ting ni zai dian hua li	OK	no_findings;stratum=sample;id=mu:14630
+淋湿的昨天忘记	lin shi de zuo tian wang ji	OK	no_findings;stratum=sample;id=mu:14631
+静静的村庄飘着白的雪	jing jing de cun zhuang piao zhe bai de xue	OK	no_findings;stratum=sample;id=mu:14675
+小伙子拿起枪奔赴边疆	xiao huo zi na qi qiang ben fu bian jiang	OK	no_findings;stratum=sample;id=mu:14682
+照亮整个夜晚	zhao liang zheng ge ye wan	OK	no_findings;stratum=sample;id=mu:14689
+不预设你会在乎我	bu yu she ni hui zai hu wo	OK	no_findings;stratum=sample;id=mu:14714
+我要变成童话里	wo yao bian cheng tong hua li	OK	no_findings;stratum=sample;id=mu:14736
+想去安慰却不知什么立场	xiang qu an wei que bu zhi shen me li chang	OK	no_findings;stratum=sample;id=mu:14794
+像遗憾季节里	xiang yi han ji jie li	OK	no_findings;stratum=sample;id=mu:14847
+陪伴你一直到故事给说完	pei ban ni yi zhi dao gu shi gei shuo wan	OK	no_findings;stratum=sample;id=mu:14863
+在北京第二十五个秋天的夜晚	zai bei jing di er shi wu ge qiu tian de ye wan	OK	no_findings;stratum=sample;id=mu:14888
+我们不可能模仿	wo men bu ke neng mo fang	OK	no_findings;stratum=sample;id=mu:14891
+情意绵绵总与见异思迁为难	qing yi mian mian zong yu jian yi si qian wei nan	OK	no_findings;stratum=sample;id=mu:14934
+沿着你皮肤纹理走	yan zhe ni pi fu wen li zou	OK	no_findings;stratum=sample;id=mu:14962
+太多难辨真伪在你身边是谁	tai duo nan bian zhen wei zai ni shen bian shi shei	OK	no_findings;stratum=sample;id=mu:14967
+发动结界让憧憬都快快长高	fa dong jie jie rang chong jing dou kuai kuai zhang gao	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:14985
+我坚持不能说	wo jian chi bu neng shuo	OK	no_findings;stratum=sample;id=mu:15002
+多得是	duo de shi	OK	no_findings;stratum=sample;id=mu:15022
+默默乞求上苍指引我方向	mo mo qi qiu shang cang zhi yin wo fang xiang	OK	no_findings;stratum=sample;id=mu:15042
+下个路口你会看见爱	xia ge lu kou ni hui kan jian ai	OK	no_findings;stratum=sample;id=mu:15073
+爱转角以后的街能不能有我来陪	ai zhuan jiao yi hou de jie neng bu neng you wo lai pei	OK	no_findings;stratum=sample;id=mu:15076
+某个路口	mou ge lu kou	OK	no_findings;stratum=sample;id=mu:15081
+不管你会不会经过	bu guan ni hui bu hui jing guo	OK	no_findings;stratum=sample;id=mu:15089
+每当我为你抬起头	mei dang wo wei ni tai qi tou	OK	no_findings;stratum=sample;id=mu:15090
+某一刻	mou yi ke	OK	no_findings;stratum=sample;id=mu:15099
+夜空中最亮的星是否在意	ye kong zhong zui liang de xing shi fou zai yi	OK	no_findings;stratum=sample;id=mu:15109
+飞去而旋转的飞鸟	fei qu er xuan zhuan de fei niao	OK	no_findings;stratum=sample;id=mu:15140
+才能拥抱	cai neng yong bao	OK	no_findings;stratum=sample;id=mu:15167
+这眉头那么重这思念那么浓	zhe mei tou na me zhong zhe si nian na me nong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:15188
+潮起又潮落	chao qi you chao luo	OK	no_findings;stratum=sample;id=mu:15208
+此时已莺飞草长爱的人正在路上	ci shi yi ying fei cao zhang ai de ren zheng zai lu shang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:15224
+怎么泪水还偶尔失守	zen me lei shui hai ou er shi shou	OK	no_findings;stratum=sample;id=mu:15229
+所有小脾气	suo you xiao pi qi	OK	no_findings;stratum=sample;id=mu:15250
+生活是这样子啊不如诗啊	sheng huo shi zhe yang zi a bu ru shi a	OK	no_findings;stratum=sample;id=mu:15260
+等着美丽的故事被腐蚀啊	deng zhe mei li de gu shi bei fu shi a	OK	no_findings;stratum=sample;id=mu:15263
+哪怕好多盆水往下淋	na pa hao duo pen shui wang xia lin	OK	no_findings;stratum=sample;id=mu:15367
+赶赴一场关于青春的约会	gan fu yi chang guan yu qing chun de yue hui	OK	no_findings;stratum=sample;id=mu:15393
+互相折磨到白头	hu xiang zhe mo dao bai tou	OK	no_findings;stratum=sample;id=mu:15411
+开始纠缠之后	kai shi jiu chan zhi hou	OK	no_findings;stratum=sample;id=mu:15413
+难过时候不流泪	nan guo shi hou bu liu lei	OK	no_findings;stratum=sample;id=mu:15506
+流泪也不算伤悲	liu lei ye bu suan shang bei	OK	no_findings;stratum=sample;id=mu:15507
+再无动于衷	zai wu dong yu zhong	OK	no_findings;stratum=sample;id=mu:15524
+等你发现时间是贼了	deng ni fa xian shi jian shi zei le	OK	no_findings;stratum=sample;id=mu:15561
+情歌被打败	qing ge bei da bai	OK	no_findings;stratum=sample;id=mu:15582
+你笑得像光芒	ni xiao de xiang guang mang	OK	no_findings;stratum=sample;id=mu:15597
+都清醒都独立	dou qing xing dou du li	OK	no_findings;stratum=sample;id=mu:15641
+妄想都没痕迹	wang xiang dou mei hen ji	OK	no_findings;stratum=sample;id=mu:15642
+试探说晚安	shi tan shuo wan an	OK	no_findings;stratum=sample;id=mu:15668
+多空泛又心酸	duo kong fan you xin suan	OK	no_findings;stratum=sample;id=mu:15676
+似我盛放还似我缺氧乖张	si wo sheng fang hai si wo que yang guai zhang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:15708
+是笑着与你分开	shi xiao zhe yu ni fen kai	OK	no_findings;stratum=sample;id=mu:15711
+我太嫉妒时光	wo tai ji du shi guang	OK	no_findings;stratum=sample;id=mu:15722
+是你的名字停留在我的过往	shi ni de ming zi ting liu zai wo de guo wang	OK	no_findings;stratum=sample;id=mu:15725
+可爱的鸽子鸽子	ke ai de ge zi ge zi	OK	no_findings;stratum=sample;id=mu:15755
+忘不掉想念你的嗜好	wang bu diao xiang nian ni de shi hao	OK	no_findings;stratum=sample;id=mu:15782
+我的爱就像一片云	wo de ai jiu xiang yi pian yun	OK	no_findings;stratum=sample;id=mu:15816
+不管未来会怎么样	bu guan wei lai hui zen me yang	OK	no_findings;stratum=sample;id=mu:15820
+却在我的心里	que zai wo de xin li	OK	no_findings;stratum=sample;id=mu:15872
+当我回到一个人住的地方	dang wo hui dao yi ge ren zhu de di fang	OK	no_findings;stratum=sample;id=mu:15874
+我和你的眼中	wo he ni de yan zhong	OK	no_findings;stratum=sample;id=mu:15897
+转到了最后只剩你我没分	zhuan dao le zui hou zhi sheng ni wo mei fen	OK	no_findings;stratum=sample;id=mu:15909
+人的一生感情是旋转门	ren de yi sheng gan qing shi xuan zhuan men	OK	no_findings;stratum=sample;id=mu:15911
+一年之后的相遇	yi nian zhi hou de xiang yu	OK	no_findings;stratum=sample;id=mu:15937
+最后最后还是放开了手	zui hou zui hou hai shi fang kai le shou	OK	no_findings;stratum=sample;id=mu:15944
+雨后的阳光洒落人们都出来了	yu hou de yang guang sa luo ren men dou chu lai le	OK	no_findings;stratum=sample;id=mu:15950
+是否我一个人走想听见你的挽留	shi fou wo yi ge ren zou xiang ting jian ni de wan liu	OK	no_findings;stratum=sample;id=mu:15980
+突然之间浪漫无法释怀	tu ran zhi jian lang man wu fa shi huai	OK	no_findings;stratum=sample;id=mu:15986
+夜色哪里都是美	ye se na li dou shi mei	OK	no_findings;stratum=sample;id=mu:15992
+回头竟然认不得	hui tou jing ran ren bu de	OK	no_findings;stratum=sample;id=mu:16004
+任事情干渴都褪去颜色	ren shi qing gan ke dou tui qu yan se	OK	no_findings;stratum=sample;id=mu:16007
+我想大声告诉你	wo xiang da sheng gao su ni	OK	no_findings;stratum=sample;id=mu:16020
+没有你我的笑更美丽	mei you ni wo de xiao geng mei li	OK	no_findings;stratum=sample;id=mu:16040
+我们像一首最美丽的歌曲	wo men xiang yi shou zui mei li de ge qu	OK	no_findings;stratum=sample;id=mu:16047
+难道是我太骄傲	nan dao shi wo tai jiao ao	OK	no_findings;stratum=sample;id=mu:16098
+湿了多少眼眶	shi le duo shao yan kuang	OK	no_findings;stratum=sample;id=mu:16153
+都以为结束也会很美	dou yi wei jie shu ye hui hen mei	OK	no_findings;stratum=sample;id=mu:16223
+在阴郁的地方积攒能量	zai yin yu de di fang ji zan neng liang	OK	no_findings;stratum=sample;id=mu:16248
+山隔壁还是山	shan ge bi hai shi shan	OK	no_findings;stratum=sample;id=mu:16260
+年轻时候的你	nian qing shi hou de ni	OK	no_findings;stratum=sample;id=mu:16283
+听我唱着一首永远	ting wo chang zhe yi shou yong yuan	OK	no_findings;stratum=sample;id=mu:16290
+祖先已磨去爪牙	zu xian yi mo qu zhao ya	OK	no_findings;stratum=sample;id=mu:16303
+优胜劣汰自舔伤疤	you sheng lie tai zi tian shang ba	OK	no_findings;stratum=sample;id=mu:16320
+巢穴一层层叠加	chao xue yi ceng ceng die jia	OK	no_findings;stratum=sample;id=mu:16330
+悄悄地隐藏	qiao qiao de yin cang	OK	no_findings;stratum=sample;id=mu:16356
+拜托你轻声重着我的名字	bai tuo ni qing sheng chong zhe wo de ming zi	DATA_FIX	annotation corrected;stratum=dispute;id=mu:16357;was=5:zhong
+我学大人的语气应着你	wo xue da ren de yu qi ying zhe ni	OK	no_findings;stratum=sample;id=mu:16358
+你是我是你的	ni shi wo shi ni de	OK	no_findings;stratum=sample;id=mu:16371
+它可曾单薄地	ta ke ceng dan bo de	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:16387
+你问他为什么亲吻他的伤疤	ni wen ta wei shen me qin wen ta de shang ba	OK	no_findings;stratum=sample;id=mu:16392
+你好奇的问我	ni hao qi de wen wo	OK	no_findings;stratum=sample;id=mu:16397
+我的身边不再有她	wo de shen bian bu zai you ta	OK	no_findings;stratum=sample;id=mu:16402
+我留至夜深治疗失眠梦呓	wo liu zhi ye shen zhi liao shi mian meng yi	OK	no_findings;stratum=sample;id=mu:16418
+我多想再见你	wo duo xiang zai jian ni	OK	no_findings;stratum=sample;id=mu:16422
+想念是你的声音	xiang nian shi ni de sheng yin	OK	no_findings;stratum=sample;id=mu:16430
+一闪一闪亮晶晶	yi shan yi shan liang jing jing	OK	no_findings;stratum=sample;id=mu:16436
+用尽所有思念	yong jin suo you si nian	OK	no_findings;stratum=sample;id=mu:16454
+唱一首歌给你	chang yi shou ge gei ni	OK	no_findings;stratum=sample;id=mu:16455
+直到你那灿烂的光芒	zhi dao ni na can lan de guang mang	OK	no_findings;stratum=sample;id=mu:16456
+记得把思念装进漂流瓶记得快寄给我别让人担心	ji de ba si nian zhuang jin piao liu ping ji de kuai ji gei wo bie rang ren dan xin	OK	no_findings;stratum=sample;id=mu:16461
+却提醒我	que ti xing wo	OK	stratum=sample;id=mu:16475
+抖着肩膀哭泣	dou zhe jian bang ku qi	OK	no_findings;stratum=sample;id=mu:16480
+用最浪漫的副歌	yong zui lang man de fu ge	OK	no_findings;stratum=sample;id=mu:16500
+已经约定过	yi jing yue ding guo	OK	no_findings;stratum=sample;id=mu:16512
+给我血肉的故乡	gei wo xue rou de gu xiang	OK	no_findings;stratum=sample;id=mu:16537
+每一对恋人都勇敢	mei yi dui lian ren dou yong gan	OK	no_findings;stratum=sample;id=mu:16566
+阳光在手之间	yang guang zai shou zhi jian	OK	no_findings;stratum=sample;id=mu:16571
+我明白我期待爱存在	wo ming bai wo qi dai ai cun zai	OK	no_findings;stratum=sample;id=mu:16580
+以后还有谁值得等吗	yi hou hai you shei zhi de deng ma	OK	no_findings;stratum=sample;id=mu:16610
+也觉得沙发上少个人	ye jue de sha fa shang shao ge ren	OK	no_findings;stratum=sample;id=mu:16654
+你说谎过几次都瞒不过我	ni shuo huang guo ji ci dou man bu guo wo	OK	no_findings;stratum=sample;id=mu:16657
+和你的诺言不轻的诺言	he ni de nuo yan bu qing de nuo yan	OK	no_findings;stratum=sample;id=mu:16693
+我数一百二十三木头人	wo shu yi bai er shi san mu tou ren	OK	stratum=sample;id=mu:16705
+我期待着	wo qi dai zhe	OK	no_findings;stratum=sample;id=mu:16718
+我期待着因为有你让爱情能完整	wo qi dai zhe yin wei you ni rang ai qing neng wan zheng	OK	no_findings;stratum=sample;id=mu:16723
+上一秒我在为某事烦恼	shang yi miao wo zai wei mou shi fan nao	OK	no_findings;stratum=sample;id=mu:16754
+也同海鸥问候	ye tong hai ou wen hou	OK	no_findings;stratum=sample;id=mu:16780
+也有飞鸟在背上停	ye you fei niao zai bei shang ting	OK	no_findings;stratum=sample;id=mu:16786
+思绪不断	si xu bu duan	OK	no_findings;stratum=sample;id=mu:16834
+灰蒙蒙的夜晚	hui meng meng de ye wan	OK	no_findings;stratum=sample;id=mu:16839
+想到我让深爱的你人海孤独旅行	xiang dao wo rang shen ai de ni ren hai gu du lv xing	OK	no_findings;stratum=sample;id=mu:16855
+蹒跚牵着你	pan shan qian zhe ni	OK	no_findings;stratum=sample;id=mu:16870
+我还能珍惜什么	wo hai neng zhen xi shen me	OK	no_findings;stratum=sample;id=mu:16882
+让你知道在孤单的时候	rang ni zhi dao zai gu dan de shi hou	OK	no_findings;stratum=sample;id=mu:16916
+对你说我爱你	dui ni shuo wo ai ni	OK	no_findings;stratum=sample;id=mu:16918
+像是吹在草原上的风	xiang shi chui zai cao yuan shang de feng	OK	no_findings;stratum=sample;id=mu:16927
+你像风一样	ni xiang feng yi yang	OK	no_findings;stratum=sample;id=mu:16936
+终于你找到一个方式	zhong yu ni zhao dao yi ge fang shi	OK	no_findings;stratum=sample;id=mu:16949
+我的剧情已落幕	wo de ju qing yi luo mu	OK	no_findings;stratum=sample;id=mu:16953
+谁能把谁保佑	shei neng ba shei bao you	OK	no_findings;stratum=sample;id=mu:16999
+你是一生一世不会了解	ni shi yi sheng yi shi bu hui liao jie	OK	no_findings;stratum=sample;id=mu:17015
+泪能落下	lei neng luo xia	OK	no_findings;stratum=sample;id=mu:17097
+踏着雪不知不觉走了很远	ta zhe xue bu zhi bu jue zou le hen yuan	OK	no_findings;stratum=sample;id=mu:17111
+问到沙哑	wen dao sha ya	OK	no_findings;stratum=sample;id=mu:17135
+多困难狠话有几句新鲜感	duo kun nan hen hua you ji ju xin xian gan	OK	no_findings;stratum=sample;id=mu:17148
+该流的泪才刚刚流一半	gai liu de lei cai gang gang liu yi ban	OK	no_findings;stratum=sample;id=mu:17165
+怎么也会曾经为了谁	zen me ye hui ceng jing wei le shei	OK	no_findings;stratum=sample;id=mu:17190
+当天空不再蓝	dang tian kong bu zai lan	OK	no_findings;stratum=sample;id=mu:17200
+行李箱里装不下我	xing li xiang li zhuang bu xia wo	OK	no_findings;stratum=sample;id=mu:17217
+看岁月剑拔弩张	kan sui yue jian ba nu zhang	OK	no_findings;stratum=sample;id=mu:17239
+在有限的深夜消失之前	zai you xian de shen ye xiao shi zhi qian	OK	no_findings;stratum=sample;id=mu:17274
+我的小时候吵闹任性的时候	wo de xiao shi hou chao nao ren xing de shi hou	OK	no_findings;stratum=sample;id=mu:17275
+天空很大却看不清楚好孤独	tian kong hen da que kan bu qing chu hao gu du	OK	no_findings;stratum=sample;id=mu:17286
+神色几分冰冻	shen se ji fen bing dong	OK	no_findings;stratum=sample;id=mu:17333
+就像躺在桥索之上	jiu xiang tang zai qiao suo zhi shang	OK	no_findings;stratum=sample;id=mu:17369
+过处翩若惊鸿	guo chu pian ruo jing hong	OK	no_findings;stratum=sample;id=mu:17374
+梨花香缠着衣角掠过熙攘	li hua xiang chan zhe yi jiao lve guo xi rang	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:17377
+入眼是落英纷然	ru yan shi luo ying fen ran	OK	no_findings;stratum=sample;id=mu:17397
+皴擦点染勾勒这世间	cun ca dian ran gou le zhe shi jian	OK	no_findings;stratum=sample;id=mu:17406
+你手掌的厚实感	ni shou zhang de hou shi gan	OK	no_findings;stratum=sample;id=mu:17443
+虽然它却不能与我共枕	sui ran ta que bu neng yu wo gong zhen	OK	no_findings;stratum=sample;id=mu:17487
+笑的多一些改变要彻底	xiao de duo yi xie gai bian yao che di	OK	no_findings;stratum=sample;id=mu:17520
+总的来说还算如意	zong de lai shuo hai suan ru yi	OK	no_findings;stratum=sample;id=mu:17565
+你是先让步的贤妻	ni shi xian rang bu de xian qi	OK	no_findings;stratum=sample;id=mu:17580
+你能回来定居在北京	ni neng hui lai ding ju zai bei jing	OK	no_findings;stratum=sample;id=mu:17584
+你的消息这就是我心里的歌	ni de xiao xi zhe jiu shi wo xin li de ge	OK	no_findings;stratum=sample;id=mu:17691
+我从远方赶来恰巧你们也在耶	wo cong yuan fang gan lai qia qiao ni men ye zai ye	OK	no_findings;stratum=sample;id=mu:17697
+我已习惯你突然间的自我	wo yi xi guan ni tu ran jian de zi wo	OK	no_findings;stratum=sample;id=mu:17709
+我已疲倦了	wo yi pi juan le	OK	no_findings;stratum=sample;id=mu:17714
+前尘硬化像石头	qian chen ying hua xiang shi tou	OK	no_findings;stratum=sample;id=mu:17730
+我不愿眼泪陪你到永恒	wo bu yuan yan lei pei ni dao yong heng	OK	no_findings;stratum=sample;id=mu:17764
+我还是重新许愿	wo hai shi chong xin xu yuan	OK	no_findings;stratum=sample;id=mu:17778
+床褥都改变如果有幸会面	chuang ru dou gai bian ru guo you xing hui mian	OK	no_findings;stratum=sample;id=mu:17781
+或者我已不会存在	huo zhe wo yi bu hui cun zai	OK	no_findings;stratum=sample;id=mu:17788
+叹惜着谁又被伤了心	tan xi zhe shei you bei shang le xin	OK	no_findings;stratum=sample;id=mu:17804
+和手指淡淡烟草味道	he shou zhi dan dan yan cao wei dao	OK	no_findings;stratum=sample;id=mu:17806
+陪你走路回家在每个	pei ni zou lu hui jia zai mei ge	OK	no_findings;stratum=sample;id=mu:17910
+变得热闹	bian de re nao	OK	stratum=sample;id=mu:17919
+我们一起启程去流浪	wo men yi qi qi cheng qu liu lang	OK	no_findings;stratum=sample;id=mu:17937
+我看着泪流不止	wo kan zhe lei liu bu zhi	OK	no_findings;stratum=sample;id=mu:17953
+可我的父亲已经老得像一张旧报纸	ke wo de fu qin yi jing lao de xiang yi zhang jiu bao zhi	OK	no_findings;stratum=sample;id=mu:17955
+站在寂寞的阳台	zhan zai ji mo de yang tai	OK	no_findings;stratum=sample;id=mu:18022
+总是以为成功之后	zong shi yi wei cheng gong zhi hou	OK	no_findings;stratum=sample;id=mu:18044
+真的爱是日复日	zhen de ai shi ri fu ri	OK	no_findings;stratum=sample;id=mu:18077
+有着你的旅行	you zhe ni de lv xing	OK	no_findings;stratum=sample;id=mu:18087
+我只要孤单滚开	wo zhi yao gu dan gun kai	OK	no_findings;stratum=sample;id=mu:18129
+往事讨一杯相思喝	wang shi tao yi bei xiang si he	OK	no_findings;stratum=sample;id=mu:18193
+欲问青天这人生有几何	yu wen qing tian zhe ren sheng you ji he	OK	no_findings;stratum=sample;id=mu:18209
+屋檐角下排着乌鸦密密麻麻	wu yan jiao xia pai zhe wu ya mi mi ma ma	OK	no_findings;stratum=sample;id=mu:18224
+曾想过离开	ceng xiang guo li kai	OK	no_findings;stratum=sample;id=mu:18238
+熬过了那些旁白那些姿态那些伤害	ao guo le na xie pang bai na xie zi tai na xie shang hai	OK	no_findings;stratum=sample;id=mu:18240
+把思念装进漂流瓶	ba si nian zhuang jin piao liu ping	OK	no_findings;stratum=sample;id=mu:18244
+有个女王不得了	you ge nv wang bu de liao	OK	no_findings;stratum=sample;id=mu:18272
+如果你要摘一片红叶	ru guo ni yao zhai yi pian hong ye	OK	no_findings;stratum=sample;id=mu:18298
+为爱囚禁数千年的关节	wei ai qiu jin shu qian nian de guan jie	OK	stratum=sample;id=mu:18315
+参不透命运	can bu tou ming yun	OK	no_findings;stratum=sample;id=mu:18319
+过关斩将所向披靡	guo guan zhan jiang suo xiang pi mi	OK	no_findings;stratum=sample;id=mu:18324
+我咬牙还给他	wo yao ya huan gei ta	OK	no_findings;stratum=sample;id=mu:18331
+我担得起	wo dan de qi	OK	no_findings;stratum=sample;id=mu:18338
+向前走去	xiang qian zou qu	OK	no_findings;stratum=sample;id=mu:18343
+每一个动作我都完整投入	mei yi ge dong zuo wo dou wan zheng tou ru	OK	no_findings;stratum=sample;id=mu:18371
+每一个孤单的晚上	mei yi ge gu dan de wan shang	OK	no_findings;stratum=sample;id=mu:18396
+我也不曾害怕	wo ye bu ceng hai pa	OK	no_findings;stratum=sample;id=mu:18407
+纯白的茉莉花	chun bai de mo li hua	OK	no_findings;stratum=sample;id=mu:18412
+你猜美梦成空	ni cai mei meng cheng kong	OK	no_findings;stratum=sample;id=mu:18448
+每当我不在	mei dang wo bu zai	OK	no_findings;stratum=sample;id=mu:18454
+大雨里的别离	da yu li de bie li	OK	no_findings;stratum=sample;id=mu:18467
+谁也不给	shei ye bu gei	OK	no_findings;stratum=sample;id=mu:18485
+怎么能忘怀嘿	zen me neng wang huai hei	OK	no_findings;stratum=sample;id=mu:18506
+太阳升起我还是没能忘	tai yang sheng qi wo hai shi mei neng wang	OK	no_findings;stratum=sample;id=mu:18528
+你把梦想写在了他手上	ni ba meng xiang xie zai le ta shou shang	OK	no_findings;stratum=sample;id=mu:18530
+是否勇敢飞行有没有人爱你	shi fou yong gan fei xing you mei you ren ai ni	OK	no_findings;stratum=sample;id=mu:18568
+如果它真的存在	ru guo ta zhen de cun zai	OK	no_findings;stratum=sample;id=mu:18632
+带着赤子的骄傲	dai zhe chi zi de jiao ao	OK	no_findings;stratum=sample;id=mu:18647
+我不明白也不需要明白	wo bu ming bai ye bu xu yao ming bai	OK	no_findings;stratum=sample;id=mu:18671
+越来越不懂爱	yue lai yue bu dong ai	OK	no_findings;stratum=sample;id=mu:18685
+恨对面不相识	hen dui mian bu xiang shi	OK	no_findings;stratum=sample;id=mu:18691
+织就春蚕丝	zhi jiu chun can si	OK	no_findings;stratum=sample;id=mu:18696
+寒风飘飘落叶	han feng piao piao luo ye	OK	no_findings;stratum=sample;id=mu:18707
+背着沉重的枷锁	bei zhe chen zhong de jia suo	OK	no_findings;stratum=sample;id=mu:18766
+为了浮华的生活	wei le fu hua de sheng huo	OK	no_findings;stratum=sample;id=mu:18775
+披第一道曙光在肩膀	pi di yi dao shu guang zai jian bang	OK	no_findings;stratum=sample;id=mu:18799
+和你手舞足蹈聊梦想	he ni shou wu zu dao liao meng xiang	OK	no_findings;stratum=sample;id=mu:18808
+呼吸微凉心事微凉	hu xi wei liang xin shi wei liang	OK	no_findings;stratum=sample;id=mu:18816
+所有喧嚣沉默都描在画上	suo you xuan xiao chen mo dou miao zai hua shang	OK	no_findings;stratum=sample;id=mu:18829
+从惊蛰一路走到霜降	cong jing zhe yi lu zou dao shuang jiang	OK	no_findings;stratum=sample;id=mu:18830
+你用轮回换我枕边月圆	ni yong lun hui huan wo zhen bian yue yuan	OK	no_findings;stratum=sample;id=mu:18838
+虽然每天都会想起你	sui ran mei tian dou hui xiang qi ni	OK	no_findings;stratum=sample;id=mu:18901
+一不小心丢了你	yi bu xiao xin diu le ni	OK	no_findings;stratum=sample;id=mu:18966
+虚妄真实	xu wang zhen shi	OK	no_findings;stratum=sample;id=mu:18987
+黑白是你	hei bai shi ni	OK	no_findings;stratum=sample;id=mu:19006
+悲伤一发寂寞唏嘘	bei shang yi fa ji mo xi xu	OK	no_findings;stratum=sample;id=mu:19044
+各种莫名的感伤	ge zhong mo ming de gan shang	OK	no_findings;stratum=sample;id=mu:19048
+孩子的孩子该要飞往哪儿去	hai zi de hai zi gai yao fei wang na er qu	OK	no_findings;stratum=sample;id=mu:19051
+当某天你若听见	dang mou tian ni ruo ting jian	OK	no_findings;stratum=sample;id=mu:19055
+把你放在手上合起了手掌	ba ni fang zai shou shang he qi le shou zhang	OK	no_findings;stratum=sample;id=mu:19095
+就是那个秋天再看不到爸爸的脸	jiu shi na ge qiu tian zai kan bu dao ba ba de lian	OK	no_findings;stratum=sample;id=mu:19120
+还没告诉你对不起我爱你	hai mei gao su ni dui bu qi wo ai ni	OK	no_findings;stratum=sample;id=mu:19134
+是缘分前世的累积	shi yuan fen qian shi de lei ji	OK	no_findings;stratum=sample;id=mu:19139
+我和我的祖国	wo he wo de zu guo	OK	no_findings;stratum=sample;id=mu:19151
+我就是笑的旋涡	wo jiu shi xiao de xuan wo	OK	no_findings;stratum=sample;id=mu:19156
+月下门推心细如你脚步碎	yue xia men tui xin xi ru ni jiao bu sui	OK	no_findings;stratum=sample;id=mu:19168
+却难拓你的美	que nan ta ni de mei	OK	no_findings;stratum=sample;id=mu:19170
+我的爱怎么停	wo de ai zen me ting	OK	no_findings;stratum=sample;id=mu:19192
+每个早晨七点半就自然醒	mei ge zao chen qi dian ban jiu zi ran xing	OK	no_findings;stratum=sample;id=mu:19209
+为什么现在变得	wei shen me xian zai bian de	OK	no_findings;stratum=sample;id=mu:19277
+让人飞翔让人坠落谷底	rang ren fei xiang rang ren zhui luo gu di	OK	no_findings;stratum=sample;id=mu:19319
+是什么样的勇气什么样的勇气	shi shen me yang de yong qi shen me yang de yong qi	OK	no_findings;stratum=sample;id=mu:19325
+缺牙的你发音却不准	que ya de ni fa yin que bu zhun	OK	no_findings;stratum=sample;id=mu:19350
+连脚步都佛朗明戈的声音	lian jiao bu dou fo lang ming ge de sheng yin	DATA_FIX	annotation corrected;stratum=dispute;id=mu:19426;was=4:fu
+马德里	ma de li	OK	no_findings;stratum=sample;id=mu:19435
+连脚步都佛朗明哥的声音	lian jiao bu dou fo lang ming ge de sheng yin	DATA_FIX	annotation corrected;stratum=dispute;id=mu:19441;was=4:fu
+都失宠	dou shi chong	OK	no_findings;stratum=sample;id=mu:19494
+我们在屋檐底下牵手听	wo men zai wu yan di xia qian shou ting	OK	no_findings;stratum=sample;id=mu:19511
+时钟就快要走到明天	shi zhong jiu kuai yao zou dao ming tian	OK	no_findings;stratum=sample;id=mu:19563
+叫幸福的花晚点开	jiao xing fu de hua wan dian kai	OK	no_findings;stratum=sample;id=mu:19604
+越伤得深	yue shang de shen	OK	stratum=sample;id=mu:19643
+你在想什么你在做什么哦	ni zai xiang shen me ni zai zuo shen me o	OK	no_findings;stratum=sample;id=mu:19666
+以为保留是宽容	yi wei bao liu shi kuan rong	OK	no_findings;stratum=sample;id=mu:19670
+这无力的超能力	zhe wu li de chao neng li	OK	no_findings;stratum=sample;id=mu:19696
+看到曾看不见的画面	kan dao ceng kan bu jian de hua mian	OK	no_findings;stratum=sample;id=mu:19697
+听到听不见的声线	ting dao ting bu jian de sheng xian	OK	no_findings;stratum=sample;id=mu:19705
+第一口蛋糕的滋味	di yi kou dan gao de zi wei	OK	no_findings;stratum=sample;id=mu:19717
+就像霓虹灯到月亮的距离	jiu xiang ni hong deng dao yue liang de ju li	OK	no_findings;stratum=sample;id=mu:19739
+我们在这活着也在这死去	wo men zai zhe huo zhe ye zai zhe si qu	OK	no_findings;stratum=sample;id=mu:19743
+交叉路口自己生活	jiao cha lu kou zi ji sheng huo	OK	no_findings;stratum=sample;id=mu:19761
+一个人自转的寂寞	yi ge ren zi zhuan de ji mo	OK	no_findings;stratum=sample;id=mu:19764
+带我走	dai wo zou	OK	no_findings;stratum=sample;id=mu:19765
+牵你的手你却哭红了眼睛	qian ni de shou ni que ku hong le yan jing	OK	no_findings;stratum=sample;id=mu:19797
+我要分享你眼中的泪光	wo yao fen xiang ni yan zhong de lei guang	OK	no_findings;stratum=sample;id=mu:19817
+爱是一种奇妙的东西	ai shi yi zhong qi miao de dong xi	OK	no_findings;stratum=sample;id=mu:19824
+若只有一天爱一个人	ruo zhi you yi tian ai yi ge ren	OK	no_findings;stratum=sample;id=mu:19845
+听不见是非耶	ting bu jian shi fei ye	OK	no_findings;stratum=sample;id=mu:19887
+雨下一整晚	yu xia yi zheng wan	OK	no_findings;stratum=sample;id=mu:19900
+小舢舨划呀划	xiao shan ban hua ya hua	OK	no_findings;stratum=sample;id=mu:19909
+因你今晚共我唱	yin ni jin wan gong wo chang	OK	no_findings;stratum=sample;id=mu:19952
+何年何月	he nian he yue	OK	no_findings;stratum=sample;id=mu:19958
+已经把沉默变成了忏悔	yi jing ba chen mo bian cheng le chan hui	OK	no_findings;stratum=sample;id=mu:19997
+你从不发现	ni cong bu fa xian	OK	no_findings;stratum=sample;id=mu:20035
+不完美另一面多美	bu wan mei ling yi mian duo mei	OK	no_findings;stratum=sample;id=mu:20067
+那一双爱笑眼睛不适合皱眉呜	na yi shuang ai xiao yan jing bu shi he zhou mei wu	OK	no_findings;stratum=sample;id=mu:20079
+有我在什么都无畏	you wo zai shen me dou wu wei	OK	no_findings;stratum=sample;id=mu:20085
+朋友都说那是惩罚	peng you dou shuo na shi cheng fa	OK	no_findings;stratum=sample;id=mu:20109
+每一次都在徘徊孤单中坚强	mei yi ci dou zai pai huai gu dan zhong jian qiang	OK	no_findings;stratum=sample;id=mu:20179
+剥去利刃沦为人臣	bo qu li ren lun wei ren chen	OK	no_findings;stratum=sample;id=mu:20215
+藤衣半卷苔衣皱岁月自无忧	teng yi ban juan tai yi zhou sui yue zi wu you	OK	no_findings;stratum=sample;id=mu:20293
+躲着人群	duo zhe ren qun	OK	no_findings;stratum=sample;id=mu:20297
+世界能否不再	shi jie neng fou bu zai	OK	no_findings;stratum=sample;id=mu:20304
+谁的哀鸣在指引	shei de ai ming zai zhi yin	OK	no_findings;stratum=sample;id=mu:20322
+是的没错	shi de mei cuo	OK	no_findings;stratum=sample;id=mu:20366
+没有谁离开谁不能活	mei you shei li kai shei bu neng huo	OK	no_findings;stratum=sample;id=mu:20367
+相思不过一场戏	xiang si bu guo yi chang xi	OK	no_findings;stratum=sample;id=mu:20403
+记忆会随之轻泛	ji yi hui sui zhi qing fan	OK	no_findings;stratum=sample;id=mu:20435
+只要每天醒来说早安	zhi yao mei tian xing lai shuo zao an	OK	no_findings;stratum=sample;id=mu:20439
+却遗忘多少的片段	que yi wang duo shao de pian duan	OK	no_findings;stratum=sample;id=mu:20470
+开得灿烂曾经爱得如此简单	kai de can lan ceng jing ai de ru ci jian dan	OK	no_findings;stratum=sample;id=mu:20474
+昨天今天过去不再回来	zuo tian jin tian guo qu bu zai hui lai	OK	no_findings;stratum=sample;id=mu:20481
+放开不能再相爱	fang kai bu neng zai xiang ai	OK	no_findings;stratum=sample;id=mu:20487
+春天的风能否吹来夏天的雨	chun tian de feng neng fou chui lai xia tian de yu	OK	no_findings;stratum=sample;id=mu:20497
+夜空的星能否落向晨曦的海	ye kong de xing neng fou luo xiang chen xi de hai	OK	no_findings;stratum=sample;id=mu:20504
+让勇敢代替所有酒	rang yong gan dai ti suo you jiu	OK	no_findings;stratum=sample;id=mu:20543
+却让我不安	que rang wo bu an	OK	no_findings;stratum=sample;id=mu:20566
+不让你难堪	bu rang ni nan kan	OK	no_findings;stratum=sample;id=mu:20579
+幻想教堂里的那场婚礼	huan xiang jiao tang li de na chang hun li	OK	no_findings;stratum=sample;id=mu:20589
+也曾以为那些是你的名字	ye ceng yi wei na xie shi ni de ming zi	OK	no_findings;stratum=sample;id=mu:20599
+我从前相信	wo cong qian xiang xin	OK	no_findings;stratum=sample;id=mu:20607
+错不错只看心境怎么描绘	cuo bu cuo zhi kan xin jing zen me miao hui	OK	no_findings;stratum=sample;id=mu:20640
+你所在之处孤单都被征服	ni suo zai zhi chu gu dan dou bei zheng fu	OK	no_findings;stratum=sample;id=mu:20704
+我有花一朵长在我心中	wo you hua yi duo zhang zai wo xin zhong	ENGINE_BUG	correct reading was available as a candidate;stratum=dispute;id=mu:20713
+灯光熄灭了音乐静止了	deng guang xi mie le yin yue jing zhi le	OK	no_findings;stratum=sample;id=mu:20803
+懂事之前情动以后长不过一天	dong shi zhi qian qing dong yi hou chang bu guo yi tian	OK	no_findings;stratum=sample;id=mu:20807
+用一场轮回的时间	yong yi chang lun hui de shi jian	OK	no_findings;stratum=sample;id=mu:20810
+只要和你在一起	zhi yao he ni zai yi qi	OK	no_findings;stratum=sample;id=mu:20831
+仅有一个方向	jin you yi ge fang xiang	OK	no_findings;stratum=sample;id=mu:20842
+爱一个人爱得如此慷慨又自私	ai yi ge ren ai de ru ci kang kai you zi si	OK	no_findings;stratum=sample;id=mu:20873
+一直忘了说我有多感动	yi zhi wang le shuo wo you duo gan dong	OK	no_findings;stratum=sample;id=mu:20899
+春天的麦芽酿成秋天的酒啊	chun tian de mai ya niang cheng qiu tian de jiu a	OK	no_findings;stratum=sample;id=mu:20916
+异乡的游子啊	yi xiang de you zi a	OK	no_findings;stratum=sample;id=mu:20927
+爱得收不回呜呜	ai de shou bu hui wu wu	OK	no_findings;stratum=sample;id=mu:20944
+还是那躺在公路尽头的月亮	hai shi na tang zai gong lu jin tou de yue liang	OK	no_findings;stratum=sample;id=mu:20964
+风里还没有细沙耶	feng li hai mei you xi sha ye	OK	no_findings;stratum=sample;id=mu:20980
+只要一息尚存	zhi yao yi xi shang cun	OK	no_findings;stratum=sample;id=mu:21021
+现在只剩下风吹乱我的发	xian zai zhi sheng xia feng chui luan wo de fa	OK	no_findings;stratum=sample;id=mu:21058
+温柔被你唱成歌	wen rou bei ni chang cheng ge	OK	no_findings;stratum=sample;id=mu:21081
+今夜太漫长今两股痒痒	jin ye tai man chang jin liang gu yang yang	OK	no_findings;stratum=sample;id=mu:21122
+今人比枯叶瘦花黄	jin ren bi ku ye shou hua huang	OK	no_findings;stratum=sample;id=mu:21123

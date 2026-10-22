@@ -1,0 +1,58 @@
+# 第 2 代公开面冻结名单（`cpp_pinyin::v2::` 的名字）—— 一行一名。
+#
+# 由 check_public_names.py 的 scan() 枚举生成：产出侧直接调用检查侧的分类器，不另行实现命名规则，
+# 以免“什么算公开名”出现两套说法。产出器本身是会话里的一次性脚本，未入库（方法即上文一句）。
+# 生成时 HEAD = 81da5bb；扫描 include/cpp-pinyin2/**/*.h 共 14 个头文件；无法分类的声明 = 0。
+# 落盘前已在只读影子根里验证：声明 36 = 冻结 36，门禁 PASS。
+# 2026-10-18（D4）：新增 `defaultStyleOf`（默认风格改由 `styles[].isDefault` 派生，`Dialect::defaultStyle`
+#   随之删除 —— 后者不是公开名，不进本文件故无需删行）⇒ 声明 37 = 冻结 37；函数 12 -> 13。
+#   迁移导引见 `docs/UPGRADING_A_GENERATION.md` 的 2026-10-18 条。
+# 2026-10-18（D10）：新增 `ToneSandhiPass`（变调趟是方言属性，`Dialect::toneSandhi` 声明它）⇒ 类型 24 -> 25、声明 38 冻结 38。
+# 本文件按 utf-8-sig 读；空行与 # 开头的行被跳过（BOM 曾把首行变成幽灵名，门禁里记着这件事）。
+# 这是契约：新增公开名必须显式改本文件，改名须走换代决定 —— 否则门禁会红。
+#
+# 25 个名字是类型/别名，13 个是函数：
+#   CanTone CantoneseStyle Code Dialect DialectCreator DisambiguationCallback Engine EngineConfig
+#   Error ErrorException ErrorHandling ManTone MandarinStyle Outcome ReadingSource Registry Result
+#   Segment Style StyleDecl Syllable ToneConverter ToneKind ToneSandhiOptions ToneSandhiPass
+#   applyMandarinToneSandhi codeText defaultStyleOf findStyle isDigit isHanzi isKana isLetter isSpace
+#   isSpecialKana resolveStyle u16strToUtf8str utf8strToU16str
+CanTone
+CantoneseStyle
+Code
+Dialect
+DialectCreator
+DisambiguationCallback
+Engine
+EngineConfig
+Error
+ErrorException
+ErrorHandling
+ManTone
+MandarinStyle
+Outcome
+ReadingSource
+Registry
+Result
+Segment
+Style
+StyleDecl
+Syllable
+ToneConverter
+ToneKind
+ToneSandhiOptions
+ToneSandhiPass
+applyMandarinToneSandhi
+codeText
+defaultStyleOf
+dictDirCandidate
+findStyle
+isDigit
+isHanzi
+isKana
+isLetter
+isSpace
+isSpecialKana
+resolveStyle
+u16strToUtf8str
+utf8strToU16str

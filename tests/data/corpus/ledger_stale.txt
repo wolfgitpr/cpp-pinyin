@@ -1,0 +1,13 @@
+# Ledger records that are intentionally not in effect.
+#
+# Format: <ds> <row id> <cell index> <reason>
+#
+# A record lands here only when the current verified value was re-verified and the record is the side
+# that is wrong, or when the record is superseded by a later, separately recorded decision. The
+# ledger self-check (tools/corpus/ledger_check.py) fails on any OTHER record that is not in effect,
+# so this file is the whole of the accepted staleness and it must stay tiny.
+#
+# Measured 2026-09-29: two wave-12 records, both of which asked for a reading the corpus and the
+# dictionary contradict. Both cells were re-read against their row and their tone-table twin.
+cu cu:1481 3  wave 12 asked mi -> mai in 原來媽咪係將剩低嘅碎片. 媽咪 is maa1 mi1, so the current mi is correct and the record is wrong.
+cu cu:5529 1  wave 12 asked hong -> hang in 銀行. 銀行 is ngan4 hong4, so the current hong is correct and the record is wrong.

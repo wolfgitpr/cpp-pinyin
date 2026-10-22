@@ -1,0 +1,103 @@
+# Public member declarations frozen at 2.0.0 -- every type the public surface freezes.
+#
+# `2.0.0` is a PROVENANCE anchor (when this freeze was cut), NOT a copy of the current
+# PROJECT_VERSION: bumping the version must NOT bump it, or the sentence stops being true about
+# the release it describes. Deliberate, and the reason the version gate does not police this
+# line (audit round 3, H26). The declarations below are what it is checked for.
+#
+# Regenerate with `python tools/check_public_surface.py --freeze` and READ the diff: every
+# changed line here is a change to the surface a C++ consumer compiles against.
+# Format: `# --- <label> (<header>) ---` then one declaration per line, whitespace-normalised.
+# `private:`/`protected:` sections are not part of it, and neither are comments.
+
+# --- Engine (core/Engine.h) ---
+[[nodiscard]] static Outcome<Engine> open(const Registry &registry, const std::filesystem::path &dictRoot, std::string_view dialectId);
+Engine(const Dialect &dialect, const std::filesystem::path &dictDir);
+Engine(const Dialect &dialect, const std::filesystem::path &dictDir, std::filesystem::path subdir);
+~Engine();
+Engine(const Engine &) = delete;
+Engine &operator=(const Engine &) = delete;
+Engine(Engine &&) noexcept;
+Engine &operator=(Engine &&) noexcept;
+[[nodiscard]] const Dialect &dialect() const;
+[[nodiscard]] Outcome<Result> query(std::string_view text, const EngineConfig &cfg = {}) const;
+[[nodiscard]] Outcome<Result> query(const std::vector<std::string> &chars, const EngineConfig &cfg = {}) const;
+[[nodiscard]] Outcome<std::vector<std::string>> readings(std::string_view hanzi, const EngineConfig &cfg = {}) const;
+[[nodiscard]] Outcome<std::string> toSimplified(std::string_view hanzi) const;
+[[nodiscard]] bool isPolyphonic(std::string_view hanzi) const;
+[[nodiscard]] Outcome<void> loadUserDict(const std::filesystem::path &path, bool clear = true);
+[[nodiscard]] Outcome<void> loadTraditionalDict(const std::filesystem::path &path, bool clear = true);
+void setDisambiguationCallback(DisambiguationCallback callback);
+
+# --- Result (core/Types.h) ---
+using value_type = Segment;
+using const_iterator = std::vector<Segment>::const_iterator;
+Result() = default;
+explicit Result(std::vector<Segment> syllables);
+[[nodiscard]] bool empty() const noexcept;
+[[nodiscard]] size_t size() const noexcept;
+const Segment &operator[](size_t i) const noexcept;
+const Segment &at(size_t i) const;
+Segment &operator[](size_t i) noexcept;
+Segment &at(size_t i);
+[[nodiscard]] const_iterator begin() const noexcept;
+[[nodiscard]] const_iterator end() const noexcept;
+[[nodiscard]] const_iterator cbegin() const noexcept;
+[[nodiscard]] const_iterator cend() const noexcept;
+[[nodiscard]] std::string join(std::string_view delimiter = " ") const;
+[[nodiscard]] std::vector<std::string> toVector() const;
+
+# --- Syllable (core/Syllable.h) ---
+std::string initial;
+std::string fin;
+std::string spelling;
+int tone = 0;
+ToneKind tone_kind = ToneKind::unspecified;
+ReadingSource source = ReadingSource::dictionary;
+
+# --- ToneConverter (core/ToneConverter.h) ---
+using ConvertFunc = std::u16string(const std::u16string &pinyin, bool v_to_u, bool neutral_tone_with_five);
+using NormalizeFunc = std::u16string(const std::u16string &pinyin);
+static constexpr int MAX_STYLE = 9;
+ToneConverter() : m_normalize(&identityNormalize);
+virtual ~ToneConverter();
+std::u16string convert(std::u16string str, int style, bool v_to_u = false, bool neutral_tone_with_five = false) const;
+[[nodiscard]] std::u16string normalizeReading(const std::u16string &pinyin) const;
+
+# --- Outcome<T> (core/Types.h) ---
+Outcome(T value) : m_value(std::move(value));
+Outcome(Error error) : m_value(std::move(error));
+[[nodiscard]] bool has_value() const noexcept;
+[[nodiscard]] explicit operator bool() const noexcept;
+[[nodiscard]] const T &value() const &;
+[[nodiscard]] T &&value() &&;
+[[nodiscard]] T &value() &;
+[[nodiscard]] const Error &error() const &;
+[[nodiscard]] Error &error() &;
+[[nodiscard]] const T &value_or_throw() const &;
+[[nodiscard]] T &value_or_throw() &;
+[[nodiscard]] T &&value_or_throw() &&;
+
+# --- Outcome<void> (core/Types.h) ---
+Outcome() noexcept = default;
+Outcome(Error error) : m_error(std::move(error)), m_ok(false);
+[[nodiscard]] bool has_value() const noexcept;
+[[nodiscard]] explicit operator bool() const noexcept;
+[[nodiscard]] const Error &error() const &;
+[[nodiscard]] Error &error() &;
+void value_or_throw() const;
+
+# --- Segment (core/Types.h) ---
+std::string text;
+Syllable reading;
+std::vector<std::string> candidates;
+Code failure_kind = Code::Ok;
+std::string rendered;
+
+# --- EngineConfig (core/Types.h) ---
+Style style;
+ErrorHandling onError = ErrorHandling::Default;
+bool includeCandidates = true;
+bool includeReading = false;
+bool vToU = false;
+bool markNeutralAs5 = false;

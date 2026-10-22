@@ -1,0 +1,49 @@
+# The C++ surface a dialect plugin compiles against. Frozen the same way
+# tests/abi/expected_public_headers.txt freezes the header set and
+# tests/abi/expected_c_api_symbols.txt freezes the C ABI.
+#
+# Order matters: `Dialect` is an aggregate, so reordering members changes the layout a
+# plugin was compiled against. tools/check_bindings.py compares this list both ways AND in
+# order, and refuses to pass if the list is too short to describe the surface.
+#
+# 2026-10-05 (S3, Registry shape): `static DialectRegistry &instance()` and the
+# CPP_PINYIN_REGISTER_DIALECT self-registration macro are GONE -- a registry is now declared by
+# the caller and its constructor registers the built-ins. The two lines those leave behind are
+# `Registry()` and `~Registry()`: a registry the caller owns has to be constructible and
+# destructible from outside. Still 16 declarations, but not the same sixteen.
+#
+# 2026-10-06 (N3, style identity): `Dialect` gains `styles` -- the single authority for "which
+# styles can this dialect emit, and what is each of them called". It is exactly where a plugin author
+# should meet it (the dialect description, not the converter): a dialect's styles are a SPARSE set of
+# numbers in one shared 0..8 domain -- Mandarin fills all nine, Cantonese declares 0, 3 and 8 -- and a
+# dense `vector<string>` cannot express that, so every entry carries the number it belongs to.
+# 16 -> 17 declarations. Read through core/Types.h's `findStyle`, pinned by tests/cpp/test_style_table.cpp
+# (which is red if a name round-trips to a different number, if the default is not an entry, or if a
+# number leaves [0, MAX_STYLE)); `cppp2_style_list` (N29) publishes the same table to the shells.
+#
+# 2026-10-18 (D4): `int defaultStyle` is GONE. It said the same thing as `styles[].isDefault` from a
+# second place, with different consumers (resolveStyle read the field, `cppp2_style_list` read the
+# flag), so a plugin could publish one default and render another. The default is now derived from the
+# table by `defaultStyleOf` (core/Types.h). 18 -> 17 declarations.
+#
+# 2026-10-18 (D10): `ToneSandhiPass toneSandhi` added -- tone sandhi is a DIALECT fact, and the C entry
+# `cppp2_apply_tone_sandhi` now takes the engine so it can ask this field instead of applying the Mandarin
+# rules to every result. 17 -> 18 declarations.
+cpp-pinyin2/ext/Dialect.h: std::string id;
+cpp-pinyin2/ext/Dialect.h: std::string dictSubDir;
+cpp-pinyin2/ext/Dialect.h: ToneConverter tone;
+cpp-pinyin2/ext/Dialect.h: bool supportsVToU = false;
+cpp-pinyin2/ext/Dialect.h: bool supportsNeutralTone5 = false;
+cpp-pinyin2/ext/Dialect.h: std::vector<StyleDecl> styles;
+cpp-pinyin2/ext/Dialect.h: ToneSandhiPass toneSandhi = ToneSandhiPass::None;
+cpp-pinyin2/ext/Dialect.h: std::function<void(Result &)> postProcess;
+cpp-pinyin2/ext/Registry.h: using DialectCreator = std::function<std::shared_ptr<const Dialect>()>;
+cpp-pinyin2/ext/Registry.h: Registry();
+cpp-pinyin2/ext/Registry.h: ~Registry();
+cpp-pinyin2/ext/Registry.h: bool add(std::string id, DialectCreator creator, bool replace = false);
+cpp-pinyin2/ext/Registry.h: [[nodiscard]] std::shared_ptr<const Dialect> resolve(std::string_view id) const;
+cpp-pinyin2/ext/Registry.h: [[nodiscard]] std::vector<std::string> ids() const;
+cpp-pinyin2/ext/Registry.h: Registry(const Registry &) = delete;
+cpp-pinyin2/ext/Registry.h: Registry &operator=(const Registry &) = delete;
+cpp-pinyin2/ext/Registry.h: Registry(Registry &&) = delete;
+cpp-pinyin2/ext/Registry.h: Registry &operator=(Registry &&) = delete;

@@ -1,0 +1,39 @@
+# The frozen C ABI surface of libcpp-pinyin2: one symbol per line below, and THE COUNT IS THESE LINES
+# (no literal number is written here, so the comment cannot contradict the list).
+#
+# One name per line; '#' starts a comment. Both directions of the comparison matter:
+#   * listed here but missing from the library -> a C#/Python binding fails to load at runtime, in
+#     the host language, with no C++ diagnostic to help anyone;
+#   * exported but not listed here -> an unreviewed addition to the documented ABI. Adding a
+#     function is a deliberate act: add it here in the same commit, and say so in section 6.7.
+#
+# The C++ API symbols are deliberately NOT listed. They are many, they are mangled differently by
+# every compiler, and they are not the contract a binding may use -- bindings call only cppp2_*.
+#
+# Authority: docs/PLUGIN_INTERFACE_AND_BINDINGS.md section 6.7.8 (D10) and include/cpp-pinyin2/ext/c_api.h.
+# Checked by: tests/abi/check_exports.cmake (CTest entry `ExportGate`, shared builds only).
+# (2026-10-18: this block was found shuffled -- the paragraphs were out of order and the prefix read
+# `cppp_*`; restored to the coherent original. No symbol line was touched.)
+cppp2_apply_tone_sandhi
+cppp2_code_text
+cppp2_destroy
+cppp2_dialect_ids
+cppp2_dict_dir_candidate
+cppp2_is_polyphonic
+cppp2_load_traditional_dict
+cppp2_load_traditional_dict_ex
+cppp2_load_user_dict
+cppp2_load_user_dict_ex
+cppp2_open
+cppp2_query
+cppp2_query_opts_init
+cppp2_readings
+cppp2_render_syllable
+cppp2_result_free
+cppp2_string_free
+cppp2_string_list_free
+cppp2_style_list
+cppp2_style_list_free
+cppp2_to_simplified
+cppp2_tone_convert
+cppp2_version
