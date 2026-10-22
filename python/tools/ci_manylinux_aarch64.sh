@@ -131,6 +131,9 @@ note "8 the wheel against the binding contract (D20's name, the C ABI, the diale
 # This step is why the leg exists in this shape. check_bindings.py --wheel had only ever been measured on
 # Windows, and CI runs it on Linux too -- so the first honest measurement of it on Linux belongs here, in the
 # same file the runner executes rather than in a note claiming it would probably work.
+# Version-chain place 5 is the generated `version.props`; this leg never built the C# shell, so it has to
+# be generated before the chain can be checked (measured 2026-10-22: "version.props is missing").
+$PY "$WORK/csharp/tools/emit_build_info.py" --version-props-only
 $PY "$WORK/tools/check_bindings.py" --wheel "$WORK/python/$wheel" > /tmp/check-bindings.txt 2>&1
 bind_rc=$?
 echo "exit: $bind_rc"
