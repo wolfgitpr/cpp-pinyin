@@ -364,11 +364,11 @@ if (CPP_PINYIN2_INSTALL)
     add_test(NAME InstallConsumerSmoke
         COMMAND ${CMAKE_COMMAND} ${_install_gate_args}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/install/check_install_consumer.cmake)
-    # Its own budget, because `ctest --timeout 300` (added so a hang reports itself) is too small for the
-    # heaviest entry in the suite: it installs the tree and then configures AND builds an out-of-tree
-    # consumer, which on a Windows runner takes longer than 300 s (measured 2026-10-22, job `windows`:
-    # "InstallConsumerSmoke (Timeout)"). A property wins over `--timeout`.
-    set_tests_properties(InstallConsumerSmoke PROPERTIES LABELS "install" RUN_SERIAL TRUE TIMEOUT 1800)
+    # NO TIMEOUT property here, deliberately. `check_gate_inventory` enforces "a TIMEOUT >= 300 means the
+    # `slow` label", and this entry is fast on Linux and macOS (about a second inside the suite) -- only
+    # a Windows runner stalls it, and a per-test budget would both break that rule and hide the stall
+    # behind a bigger number. The Windows job raises the global `--timeout` instead.
+    set_tests_properties(InstallConsumerSmoke PROPERTIES LABELS "install" RUN_SERIAL TRUE)
     # Proves it can fail: the same consumer asks for version 0.0.1, which no installed metadata
     # offers. Without this, a ConfigVersion file that stopped comparing versions would look fine.
     add_test(NAME InstallConsumerSmokeSelfTest

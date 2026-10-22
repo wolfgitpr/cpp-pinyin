@@ -265,7 +265,14 @@ def self_test() -> int:
         orphan = run("rev-parse", "HEAD", cwd=repository)
         run("reset", "--hard", "--quiet", "HEAD~1", cwd=repository)
         code_orphan, lines_orphan = verdict(fixture(repository, orphan[:7]), require=True)
-        cases.append(("(e) a commit that exists but no ref reaches is refused",
+        # The case asserts the VERDICT, so a fixture that failed to orphan the commit used to report the verdict
+        # as wrong and name nothing. On the msys2 job that is what happened (measured 2026-10-22). The label
+        # carries the fixture's own evidence when it has any, and the case count does not change.
+        orphan_probe = run("rev-list", orphan, "--not", "--all", cwd=repository)
+        label_orphan = "(e) a commit that exists but no ref reaches is refused"
+        if not (orphan_probe and orphan_probe.strip()):
+            label_orphan += f" [the fixture could not orphan a commit: rev-list said {orphan_probe!r}]"
+        cases.append((label_orphan,
                       code_orphan == 1 and any("no branch or tag" in line for line in lines_orphan)))
         cases.append(("(f) restoring the reachable fixture passes again",
                       verdict(fixture(repository, short), require=True)[0] == 0))

@@ -142,8 +142,29 @@ def self_test() -> int:
         (root / "docs" / "with space.md").write_text("# target\n", encoding="utf-8")
 
         def init() -> None:
+            """Stage the fixture, and SAY SO when the staging did not happen.
+
+            The cases below assert verdicts about a tree that `git ls-files` must be able to see. On the msys2 job
+            the staging silently produced a listing without `docs/b.md`, so the case that expects a dead link
+            reported "the link passes" and named nothing useful (measured 2026-10-22). A fixture that cannot
+            prepare itself must fail with the reason, not hand out a verdict about a tree it never built.
+            """
             subprocess.run(["git", "init", "-q"], cwd=root, capture_output=True)
-            subprocess.run(["git", "add", "-A"], cwd=root, capture_output=True)
+            added = subprocess.run(["git", "add", "-A"], cwd=root, capture_output=True, text=True)
+            if added.returncode != 0:
+                raise SystemExit(f"check_links self-test: `git add -A` failed in the fixture: "
+                                 f"{added.stderr.strip() or added.stdout.strip()}")
+            listed = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True)
+            if listed.returncode != 0:
+                raise SystemExit(f"check_links self-test: `git ls-files` failed in the fixture: "
+                                 f"{listed.stderr.strip()}")
+            staged = {line for line in listed.stdout.splitlines() if line}
+            present = {path.relative_to(root).as_posix()
+                       for path in root.rglob("*.md") if ".git" not in path.parts}
+            missing = sorted(present - staged)
+            if missing:
+                raise SystemExit(f"check_links self-test: the fixture has {missing} on disk but not in the "
+                                 f"index -- the cases below would judge a tree the checker cannot see")
 
         (root / "a.md").write_text("see [t](docs/with%20space.md)\n", encoding="utf-8")
         init()
