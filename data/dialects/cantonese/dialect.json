@@ -1,0 +1,15 @@
+{
+    "id":  "cantonese",
+    "min_library":  "2.0.0",
+    "required_tables":  [
+                            "word.txt",
+                            "phrases_dict.txt",
+                            "phrases_map.txt",
+                            "trans_word.txt"
+                        ],
+    "optional_tables":  [
+                            "user_dict.txt"
+                        ],
+    "assets":  [
+                   "License.txt", "format.txt"]
+}

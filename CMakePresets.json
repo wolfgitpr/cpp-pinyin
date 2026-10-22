@@ -1,0 +1,83 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Release with Ninja, tests and install on",
+      "description": "Reproduces the configuration this repository is verified with. Build output goes under .tmp/, so no IDE ever grows cmake-build-* in the repository root again. Using presets needs CMake 3.21 or newer; the library itself still needs only 3.17.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.tmp/build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON",
+        "CPP_PINYIN2_BUILD_TESTS": "ON",
+        "CPP_PINYIN2_BUILD_EXAMPLES": "OFF",
+        "CPP_PINYIN2_INSTALL": "ON"
+      }
+    },
+    {
+      "name": "msvc",
+      "displayName": "Release with Ninja + MSVC, tests and install on",
+      "description": "The second measured leg (2026-10-21): MSVC 19.51 / VS2026 with Ninja. START IT FROM A DEVELOPER SHELL ('x64 Native Tools Command Prompt for VS2026', or anything that has run vcvars64.bat) -- a preset cannot set that environment, and cl.exe without it cannot find its own STL headers (every TU fails with C1083 'cstdint'). Recipe and results: docs/HISTORY.md Do not switch this to the 'Visual Studio 17 2022' generator: CMake 3.30 cannot find a VS2026 instance that way (measured).",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.tmp/build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON",
+        "CPP_PINYIN2_BUILD_TESTS": "ON",
+        "CPP_PINYIN2_BUILD_EXAMPLES": "OFF",
+        "CPP_PINYIN2_INSTALL": "ON"
+      }
+    },
+    {
+      "name": "clang",
+      "displayName": "Release with Ninja + Clang, tests and install on",
+      "description": "The third measured leg (2026-10-21): Clang 22.1.4 targeting x86_64-pc-windows-msvc. Needs the same Developer Shell as the msvc preset, because clang-cl-style Windows targets still link with link.exe and need the MSVC headers/libraries. Compiler names are left to PATH on purpose: the absolute path of a local LLVM tree is not something to bake into a repository preset. Results: 50/50 ctest.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.tmp/build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "BUILD_SHARED_LIBS": "ON",
+        "CPP_PINYIN2_BUILD_TESTS": "ON",
+        "CPP_PINYIN2_BUILD_EXAMPLES": "OFF",
+        "CPP_PINYIN2_INSTALL": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "msvc",
+      "configurePreset": "msvc"
+    },
+    {
+      "name": "clang",
+      "configurePreset": "clang"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "msvc",
+      "configurePreset": "msvc",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "clang",
+      "configurePreset": "clang",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

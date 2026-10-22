@@ -26,14 +26,14 @@
 识:shí,shi,zhì
 点:diǎn,dian
 下:xià,xia
-儿:er,ér
+儿:ér,er
 子:zi,zǐ,zì
 小:xiǎo
 心:xīn,xin
 世:shì
 丘:qiū
 之:zhī
-貉:hé
+貉:mò,hé
 并:bìng
 中:zhōng,zhòng
 台:tái,tāi
@@ -69,9 +69,9 @@
 政:zhèng
 策:cè
 人:rén,ren
-劲:jìn,jìng
+劲:jìng,jìn
 半:bàn,ban
-将:jiàng,jiāng,qiāng
+将:jiāng,jiàng,qiāng
 军:jūn
 令:lìng,líng
 巴:bā,ba
@@ -125,7 +125,7 @@
 刻:kè
 千:qiān
 金:jīn
-刹:shā,chà
+刹:chà,shā
 那:nà,nǎ,na
 劳:láo,lao
 永:yǒng
@@ -169,7 +169,7 @@
 品:pǐn
 红:hóng,gōng
 锅:guō
-哄:hōng,hǒng,hòng
+哄:hǒng,hōng,hòng
 而:ér
 散:sàn,sǎn,san
 起:qǐ,qi
@@ -236,7 +236,7 @@
 褒:bāo
 贬:biǎn
 学:xué
-会:huì,kuài,hui
+会:huì,kuài
 要:yào,yāo
 家:jiā,jia
 主:zhǔ
@@ -244,7 +244,7 @@
 审:shěn
 寸:cùn,cun
 光:guāng
-斗:dòu,dǒu,dou
+斗:dǒu,dòu,dou
 牛:niú
 撮:cuō
 部:bù
@@ -261,7 +261,7 @@
 风:fēng
 顺:shùn
 席:xí
-地:de,dì,di
+地:dì,de
 带:dài
 路:lù,lu
 过:guò,guo
@@ -269,7 +269,7 @@
 计:jì,ji
 于:yú
 春:chūn
-载:zài,zǎi
+载:zǎi,zài
 四:sì
 季:jì
 期:qī
@@ -364,7 +364,7 @@
 暴:bào,pù
 寒:hán
 曝:pù,bào
-更:gēng,gèng
+更:gèng,gēng
 月:yuè
 望:wàng
 垠:yín
@@ -502,11 +502,11 @@
 销:xiāo
 抹:mǒ,mò,mā
 杀:shā
-煞:shā,shà
+煞:shà,shā
 等:děng
 奖:jiǎng
 箭:jiàn
-仇:chóu
+仇:qiú,chóu
 双:shuāng
 雕:diāo
 节:jié,jiē,jie
@@ -534,7 +534,7 @@
 微:wēi
 声:shēng,sheng
 吭:kēng,háng
-肚:dù,dǔ,du
+肚:dǔ,dù,du
 皮:pí,pi
 股:gǔ,gu
 胎:tāi
@@ -607,7 +607,7 @@
 跃:yuè
 役:yì
 胆:dǎn
-汗:hàn,hán
+汗:hán,hàn
 较:jiào
 辈:bèi
 轮:lún
@@ -699,13 +699,13 @@
 梁:liáng,liang
 街:jiē
 裤:kù
-镐:gǎo
+镐:hào,gǎo
 客:kè
 宁:níng,nìng
 宠:chǒng
 庭:tíng
 巳:sì
-辟:pì,bì
+辟:bì,pì
 忧:yōu
 未:wèi
 格:gé,ge
@@ -885,7 +885,7 @@
 氰:qíng
 胺:àn
 江:jiāng
-侗:dòng,tóng
+侗:tóng,dòng
 自:zì,zi
 旅:lǚ
 法:fǎ,fa
@@ -907,7 +907,7 @@
 幸:xìng
 田:tián
 略:lüè
-番:fān
+番:pān,fān
 叠:dié
 皇:huáng
 捶:chuí
@@ -948,7 +948,7 @@
 饭:fàn
 菱:líng
 云:yún
-藏:cáng,zàng
+藏:zàng,cáng
 藩:fān
 叛:pàn
 苏:sū
@@ -992,7 +992,7 @@
 阿:ā,ē
 陪:péi
 姐:jiě,jie
-只:zhī,zhǐ
+只:zhǐ,zhī
 臂:bì,bei
 顾:gù,gu
 茅:máo
@@ -1006,7 +1006,7 @@
 床:chuáng
 菜:cài
 单:dān,chán,shàn
-铺:pū,pù
+铺:pù,pū
 乘:chéng,shèng
 任:rèn,rén
 佳:jiā
@@ -1142,7 +1142,7 @@
 削:xuē,xiāo
 棋:qí
 榻:tà
-槛:kǎn,jiàn
+槛:jiàn,kǎn
 礼:lǐ
 沉:chén
 滑:huá
@@ -1293,7 +1293,7 @@
 赐:cì
 含:hán
 延:yán
-咋:zǎ,zhā,zhà,za
+咋:zǎ,zhā,zé,za
 咎:jiù
 歹:dǎi
 听:tīng,ting
@@ -1319,7 +1319,7 @@
 室:shì
 完:wán
 纳:nà
-冠:guān,guàn
+冠:guàn,guān
 积:jī,ji
 宣:xuān
 疑:yí
@@ -1378,7 +1378,7 @@
 也:yě
 罢:bà
 插:chā
-揣:chuǎi,chuāi,chuài
+揣:chuāi,chuǎi,chuài
 冒:mào
 搭:dā,da
 撞:zhuàng
@@ -1393,7 +1393,7 @@
 敬:jìng
 厉:lì
 冤:yuān
-吗:mǎ,ma,má
+吗:ma,mǎ,má
 滋:zī
 需:xū
 景:jǐng
@@ -1459,7 +1459,7 @@
 换:huàn
 答:dá,dā,da
 简:jiǎn
-粘:zhān,nián
+粘:nián,zhān
 结:jié,jiē,jie
 果:guǒ
 盟:méng
@@ -1473,7 +1473,7 @@
 羁:jī
 翼:yì
 耐:nài
-肖:xiào,xiāo
+肖:xiāo,xiào
 胫:jìng
 兴:xīng,xìng
 舒:shū,shu
@@ -1567,7 +1567,7 @@
 胄:zhòu
 袭:xí
 君:jūn
-厦:shà,xià
+厦:xià,shà
 赛:sài
 壑:hè
 桐:tóng
@@ -1595,7 +1595,7 @@
 掉:diào
 纱:shā
 帽:mào
-弄:nòng,nong,lòng,leng
+弄:lòng,nòng,nong,leng
 扯:chě,che
 坐:zuò
 存:cún
@@ -1625,7 +1625,7 @@
 央:yāng
 委:wěi,wēi
 察:chá
-卷:juǎn,juàn
+卷:juàn,juǎn
 剂:jì
 圈:quān,juàn,quan
 输:shū
@@ -1820,7 +1820,7 @@
 泉:quán
 章:zhāng
 霄:xiāo
-钉:dīng,dìng,ding
+钉:dìng,dīng,ding
 耙:pá,bà,pā
 乞:qǐ,qi
 扎:zhā,zā,zhá,zha
@@ -1840,7 +1840,7 @@
 液:yè
 瑶:yáo
 浆:jiāng,jiàng
-燕:yàn,yān
+燕:yān,yàn
 癌:ái
 突:tū
 窦:dòu
@@ -2009,7 +2009,7 @@
 剌:là,lá,lā
 努:nǔ
 喀:kā
-塞:sāi,sè,sài
+塞:sài,sāi,sè
 庇:bì
 弗:fú
 曼:màn
@@ -2080,7 +2080,7 @@
 晶:jīng
 蓝:lán,lan
 锃:zèng
-丽:lì,lí
+丽:lí,lì
 亳:bó
 亹:wěi
 责:zé
@@ -2133,7 +2133,7 @@
 狮:shī
 税:shuì
 剖:pōu
-什:shén,shí,shi
+什:shí,shén,shi
 献:xiàn
 邡:fāng
 兄:xiōng,xiong
@@ -2169,7 +2169,7 @@
 偿:cháng
 填:tián
 泊:bó,pō
-拓:tà,tuò
+拓:tuò,tà
 扑:pū
 簇:cù
 羔:gāo
@@ -2283,7 +2283,7 @@
 伸:shēn
 懒:lǎn
 缩:suō
-喇:lǎ,là,lā,la,lá
+喇:lǎ,là,lā,lá
 叭:ba,bā
 伺:sì,cì
 鲴:gù
@@ -2310,7 +2310,7 @@
 耗:hào
 迷:mí
 挡:dǎng,dàng
-率:lǜ,shuài
+率:shuài,lǜ
 龋:qǔ
 宅:zhái
 沫:mò,mo
@@ -2342,12 +2342,12 @@
 誓:shì
 践:jiàn,jian
 佝:gōu,kòu
-偻:lóu
+偻:lǚ,lóu
 瞀:mào
 佟:tóng
 我:wǒ
 夺:duó
-吧:bā,ba
+吧:ba,bā
 赶:gǎn
 佣:yōng,yòng
 佤:wǎ
@@ -2366,7 +2366,7 @@
 侃:kǎn
 鸿:hóng
 侈:chǐ
-靡:mǐ,mí
+靡:mí,mǐ
 侉:kuǎ
 妾:qiè
 侏:zhū
@@ -2462,7 +2462,7 @@
 敷:fū
 猝:cù
 逃:táo
-颉:jié
+颉:xié,jié
 鸮:xiāo
 蓄:xù
 崇:chóng
@@ -2523,7 +2523,7 @@
 拱:gǒng,gōng
 摔:shuāi,shuǎi
 芫:yuán
-茜:qiàn,xī
+茜:xī,qiàn
 虢:guó
 钞:chāo
 伟:wěi
@@ -2589,7 +2589,7 @@
 泄:xiè
 箧:qiè
 羡:xiàn
-轧:yà,zhá
+轧:zhá,yà
 颓:tuí
 侨:qiáo
 眷:juàn
@@ -2597,14 +2597,14 @@
 猴:hóu
 僬:jiāo
 僭:jiàn
-僮:tóng
+僮:zhuàng,tóng
 雇:gù
 僵:jiāng
 殖:zhí,shi
 静:jìng
 陇:lǒng
-朴:pǔ,pò,piáo,pú
-薄:bó,báo,bò
+朴:piáo,pǔ,pò,pú
+薄:báo,bó,bò
 儋:dān
 傧:bīn
 艮:gèn,gěn
@@ -2733,7 +2733,7 @@
 颊:jiá
 佰:bǎi
 卦:guà
-撇:piě,piē
+撇:piē,piě
 岐:qí
 廓:kuò
 轿:jiào
@@ -2884,7 +2884,7 @@
 墅:shù
 帜:zhì
 筵:yán
-刨:bào,páo
+刨:páo,bào
 昏:hūn
 默:mò
 奈:nài
@@ -2900,7 +2900,7 @@
 蹭:cèng,ceng
 铲:chǎn
 踏:tà,tā
-呢:ne,ní
+呢:ní,ne
 屏:píng,bǐng,bīng
 李:lǐ,li
 戳:chuō
@@ -2953,10 +2953,10 @@
 剿:jiǎo
 劈:pī,pǐ
 啪:pā
-啦:lā,la
+啦:la,lā
 刘:liú
 奭:shì
-姥:lǎo,lao,mǔ
+姥:mǔ,lǎo,lao
 夼:kuǎng
 培:péi,bèi
 欣:xīn
@@ -2978,17 +2978,17 @@
 蛉:líng
 鸻:héng
 劐:huō
-拚:pàn,pīn
+拚:pīn,pàn
 澜:lán
 荐:jiàn
 亏:kuī
 篑:kuì
 赏:shǎng
-哩:lī,li,lǐ,lí
+哩:lǐ,lī,li,lí
 釜:fǔ
 晋:jìn
 彭:péng
-缪:miù,móu
+缪:miào,miù,móu
 绅:shēn
 焊:hàn
 熔:róng
@@ -3187,7 +3187,7 @@
 煽:shān
 馈:kuì
 缔:dì
-挨:ái,āi
+挨:āi,ái
 饿:è
 夹:jiā,jiá
 浸:jìn
@@ -3225,7 +3225,7 @@
 泣:qì
 蠢:chǔn
 蝠:fú
-磅:bàng,páng
+磅:páng,bàng
 叱:chì
 吒:zhà,zhā,zha
 咄:duō
@@ -3303,9 +3303,9 @@
 唧:jī,ji
 嗒:dā,da,tà
 咐:fù
-隽:juàn,jùn
+隽:jùn,juàn
 咀:jǔ,zuǐ
-徵:zhǐ
+徵:zhēng,zhǐ
 苞:bāo
 茹:rú
 钙:gài
@@ -3329,7 +3329,7 @@
 呐:nà
 嘘:xū
 拂:fú,bì
-擂:léi,lèi
+擂:lèi,léi
 疵:cī
 熄:xī
 竽:yú
@@ -3354,7 +3354,7 @@
 呦:yōu
 瑛:yīng
 眩:xuàn
-扒:pá,bā
+扒:bā,pá
 晬:zuì
 淑:shū
 姬:jī
@@ -3555,7 +3555,7 @@
 嗳:ǎi
 噱:xué
 嚏:tì
-涌:yǒng,chōng
+涌:chōng,yǒng
 溅:jiàn
 洒:sǎ
 巫:wū
@@ -3693,7 +3693,7 @@
 夯:hāng,bèn
 毁:huǐ
 渍:zì
-翟:zhái,dí
+翟:dí,zhái
 堕:duò
 茔:yíng
 橱:chú
@@ -3706,7 +3706,7 @@
 寝:qǐn
 漱:shù
 腕:wàn
-豁:huò,huō,huá
+豁:huō,huò,huá
 烩:huì
 甥:sheng,shēng
 舅:jiù,jiu
@@ -3738,7 +3738,7 @@
 鹡:jí
 鸰:líng
 霓:ní
-裨:bì
+裨:pí,bì
 缸:gāng,gang
 菠:bō
 氅:chǎng
@@ -3811,7 +3811,7 @@
 娲:wā
 孩:hái
 隶:lì
-拽:zhuài,zhuǎi,yè
+拽:zhuài,zhuǎi
 酥:sū
 宄:guǐ
 狡:jiǎo
@@ -4091,7 +4091,7 @@
 杏:xìng
 茂:mào
 甫:fǔ,fu
-楞:léng,lèng,leng
+楞:léng,leng
 巽:xùn
 帼:guó
 侩:kuài
@@ -4109,7 +4109,7 @@
 帏:wéi
 幌:huǎng
 幡:fān
-幢:chuáng
+幢:zhuàng,chuáng
 遥:yáo
 蹉:cuō
 跎:tuó
@@ -4140,7 +4140,7 @@
 憾:hàn
 弪:jìng
 霖:lín
-繇:yóu,yáo
+繇:yáo,yóu
 焘:tāo,dào
 斌:bīn
 旭:xù
@@ -4156,7 +4156,7 @@
 虹:hóng
 彪:biāo
 炳:bǐng
-蔚:wèi,yù
+蔚:yù,wèi
 彰:zhāng
 瘅:dàn
 彳:chì
@@ -4171,7 +4171,7 @@
 旆:pèi
 徇:xùn
 渭:wèi
-畲:yú,shē
+畲:shē,yú
 铉:xuàn
 裼:xī
 筌:quán
@@ -4184,7 +4184,7 @@
 檀:tán
 醺:xūn
 徯:xī
-徼:jiǎo
+徼:jiào,jiǎo
 瘁:cuì
 绞:jiǎo
 焚:fén
@@ -4239,7 +4239,7 @@
 怆:chuàng
 怅:chàng
 惘:wǎng
-闷:mèn,mēn,men
+闷:mēn,mèn,men
 悻:xìng
 愫:sù
 蒐:sōu
@@ -4255,7 +4255,7 @@
 拈:niān
 愆:qiān
 愕:è
-氓:máng,méng
+氓:méng,máng
 騃:ái
 昵:nì
 珂:kē
@@ -4269,7 +4269,7 @@
 怄:òu
 怂:sǒng
 恿:yǒng
-藉:jiè,jí
+藉:jí,jiè
 悭:qiān
 慵:yōng
 慷:kāng
@@ -4313,7 +4313,7 @@
 铐:kào
 镯:zhuó
 赉:lài
-搂:lou,lǒu,lōu
+搂:lǒu,lou,lōu
 搅:jiǎo
 烊:yàng,yáng
 盹:dǔn
@@ -4329,7 +4329,7 @@
 鼾:hān
 玫:méi
 腮:sāi
-扛:káng
+扛:gāng,káng
 盔:kuī
 扦:qiān
 罾:zēng
@@ -4380,7 +4380,7 @@
 旛:fān
 拴:shuān
 拶:zǎn
-攒:zǎn,cuán
+攒:cuán,zǎn
 掇:duō,duo
 芥:jiè,gài
 橐:tuó
@@ -4403,7 +4403,7 @@
 捅:tǒng
 捆:kǔn
 捉:zhuō
-捋:luō
+捋:lǚ,luō
 胳:gē,gé,gā
 揎:xuān
 捍:hàn
@@ -4416,7 +4416,7 @@
 掀:xiān
 掂:diān
 帚:zhou,zhǒu
-抡:lún,lūn
+抡:lūn,lún
 臀:tún
 掴:guāi
 掏:tāo
@@ -4538,7 +4538,7 @@
 绛:jiàng
 邵:shào
 旃:zhān
-旄:mào,máo
+旄:máo,mào
 涡:wō,guō
 旌:jīng
 旖:yǐ
@@ -4791,7 +4791,7 @@
 欿:kǎn
 歃:shà
 艎:huáng
-莳:shí
+莳:shì,shí
 歙:shè
 蹦:bèng
 诠:quán
@@ -4931,7 +4931,7 @@
 苔:tái
 蛞:kuò
 蝓:yú
-蜇:zhé
+蜇:zhē,zhé
 螵:piāo
 蛸:shāo,xiāo
 蛎:lì
@@ -5001,7 +5001,7 @@
 溇:lóu
 绎:yì
 漕:cáo
-沤:òu
+沤:ōu,òu
 漪:yī
 漾:yàng
 漶:huàn
@@ -5062,7 +5062,7 @@
 饪:rèn
 燧:suì
 耆:qí
-焌:qū,jùn
+焌:jùn,qū
 焗:jú
 焢:kòng
 煊:xuān
@@ -5442,7 +5442,7 @@
 絘:cì
 绚:xuàn
 𬘡:yīn
-缊:yūn
+缊:yùn,yūn
 聒:guō
 缎:duàn
 綦:qí
@@ -5564,7 +5564,7 @@
 芊:qiān
 萰:liàn
 艿:nǎi
-陂:pí,bēi,pō
+陂:bēi,pí,pō
 蕙:huì
 罘:fú
 茉:mò,mo
@@ -5605,7 +5605,7 @@
 荠:jì,qí
 莆:pú
 莒:jǔ
-莘:shēn,xīn
+莘:xīn,shēn
 莜:yóu
 莨:làng
 菪:dàng
@@ -5799,7 +5799,7 @@
 裣:liǎn
 褴:lán
 褛:lǚ
-覃:tán
+覃:qín,tán
 阎:yán
 觃:yàn
 觇:chān
@@ -5817,7 +5817,7 @@
 赅:gāi
 讣:fù
 诂:gǔ
-廑:qín
+廑:jǐn,qín
 诋:dǐ
 詈:lì
 骘:zhì
@@ -5858,7 +5858,7 @@
 餍:yàn
 汙:wū
 椟:dú
-贲:bì,bēn
+贲:bēn,bì
 赂:lù
 勰:xié
 赊:shē
@@ -5880,8 +5880,8 @@
 稙:zhí
 趺:fū
 趿:tā
-跂:qì,qǐ,qí,zhī
-訾:zǐ
+跂:qǐ,qì,qí,zhī
+訾:zī,zǐ
 跆:tái
 踬:zhì
 跄:qiàng
@@ -5923,13 +5923,13 @@
 轱:gū
 辘:lù
 輂:jú
-絜:xié
+絜:jié,xié
 佻:tiāo
 辗:zhǎn
 辒:wēn
 辌:liáng
 轳:lu
-圜:huán
+圜:yuán,huán
 捩:liè
 轗:kǎn
 轘:huàn
@@ -5984,7 +5984,7 @@
 鄱:pó
 酃:líng
 酆:fēng
-酊:dǐng,dīng
+酊:dīng,dǐng
 酋:qiú
 酕:máo
 醄:táo
@@ -6004,7 +6004,7 @@
 翮:hé
 镏:liù,liú
 阊:chāng
-钌:liào
+钌:liǎo,liào
 铞:diào
 钯:bǎ
 鼢:fén
@@ -6018,7 +6018,7 @@
 铤:tǐng
 铗:jiá
 铓:máng
-锔:jū
+锔:jú,jū
 锆:gào
 锂:lǐ
 镚:bèng
@@ -6052,7 +6052,7 @@
 皌:mò
 闵:mǐn
 揆:kuí
-阆:láng,làng
+阆:làng,láng
 阉:yān
 阏:yān,è
 阢:wù
@@ -6133,7 +6133,7 @@
 馑:jǐn
 饩:xì
 餮:tiè
-馕:nǎng
+馕:náng,nǎng
 馘:guó
 馥:fù
 邨:cūn
@@ -7380,7 +7380,7 @@
 圥:lù
 圦:kuài
 圧:yā
-圩:wéi
+圩:xū,wéi
 圫:yù
 圬:wū
 圯:yí
@@ -7880,7 +7880,7 @@
 婟:hù
 婠:wān
 婤:chōu
-婥:nào
+婥:chuò
 婧:jìng
 婨:lún
 婩:àn
@@ -8381,7 +8381,7 @@
 嶿:ru
 巀:jié
 巁:lì
-巂:guī
+巂:xī,guī
 巃:lóng
 巄:lóng
 巆:róng
@@ -9494,7 +9494,7 @@
 𬀪:xiàn
 晜:kūn
 晞:xī
-晟:chéng
+晟:shèng,chéng
 晠:shèng
 晡:bū
 晢:zhé
@@ -9618,7 +9618,7 @@
 朡:zōng
 朣:tóng
 朤:lǎng
-𦛨:lao
+𦛨:láo
 朩:děng
 朰:mù
 朲:rén
@@ -9646,7 +9646,7 @@
 杚:gài
 杛:gōng
 杝:lí
-杢:jiang
+杢:jié
 杣:mián
 杤:wàn
 杦:jiǔ
@@ -9659,7 +9659,7 @@
 杸:shū
 杹:huà
 杺:xīn
-杻:chǒu
+杻:niǔ,chǒu
 杽:chǒu
 枀:sōng
 枂:wò
@@ -9678,7 +9678,7 @@
 枙:ě
 枛:zhào
 枟:yùn
-枠:zui
+枠:huà
 枡:shēng
 枤:dì
 枦:lú
@@ -11618,7 +11618,7 @@
 瑬:liú
 瑭:táng
 瑮:lì
-瑱:zhèn
+瑱:tiàn,zhèn
 瑳:cuō
 瑴:jué
 瑵:zhǎo
@@ -12599,7 +12599,7 @@
 笶:shǐ
 笷:mǎo
 笸:pǒ
-笹:ti
+笹:tì
 笻:qióng
 笽:mǐn
 笾:biān
@@ -15883,7 +15883,7 @@
 鏎:bì
 𬭬:wèi
 镠:liú
-镝:dī
+镝:dí,dī
 鏒:sǎn
 鏓:zǒng
 鏔:yí
@@ -15933,7 +15933,7 @@
 鐑:qiè
 铹:láo
 镦:duì
-镡:chán
+镡:tán,chán
 鐕:zān
 鐖:jī
 鐗:jiǎn
@@ -16121,7 +16121,7 @@
 𬮿:qí
 隒:yǎn
 隓:huī
-隗:kuí
+隗:wěi,kuí
 隚:táng
 隝:dǎo
 隞:áo
@@ -16707,7 +16707,7 @@
 鬬:dòu
 鬭:dòu
 鬯:chàng
-鬲:gé
+鬲:lì,gé
 鬳:yàn
 鬴:fǔ
 鬵:qín
@@ -17292,13 +17292,36 @@
 龣:jué
 龤:xié
 龥:yù
+龪:zhān
+龬:wǎng
+龰:zǒu
+龵:shǒu
+龻:luán
 鿃:shǎn
+鿄:liáng
+鿇:zhēng
+鿌:liáng
 鿍:gàng
 鿎:tǎ
 鿏:mài
 鿕:dān
 鿫:ào
 鿬:tián
+鿰:hán
+鿱:bā
+鿲:láo
+鿳:tuò
+鿴:dōng
+鿵:zhì
+鿶:láng
+鿷:àn
+鿸:tuò
+鿹:mì
+鿺:mài
+鿻:bù
+鿼:jiā
+鿾:làng
+鿿:xìng
 䲞:lì
 䌺:ěr
 䌻:yì

@@ -15,6 +15,8 @@
 掉以輕心:diu6,ji5,hing1,sam1
 度身訂做:dou6,san1,deng6,zou6
 交響樂:gaau1,hoeng2,ngok6
+紀念品:gei3,nim6,ban2
+紀念碑:gei3,nim6,bei1
 管弦樂:gun2,jin4,ngok6
 供不應求:gung1,bat1,jing3,kau4
 刮目相看:gwaat3,muk6,soeng1,hon1
@@ -260,6 +262,7 @@
 投其所好:tau4,kei4,so2,hou3
 甜甜哋:tim4,tim2,dei2
 天矇光:tin1,mung1,gwong1
+跌打酒:tit3,daa2,zau2
 陀陀擰:to4,to2,ning3
 糖黐豆:tong4,ci1,dau2
 挽手袋:waan2,sau2,doi2
@@ -362,7 +365,6 @@
 穿着:cyun1,zoek3
 打量:daa2,loeng4
 打聽:daa2,ting3
-大道:daai6,dou3
 大使:daai6,si3
 大將:daai6,zoeng3
 擔子:daam3,zi2
@@ -589,7 +591,6 @@
 打牌:daa2,paai2
 打仗:daa2,zoeng3
 戴帽:daai3,mou2
-大脾:daai6,bei2
 大件:daai6,gin6
 大命:daai6,meng6
 大會:daai6,wui2
@@ -677,7 +678,6 @@
 夾硬:gaap3,ngaang2
 交易:gaau1,jik6
 鉸剪:gaau3,zin2
-雞脾:gai1,pei2
 雞腎:gai1,san5
 計仔:gai2,zai2
 金錢:gam1,cin4
@@ -692,7 +692,6 @@
 幾乎:gei1,fu4
 機會:gei1,wui6
 幾大:gei2,daai2
-紀念:gei3,nim6
 忌廉:gei6,lim1
 驚青:geng1,ceng1
 驚動:ging1,dung6
@@ -755,7 +754,6 @@
 輕鬆:hing1,sung1
 輕佻:hing1,tiu1
 興趣:hing3,ceoi3
-河粉:ho2,fan2
 可惡:ho2,wu3
 鄉下:hoeng1,haa2
 响處:hoeng2,syu3
@@ -811,7 +809,6 @@
 卡片:kaat1,pin2
 給予:kap1,jyu5
 球隊:kau4,deoi2
-企業:kei2,jip6
 棋子:kei4,zi2
 乾坤:kin4,kwan1
 傾斜:king1,ce4
@@ -866,7 +863,6 @@
 舞會:mou5,wui2
 武將:mou5,zoeng3
 每當:mui5,dong3
-沒有:mut6,jau6
 難民:naan6,man4
 硬盤:ngaang6,pun2
 牛痘:ngau4,dau6
@@ -878,7 +874,6 @@
 樂團:ngok6,tyun4
 年輕:nin4,hing1
 年畫:nin4,waa2
-數據:ou3,geoi3
 烹調:paang1,tiu4
 頻道:pan4,dou3
 皮帶:pei4,daai2
@@ -1142,7 +1137,6 @@
 愛好:oi3,hou3
 惡劣:ok3,lyut3
 澳門:ou3,mun2
-扒飯:paa4,faan6
 扒手:paa4,sau2
 派籌:paai3,cau2
 派糖:paai3,tong2
@@ -1152,6 +1146,7 @@
 泡製:paau3,zai3
 啤牌:pe1,paai2
 皮褸:pei2,lau1
+脾氣:pei4,hei3
 便宜:pin4,ji4
 拼盤:ping3,pun2
 甫士:pou1,si2
@@ -1287,7 +1282,6 @@
 彈劾:taan4,hat6
 撻訂:taat3,deng6
 體重:tai2,cung5
-睇到:tai2,dou2
 睇樓:tai2,lau2
 睇相:tai2,soeng3
 睇中:tai2,zung3
@@ -1395,7 +1389,6 @@
 聽朝:ting1,ziu1
 聽聞:ting3,man4
 貼士:tip1,si2
-跌打:tit3,daa2
 鐵蹄:tit3,tai4
 跳樓:tiu3,lau2
 調養:tiu4,joeng5

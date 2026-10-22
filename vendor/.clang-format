@@ -1,0 +1,5 @@
+# Third-party code is stored verbatim: its formatting is part of what was vendored (Catch2's
+# amalgamated distribution, BSL-1.0). Reformatting it would make every future update of that file a
+# merge conflict and would hide our own changes inside a 20k-line diff.
+DisableFormat: true
+SortIncludes: Never

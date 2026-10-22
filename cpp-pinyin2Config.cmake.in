@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/cpp-pinyin2Targets.cmake")
+
+# Where the dictionaries were installed. The pkg-config file has always exported `dictdir=`
+# (cpp-pinyin2.pc.in) and had no CMake counterpart until Q14: a `find_package` consumer could pick up
+# the target and the headers and still have no supported way to find the data. Same path, computed
+# the same way, so the two files cannot drift. `set_and_check` fails the consumer's configure if the
+# directory is not there -- the point being that a missing dictionary must not look like an empty one.
+set_and_check(CPP_PINYIN2_DICT_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_DATADIR@/cpp-pinyin2/dict")

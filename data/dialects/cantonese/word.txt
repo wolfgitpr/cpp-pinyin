@@ -213,7 +213,7 @@
 顧:gu3,gwu3
 管:gun2
 懈:haai6
-行:hang4,haang4,hong4,hang6,hong2
+行:haang4,hang4,hong4,hang6,hong2
 許:heoi2,fu2
 可:ho2,hak1,ko1
 思:si1,si3
@@ -294,7 +294,7 @@
 長:coeng4,zoeng2,zoeng6,coeng2,coeng1
 庇:bei3
 護:wu6
-被:pei5,bei6,pei2
+被:bei6,pei5,pei2
 告:gou3,guk1
 鼻:bei6
 孔:hung2
@@ -318,7 +318,7 @@
 碧:bik1
 空:hung1
 璧:bik1
-玉:juk2,juk6
+玉:juk6,juk2
 綠:luk6,luk2
 使:si2,sai2,si3
 邊:bin1,bin6
@@ -341,7 +341,7 @@
 化:faa3,faa2
 多:do1
 革:gaak3
-更:gaang1,gang1,gang3
+更:gang3,gaang1,gang1
 態:taai3
 換:wun6
 辨:bin6
@@ -458,7 +458,7 @@
 操:cou1
 部:bou6
 署:cyu5
-隊:deoi6,deoi2,zeoi6
+隊:deoi2,deoi6,zeoi6
 分:fan1,fan6,fan2
 伐:fat6
 暴:bou6
@@ -662,7 +662,7 @@
 隋:ceoi4
 徐:ceoi4
 隨:ceoi4
-處:cyu5,cyu3,cyu2,syu3,syu2
+處:cyu3,cyu5,cyu2,syu3,syu2
 地:dei6,dei2
 欲:juk6
 即:zik1
@@ -1124,7 +1124,7 @@
 卡:kaa1,kaat1,kaa4,kaa2
 叮:ding1
 囑:zuk1
-頂:ding2,deng2
+頂:deng2,ding2
 碟:dip2,dip6
 秩:dit6
 丟:diu1,diu2
@@ -1183,7 +1183,7 @@
 洞:dung6
 穴:jyut6
 脈:mak6,maak6
-園:jyun4,jyun2
+園:jyun2,jyun4
 庭:ting4
 湖:wu4
 午:ng5
@@ -1998,7 +1998,7 @@
 侶:leoi5
 缽:but3,but1,but6
 唔:m4
-腸:coeng4,coeng2
+腸:coeng2,coeng4
 酥:sou1
 搽:caa4
 膏:gou1
@@ -2044,7 +2044,7 @@
 蠢:ceon2
 哋:dei2,dei6,di4
 嫁:gaa3
-嚟:lai4,lei4
+嚟:lei4,lai4
 糧:loeng4
 雙:soeng1,sung1
 黐:ci1
@@ -2102,7 +2102,7 @@
 樁:zong1,zung1
 戴:daai3
 挈:hit3
-脾:pei4,bei2,pei2
+脾:bei2,pei4
 血:hyut3
 笪:daat3
 秀:sau3
@@ -2382,7 +2382,7 @@
 孝:haau3
 順:seon6,seon2
 喺:hai2
-咪:mei1,mai6,mai1,mi4,mai5
+咪:mai5,mei1,mai6,mai1,mi4
 瞇:mai5,mei1,mi1,mai4
 撼:ham2,ham6
 冤:jyun1
@@ -2422,7 +2422,7 @@
 响:hoeng2
 誠:sing4,sing2
 胃:wai6
-玩:wun6,waan2,waan4
+玩:waan2,wun6,waan4
 支:zi1
 枝:zi1
 灘:taan1
@@ -3146,7 +3146,7 @@
 壬:jam4
 捋:lyut3
 旨:zi2
-嗎:maa1,maa3,ma3,maa5,maa4
+嗎:maa3,maa1,ma3,maa5,maa4
 騮:lau4,lau1
 葬:zong3
 擘:maak3
@@ -4584,8 +4584,8 @@
 吇:zi2
 吋:cyun3,jing1 cyun3
 吏:lei6
-咤:zaa3,caak1,caa3,caat4,zaa1
-吓:haa2,haa1,haak1,haak3,haa5
+吒:zaa3,zaa1,caak1
+吓:haa5,haa2,haa1,haak1,haak3
 吕:leoi5
 吖:aa1,a1,ngaa1,aa3,ngaa3
 吗:maa1,maa3,maa5,ma3,maa4
@@ -4688,6 +4688,7 @@
 咡:ji6
 咢:ngok6,ok6
 咣:gwong1,gong1
+咤:zaa3,caak1,caa3,caat4,zaa1
 咥:hei3,dit6
 咦:ji2,ji4,hi1,ji1
 咧:le2,le4,lit6,le3,le1,lit1,le5
@@ -4998,7 +4999,7 @@
 噗:pok3,pok1
 噘:kyut3
 噙:kam4
-噚:cam4,cam6,jing1 cam4,cam3
+噚:cam4,cam6,cam3,jing1 cam4
 噛:ngit6,it6
 噜:lou1,lu3,lou3,lu4
 噞:jim2,jim1
@@ -18556,7 +18557,7 @@
 鳠:wu6
 鱰:cyu5
 鱱:lai6
-鱲:lip6,laap6,lap6
+鱲:laap6,lip6,lap6
 鱳:lik6,lok6,luk6
 鱴:mit6
 鱵:zam1

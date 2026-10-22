@@ -1,0 +1,50 @@
+---
+# Why this file exists: the 2026-10-18 assessment found no static analysis at all -- no `.clang-tidy`, no
+# caller anywhere, nothing in the gates. This is the smallest file that makes that untrue while staying
+# honest about what the tree can absorb today.
+#
+# What it says, and what it does NOT say. The checks below pass over `src/` and `tools/` at this commit
+# except for SEVEN known findings, each of which is a real observation whose fix would change a frozen
+# public signature (by-value parameters such as `Engine::open(..., std::string dictDir, ...)`,
+# `Dialect`'s by-value `ToneConverter`) or is harmless (`std::move` of a trivially-copyable type). They
+# are listed here instead of being silenced by deleting the checks that found them:
+#     src/Engine.cpp            performance-unnecessary-value-param  (dictDir / dialect / toneConverter)
+#     src/EngineImplLoad.cpp    performance-move-const-arg          (loaded, transTable)
+#     src/dict/PhraseLayers.cpp performance-move-const-arg / -const-arg (rebuiltStart)
+#     tools/*.cpp               performance-unnecessary-value-param  (dir)
+# Turning this into a gate needs a per-platform LLVM story and a decision about those signatures; until
+# then this file is a tool, not a promise -- and it is described that way on purpose.
+#
+# Run it by hand (the compile database comes from the standard dev configure, which exports it):
+#     cmake -S . -B .tmp/mk-default ... -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+#     clang-tidy -p .tmp/mk-default --quiet src/*.cpp tools/*.cpp
+Checks: >
+  -*,
+  bugprone-branch-clone,
+  bugprone-copy-constructor-init,
+  bugprone-move-forwarding-reference,
+  bugprone-sizeof-expression,
+  bugprone-string-constructor,
+  bugprone-suspicious-memset-usage,
+  bugprone-swapped-arguments,
+  bugprone-unhandled-self-assignment,
+  bugprone-use-after-move,
+  # The static analyser's own family (2026-10-20, audit round 2 G31): the file claimed to be "the smallest
+  # file that makes 'no static analysis at all' untrue" while containing ZERO clang-analyzer checks. These
+  # three are the analyser's core path/taint checks; they are cheap, and they are the reason clang-tidy
+  # exists for C++ rather than being another linter.
+  clang-analyzer-core.NullDereference,
+  clang-analyzer-core.uninitialized.Assign,
+  clang-analyzer-cplusplus.NewDeleteLeaks,
+  misc-misplaced-const,
+  modernize-use-emplace,
+  modernize-use-nullptr,
+  modernize-use-override,
+  performance-for-range-copy,
+  performance-move-const-arg,
+  performance-unnecessary-copy-initialization,
+  performance-unnecessary-value-param
+WarningsAsErrors: ''
+HeaderFilterRegex: '(include/cpp-pinyin2|src)/.*'
+FormatStyle: file
+...

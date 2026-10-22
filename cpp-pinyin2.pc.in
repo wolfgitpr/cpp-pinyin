@@ -1,0 +1,26 @@
+prefix=${pcfiledir}/../..
+
+# cpp-pinyin2 pkg-config file
+
+exec_prefix=${prefix}/bin
+# Substituted, not written out: CMake's GNUInstallDirs says `lib` on Debian/Ubuntu but `lib64` on
+# Fedora/RHEL/AlmaLinux (measured 2026-10-02 in the manylinux image, where the install tree is
+# lib64/pkgconfig/...). This line used to be the literal `lib`, which made `-L${libdir}` wrong for every
+# pkg-config consumer on the RPM family -- and it contradicted the note below. `include` and `bin` stay
+# literal because no distribution changes those.
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include
+
+# Dicts are installed to ${CMAKE_INSTALL_DATADIR}/cpp-pinyin2 (the CMake install tree keeps the
+# "dict" subdirectory), and libdir/includedir must agree with CMAKE_INSTALL_LIBDIR/INCLUDEDIR.
+dictdir=${prefix}/@CMAKE_INSTALL_DATADIR@/cpp-pinyin2/dict
+
+Name: cpp-pinyin2
+Description: A lightweight Chinese/Cantonese to Pinyin library.
+Version: @version@
+Requires:
+Conflicts:
+
+Cflags: -I${includedir} -std=c++17@CPP_PINYIN2_PC_EXTRA_CFLAGS@
+Libs: -L${libdir} -lcpp-pinyin2
+

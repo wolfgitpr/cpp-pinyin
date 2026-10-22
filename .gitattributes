@@ -1,0 +1,50 @@
+# Why this file exists at all: conformance/cases.sha256 is checked against conformance/cases.json's
+# BYTES, and this repository has no line-ending policy of its own. On Windows, git's default
+# core.autocrlf=true rewrites LF as CRLF on checkout, so a fixture generated with LF would hash one
+# way on the machine that generated it and another way in a fresh clone -- a fingerprint that fails
+# for everyone except its author.
+#
+# `text eol=lf` is the narrow fix: the file stays text (diffs and blame keep working), git stores LF,
+# and every checkout gets LF back on every platform. Note the absence of a blanket `*` rule: a global
+# rule in a repository this size changes how every existing file is stored, which is not this
+# feature's business.
+
+conformance/cases.json text eol=lf
+conformance/cases.sha256 text eol=lf
+
+# The same narrow reasoning, for a script that runs on the board (kept out of the repository since
+# 2026-10-23, but a CRLF copy is still what a checkout of an older tag hands you): board_baseline.sh is started with
+# `bash <script>` (on the board and in Git Bash locally). A CRLF checkout makes that fail in a way
+# that looks like a broken script rather than a checkout artifact, so pin just this path.
+# every script the suite runs through `bash`: a CRLF checkout fails on `$'\r'`
+*.sh text eol=lf
+# License text: byte fidelity beats convenience. A CRLF conversion here would no longer be the
+# verbatim BSL-1.0 text that shipped with Catch2.
+vendor/LICENSE.txt -text
+# Source files: LF everywhere. Two reasons, both narrow. (1) The same byte-fidelity argument as the two
+# conformance files above -- these are text, so git can normalise them, and an LF checkout is what every
+# other platform reads. (2) `tools/check_format.py` compares the tree against clang-format's own output;
+# on a CRLF checkout clang-format's output differs by every line ending, so the gate would fail on a
+# machine where nothing is actually wrong. Pinned by EXTENSION, not by a blanket `*` rule: the reason
+# above applies to source files and to nothing else in this tree.
+*.c text eol=lf
+*.cc text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+CMakeLists.txt text eol=lf
+*.cmake text eol=lf
+
+# The dictionary tables: byte fidelity, and LF on every checkout (added 2026-10-19, finding F32).
+#
+# These eight files are a CROSS-REPOSITORY byte contract: the producer (pinyin-makedict) writes them
+# and `tools/check_drift.ps1` compares them with `data/dialects/**` byte for byte. The index blobs
+# were already LF (`git ls-files --eol` measured `i/lf w/crlf`), so nothing was wrong on disk that a
+# clone would see -- but on Windows the WORKING COPY was CRLF, which meant the comparison depending
+# on which side of the run you looked at, and the producer's text-mode writes made the two agree only
+# because both were CRLF.
+#
+# `-text` (not `text eol=lf`) on purpose: these are DATA. Git must not normalise them at all -- not
+# on checkin, not on checkout -- so the bytes a consumer's wheel/nupkg ships are the bytes committed.
+# Same reasoning as vendor/LICENSE.txt above.
+data/dialects/** -text
