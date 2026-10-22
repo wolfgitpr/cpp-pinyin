@@ -15,7 +15,7 @@
    | 平台 | 状态 |
    |---|---|
    | Windows x64 | ✅ 已实测（含现成 wheel / nupkg） |
-   | Linux x86_64 / aarch64 | ✅ 能构建，脚本已在板上跑过；**CI 尚未在 GitHub 上跑过** |
+   | Linux x86_64 / aarch64 | ✅ 能构建：脚本在板上跑过，**CI 也跑过**（2026-10-22 起，构建与 `linux`/`linux-sanitizers` 两条腿；测试侧的修复见 `docs/RELEASE_CHECKLIST.md` §6） |
    | macOS | ⚠️ **未实测**——本仓没有 Mac；部署目标（10.15）与验收脚本已进树 |
 3. **词典要能被找到**：库本身**不含**默认词典路径（`Engine::open` / `cppp2_open` 都要求显式路径）。
    谁能替决定，优先级是固定的：

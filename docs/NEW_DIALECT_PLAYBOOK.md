@@ -3,7 +3,8 @@
 > 本文是**流程与验收口径**，不是语种方案。边界本身早就定死：本仓只发 `{mandarin, cantonese}`，
 > 新语种一律留在 `pinyin-makedict`。本文只回答"**怎么把一个新语种从数据做到可报的准确率**"。
 
-**行号口径**：本文所有 `文件:行` 均在本仓 `v2` 分支、提交 `e0f0173` 上**逐条读过**；引用前请自行复核（行号会漂）。
+**行号口径**：本文所有 `文件:行` 均在本仓 `v2` 分支上**逐条读过**；引用前请自行复核——行号会漂，提交也会被
+压缩改写，所以这里不钉哈希，以你读到的这棵树为准。
 未复核的项在 §8 标「未验证」。
 
 ---
@@ -156,7 +157,7 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
    本节只留上面那次实测记录本身。
 7. ⚠️ **生成仓现状（2026-10-03 只读复核，静态判读、未运行生成器）**：
    - 仓库是同级检出 **`pinyin-makedict`**，
-     分支 **`v2`**、HEAD **`1d175eb`**、工作区干净、31 个跟踪文件（2026-10-01 记的 `7b18e6f` 已过期）。
+     分支 **`v2`**、工作区干净、31 个跟踪文件（2026-10-01 的一次快照；该仓此后已推进，当前 HEAD 与跟踪文件数按该仓 `git log -1` / `git ls-files` 为准）。
      `rime-cantonese-upstream` 子模块**未初始化**（目录 0 项）⇒ 不联网拉它就跑不了粤语全量生成。
    - **入口是每语种一个脚本**：`python mandarin.py` / `cantonese.py`（须在仓库根目录跑，路径全相对；
      模块级执行，没有 `if __name__ == "__main__"`）。该仓 `README.md` 已是真实现状（不再是 `makedict.py`）；
@@ -173,7 +174,7 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
      ⚠️ **按红线②，各语种的准确率统计与依据只在该仓记录** —— 本仓不复述具体百分比；方法与判据见该仓
      `docs/DIALECT_EXTENSION_RECORD.md` 的语种表。
    - **短语表行数以产出为准 = 6,975 行**（`out/dict/mandarin/phrases_dict.txt` 与本仓现役文件**行数一致**）。
-     ⚠️ 常被引用的 **6,931** 是**审计分母**（该仓 `data/overrides/man_overrides.py:195` 的原话是"All 6931 Mandarin phrase entries were
+     ⚠️ 常被引用的 **6,931** 是**审计分母**（该仓 `pinyin-makedict/data/overrides/man_overrides.py:195` 的原话是"All 6931 Mandarin phrase entries were
      compared against the corpus …"），**不是产物行数**——本仓 `tests/cpp/test_accuracy_v2.cpp` 与 提交历史 曾按 6,931 记，
      已更正。
    - **加新语种的落点**（该仓 `docs/DIALECT_EXTENSION_RECORD.md`；潮州话先例的生成器与数据已出仓，只存记录）：

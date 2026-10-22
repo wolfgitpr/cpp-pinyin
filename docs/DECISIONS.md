@@ -146,6 +146,33 @@ D1 已经量过这笔账（收益上界 1.0422 ≈ 4.2%，且那是"转换免费
 
 ---
 
+### D42｜manylinux 政策线是 **wheel 用标签许下的承诺**，不是所有 Linux wheel 的义务（2026-10-22）
+
+**裁定**：`python/tools/check_wheel.py` 的 glibc 上限（`MAX_GLIBC = (2, 28)`）**只对平台标签里声称
+`manylinux*` 的 wheel 生效**。不声称的（例如托管 runner 上直接打出来的 `linux_x86_64`）把实测到的最高 glibc
+版本记为 note，不判红。
+
+**为什么**：CI 首跑时这条规则把宿主机构建的 wheel 判红（`references glibc 2.38, above the manylinux_2_28
+policy line 2.28`）——那个 wheel 的标签就是 `linux_x86_64`，它**没有承诺** 2.28，宿主机的 glibc 是多少它就
+该是多少。真正需要 2.28 承诺的是容器里构建的那颗（`docs/RELEASE_CHECKLIST.md` §6 里那条 manylinux 腿），而它
+的标签会写 `manylinux_2_28_*`，规则在它身上照旧生效。
+
+**控制项**：`--self-test` 两侧都有——声称 manylinux 时必须红，同一份字节不声称时必须不红。
+
+
+### D43｜许可证文本有两种合法布局，校验器两者都收（2026-10-22）
+
+**裁定**：wheel 里的 `LICENSE` 与 `THIRD_PARTY_NOTICES.md` 可以落在 `dist-info/` 下，也可以落在 PEP 639 的
+`dist-info/licenses/` 下；两种都算合规，**都没有才判红**。
+
+**为什么**：setuptools 77 起按 PEP 639 把 `license_files` 写到 `licenses/` 子目录，而校验器只认旧位置，
+于是三个 Python job 拒收了一颗完全正确的 wheel。**这是包装标准的版本差，不是本项目的事实**——把其中一种
+写死，等于让校验器随 setuptools 版本变红。
+
+**控制项**：`--self-test` 同时有"PEP 639 布局必须绿"与"缺第三方声明必须红"两条；后一条此前是**假控制**
+（用了 6 段文件名，`check()` 在解析处就返回了），本轮一并修成真控制。
+
+
 ## 4. 退役记号里仍然重要的裁定（retired，但代码里还在引用）
 
 **这一段按"系列"分组，因为 `D<n>` 在不同系列里不同义**——代码里同时引用着**三个不同的 `D4`**（安装面 =

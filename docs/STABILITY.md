@@ -26,8 +26,8 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 ### 0.1 CI 与门禁的接线现状（三栏；A29）
 
-「CI 从未运行」是本线的已知事实（§1.2 的 `[未证实]` 口径）。下面记的是**接线现状**，不是运行记录——
-每一行都写着证据位置，读的时候请连带读那一条：**这套接线是否真跑过，仍未证实。**
+**接线已跑过，但只在 `test_runner.yml` 这条链上**（2026-10-22，`v2` 推送后共 4 轮）：构建四条腿（linux / macos / windows / mingw）与 C# 两条腿已有**运行记录**，测试侧当时是红的，修复记在
+`docs/RELEASE_CHECKLIST.md` §6。**仍然未跑的是 `release_prep.yml`**（只在 `workflow_dispatch` 下存在，标签、镜像拉取、runner 的 Docker 都没验过）——读下面的接线行时，请按这个分工理解：
 
 | 接法 | 是谁 | 证据 |
 |---|---|---|
@@ -82,7 +82,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 * `check_bindings`：有 `--self-test`，自检 **77 条**（2026-10-20 起 +4：随包 `format.txt` 的值与 `src/Engine.cpp` 的 `kSupportedDictFormat` 必须一致（三条控制项）；以及 Python 壳的 7 个 ctypes 镜像必须逐字段对齐 `c_api.h`（一条控制项：删掉镜像里的一个字段必须红）。同时 C# 与 Python 两侧的比对表都补上了 `cppp2_tone_sandhi_opts`。**2026-10-20 再 +2**：C# 包身份三元组（`PackageId`/`AssemblyName`/`RootNamespace`）的冻结值必须与 csproj 一致——R15 的"只有 `PackageId` 不带代令牌"从政策散文变成可执行断言（审计 round 3 的 H28）。**2026-10-21 再 +8**（发布面 objective）：装配名从 csproj 读而不是硬编码（+1 反例）、发布面四条仓库 URL 必须同名（+2）、TFM 只能是包声明的子集（+1）、两条 CI 的 RID 矩阵必须相同且每个 RID 有扩展名规则（+3）、vcpkg 许可证表达式必须覆盖各词典 `License.txt` 声明的版本（+1）；发布面链接的**分支路径**必须同为一个且该分支存在（+2）；两张发布页不得对同一条命令给出两种写法（+2）。
 * `check_layers`：有 `--self-test`，自检 21 条（2026-10-20 起 +2：`src/Capabilities.h` 的 `core -> ext/` 边登记为合法，另一条把同一 include plant 到别的核心文件必须被抓 —— 审计 round 3 的 H09）。
-* `check_wheel`：有 `--self-test`，自检 **17 条**（2026-10-21 +1：wheel 缺 `dist-info/LICENSE` 或 `THIRD_PARTY_NOTICES.md` 必须红）。
+* `check_wheel`：有 `--self-test`，自检 **19 条**（2026-10-21 +1：wheel 缺 `dist-info/LICENSE` 或 `THIRD_PARTY_NOTICES.md` 必须红；2026-10-22 +2：PEP 639 的 `dist-info/licenses/` 布局必须**绿**、而同一份字节在不声称 manylinux 的 wheel 里**不得**触发 glibc 政策线）。
 * `check_links`：有 `--self-test`，自检 9 条。
 * `check_public_surface`：有 `--self-test`，自检 **16 条**（2026-10-19 起；其中 9 条专测成员签名冻结面 —— 2026-10-20 起覆盖 `Engine`/`Result`/`Syllable`/`ToneConverter`/`Outcome`/`Segment`/`EngineConfig` 七个类型的冻结声明，含数据成员，且**按声明顺序**比对：换序与改名一样判红。第三轮 H01 新增 2 条：**默认实参**（`= EngineConfig{}`）必须保留在签名里，而**内联函数体**仍必须被裁掉——上一版解析把默认值裁成了 `=;`，等于把"调用方能省略什么"从冻结面里删了）。
 * `merge_nupkgs`：有 `--self-test`，自检 6 条。
