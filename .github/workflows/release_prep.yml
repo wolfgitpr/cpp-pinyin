@@ -1,0 +1,277 @@
+name: Release prep
+
+# WHY THIS FILE EXISTS. `test_runner.yml` says it in its own header: "no publishing lives here -- a
+# PyPI or NuGet upload must be a separate, manually dispatched workflow". This is that workflow, one
+# step short of publishing on purpose. It builds the release matrix and puts every artifact through
+# the acceptance chain the tree already owns, then uploads the results as workflow artifacts. The
+# upload to PyPI (or the GitHub release) stays a human action: plan section 6.7.12 records the user
+# decision "do not publish anything automatically; do not push".
+#
+# WHAT IS BUILT HERE, AND WHERE. Release target from plan section 6.7.10 -- the wheels that are
+# `py3-none-<platform>`, so ONE artifact serves every Python version:
+#
+#   linux_x86_64 + manylinux_2_28_x86_64   -> built INSIDE the manylinux container (required, plan
+#   linux_aarch64 + manylinux_2_28_aarch64     section 6.5 item 1b: a wheel built on a modern distro
+#                                             cannot earn a manylinux tag, only auditwheel grants it)
+#   win_amd64                              -> built on the runner with MinGW + Ninja
+#
+# C# is built here too, and pooled (user decision, 2026-10-10): one nupkg per runtime identifier from three
+# legs, then `csharp/tools/merge_nupkgs.py` merges them into ONE package carrying all three rids
+# (win-x64 / linux-x64 / osx-arm64). The alternative -- publishing N packages -- would ask every consumer to
+# pick the right one by hand, which is the mistake `CppPinyinRid` having no default exists to prevent.
+#
+# The two Linux legs run the SAME SCRIPT (`python/tools/ci_manylinux_aarch64.sh`), which reads the
+# architecture from `uname -m`; the file name still says aarch64 because that is the leg it was first
+# measured on. Nothing here uses QEMU: each leg runs on a runner of its own architecture, so the
+# artifact is built on the hardware it claims.
+#
+# WHAT IS NOT VERIFIED HERE, stated instead of implied:
+#   * the runner wiring -- no job in this file has run on GitHub yet. The commands inside the Linux
+#     script were measured on a real aarch64 board (ledger V110) and the Windows commands on the
+#     development machine (2026-10-09, rebuilt from commit 50be016); the labels, the image pull and
+#     the runners' Docker have not.
+#   * the C# legs: only the Windows one has ever run (on the development machine, via release_prep's own
+#     commands). The pooling step itself was measured locally on 2026-10-09 (two same-source per-rid
+#     packages -> 34 members, rids linux-x64 + win-x64, gate PASS). The linux-x64 and osx-arm64 legs of
+#     THIS file have never run anywhere.
+#   * macOS wheels: deliberately absent. Plan section 6.7.9 records "macOS (universal2): no machine, no
+#     osxcross", and setting `MACOSX_DEPLOYMENT_TARGET`/`-arch` is still an open item (REPO_LAYOUT
+#     section P1), so a macOS wheel built today would be whatever architecture the runner happens to
+#     be. Adding the leg without those two settings would produce a wheel whose tag is a guess.
+#     (The C# side has no such gap: a nupkg carries the native library as a FILE, so `osx-arm64` is a
+#     runtime-identifier directory rather than a platform tag, and its leg is in this file.)
+#   * musllinux is out of scope by decision (2026-10-02, round 16).
+#
+# Both artifacts are uploaded together because the difference between them is the point: our own
+# build stamps a plain `linux_<arch>`, and only auditwheel's stamped wheel may claim `manylinux`.
+
+on:
+  # Manual only. A tag push already runs the full suite through test_runner.yml (its trigger
+  # includes `tags: ['v*']`); this workflow is the extra step a human takes when preparing a release.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to check the version chain against, e.g. v2.0.0 (empty = skip the tag check)"
+        required: false
+        default: ""
+
+# Least privilege: this workflow reads the repository and uploads artifacts. No publishing, so no
+# `id-token: write`, no registry credentials, and nothing here may be turned into an upload later
+# without a user decision (plan section 6.7.11).
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  linux:
+    name: Linux wheel (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+            image: quay.io/pypa/manylinux_2_28_x86_64
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            image: quay.io/pypa/manylinux_2_28_aarch64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and verify the wheel inside the manylinux container
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -v "$PWD":/work -w /work \
+            ${{ matrix.image }} \
+            /bin/bash python/tools/ci_manylinux_aarch64.sh
+
+      - name: Upload both wheels (our tag and auditwheel's stamp)
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-linux-${{ matrix.arch }}
+          path: |
+            python/dist/*.whl
+            python/repaired/*.whl
+          if-no-files-found: error
+
+  windows:
+    name: Windows wheel (win_amd64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Ninja
+        run: pip install ninja
+
+      - name: Stage the package (writes _version.py, builds the library, copies the dictionaries)
+        run: python python/tools/build_native.py --build-dir build-python --config Release
+
+      - name: The shell suite, before anything is packaged
+        working-directory: python
+        run: python -m pytest tests -q
+
+      - name: Build the wheel
+        working-directory: python
+        run: python -m pip wheel . --no-build-isolation --no-deps -w dist
+
+      # `shell: bash` on purpose (2026-10-20, audit round 2 §12.2): the default Windows shell is pwsh, which
+      # does NOT expand a native-argument glob -- python would receive the literal `dist/*.whl`, and both
+      # checkers exit non-zero on a path that does not exist. Measured on this machine: the same two commands
+      # under pwsh fail, under bash they see the file. The sibling workflow (test_python.yml) already writes
+      # these two the same way for the same reason.
+      - name: The packaged member set against the source tree
+        shell: bash
+        working-directory: python
+        run: python tools/check_wheel.py dist/*.whl
+
+      - name: The wheel's library against the frozen C ABI, header and dialect contract
+        shell: bash
+        run: python tools/check_bindings.py --wheel python/dist/*.whl ${{ inputs.tag && format('--tag {0}', inputs.tag) || '' }}
+
+      - name: Install into a compiler-less, index-less venv and answer a query
+        shell: pwsh
+        run: |
+          $wheel = (Resolve-Path python/dist/*.whl).Path
+          python -m venv smoke
+          ./smoke/Scripts/python.exe -m pip install --no-index --no-deps $wheel
+          ./smoke/Scripts/python.exe python/tools/smoke_installed.py --wheel $wheel
+
+      - name: Upload the wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-windows-win_amd64
+          path: python/dist/*.whl
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------------------------------
+  # C# / NuGet: one per-RID nupkg per leg, then ONE pooled package (user decision, 2026-10-10: "c#按你
+  # 建议的来" -- the recommendation was pooling rather than publishing N packages and asking consumers to
+  # pick the right one by hand).
+  #
+  # `CppPinyinRid` is deliberately not defaulted and `check_bindings.py --rid` asserts that a package
+  # carries exactly the rid it was asked about, so a pooled package is the one case that must be checked
+  # WITHOUT --rid. That is why the pooling job's gate command has no --rid on it.
+  # ---------------------------------------------------------------------------------------------------
+  csharp:
+    name: C# nupkg (${{ matrix.rid }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            native_subdir: bin
+            rid: win-x64
+          - os: ubuntu-latest
+            native_subdir: lib
+            rid: linux-x64
+          - os: macos-latest
+            native_subdir: lib
+            rid: osx-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            10.0.x
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      # The same configure line test_csharp.yml runs: this job's point is to produce the release artifacts
+      # from the path the suite already exercises, not a second build recipe that could drift from it.
+      - name: Build the native library
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCPP_PINYIN2_BUILD_TESTS=OFF
+          cmake --build build
+
+      - name: Generate the build info
+        shell: bash
+        run: |
+          lib=$(ls build/${{ matrix.native_subdir }}/*cpp-pinyin2.* | head -n 1)
+          echo "native library: $lib"
+          python csharp/tools/emit_build_info.py --native "$lib" --commit "$GITHUB_SHA"
+
+      - name: Pack this rid
+        run: dotnet pack csharp/CppPinyin/CppPinyin.csproj -c Release -p:CppPinyinNativeDir=${{ github.workspace }}/build/${{ matrix.native_subdir }} -p:CppPinyinRid=${{ matrix.rid }} -o dist/${{ matrix.rid }}
+
+      # Each per-RID package is gated BEFORE pooling, so a leg that packed the wrong thing fails on its own
+      # name rather than inside a merged artifact where the origin of a bad member is harder to see.
+      - name: Gate this rid's package
+        shell: bash
+        run: |
+          pkg=$(ls "dist/${{ matrix.rid }}"/*.nupkg | head -n 1)
+          echo "package: $pkg"
+          if [ "${{ startsWith(github.ref, 'refs/tags/') }}" = "true" ]; then
+            python tools/check_bindings.py --nupkg "$pkg" --rid "${{ matrix.rid }}" --tag "${{ github.ref_name }}"
+          else
+            python tools/check_bindings.py --nupkg "$pkg" --rid "${{ matrix.rid }}"
+          fi
+
+      - name: Upload this rid's nupkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-${{ matrix.rid }}
+          path: dist/${{ matrix.rid }}/*.nupkg
+          if-no-files-found: error
+
+  csharp_pool:
+    name: C# pooled nupkg (all rids)
+    needs: csharp
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: nupkg-*
+          path: dist
+
+      - name: Prove the merging tool's refusals fire
+        run: python csharp/tools/merge_nupkgs.py --self-test
+
+      - name: Show what arrived
+        run: find dist -name '*.nupkg' | sort
+
+      - name: Pool the per-rid packages
+        run: |
+          set -euo pipefail
+          python csharp/tools/merge_nupkgs.py -o dist/pooled/CppPinyin.nupkg $(find dist -name '*.nupkg' | sort)
+
+      # No --rid, on purpose: a pooled package carries several rids, which is exactly the case the
+      # single-rid assertion refuses. Measured locally on 2026-10-09: the pooled package PASSes without
+      # --rid and goes red with it.
+      - name: Gate the pooled package
+        run: python tools/check_bindings.py --nupkg dist/pooled/CppPinyin.nupkg
+
+      - name: Upload the pooled nupkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-pooled
+          path: dist/pooled/*.nupkg
+          if-no-files-found: error

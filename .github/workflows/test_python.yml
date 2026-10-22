@@ -1,0 +1,220 @@
+name: Python shell
+
+# WHY THIS FILE EXISTS. The Python shell is a consumer of the conformance fixture and of the C ABI, but
+# nothing in CI built a wheel or installed it. This is the protobuf-skeleton reusable workflow the plan
+# asks for (doc section 6.7.7); the scheduler (test_runner.yml) owns the path filters and the single
+# required check.
+#
+# WHAT IS VERIFIED AND WHERE. Every command below was run on the development machine during the P3a/P3b
+# work, and each one is traceable:
+#   * build_native.py --build-dir/--config: the shell's own native build (writes _version.py, builds the
+#     shared library, stages _native/ and data/dict/). Measured again on 2026-10-01.
+#   * python -m pytest tests -q: 91/91, 0 skipped (P3a-2b-2c).
+#   * the wheel recipe in pyproject.toml: python -m pip wheel . --no-build-isolation --no-deps -w dist.
+#   * check_wheel.py <wheel>: compares the packaged member set against the source tree (P3a-2b-2a).
+#   * the clean-room install and python/tools/smoke_installed.py: a fresh venv, --no-index --no-deps, no
+#     compiler, then the assertions. Measured on 2026-10-01 against the wheel built from commit b614d9a.
+#   * tools/check_bindings.py --wheel <wheel>: the same artifact asked the questions the C# job was already
+#     asking its package -- the version chain's last place, the dialect set, and the C ABI, header and
+#     packaged-dictionary contract the wheel's library was built from. Measured on 2026-10-02.
+#
+# WHAT IS NOT VERIFIED, deliberately stated: the runner wiring, and the rest of the wider wheel matrix. The
+# runner wiring is unverified for every job in this file until it runs on GitHub. Of the four wheels the plan
+# asks for (section 6.7.10), the linux aarch64 leg now exists as the container job below -- every command it
+# runs was measured on a real aarch64 board on 2026-10-02, its runner label was not. musllinux is out of scope
+# by decision (2026-10-02), and macOS is whatever architecture the runner happens to be. The declared Python
+# floor and the oldest interpreter in the matrix below are now the SAME number (3.9, user decision
+# 2026-10-10: the floor was raised from 3.8, which no environment could exercise any more); a green run here
+# must not be read as covering anything outside cp39-cp313 on linux x86_64.
+#
+# MULTI-VERSION (2026-10-09): the `python_versions` job below installs the ONE linux wheel into cp39, cp310,
+# cp311, cp312 and cp313 and smoke-tests each. That is the CI half of what the board measured on 2026-10-02;
+# until this job existed, every job in this file ran a single modern interpreter per operating system.
+#
+# BOARD-MEASURED (2026-10-02, round 1-3 of the compatibility sweep): the aarch64 leg and the two items this
+# header used to list as never measured on Linux were run on the real board -- ci_manylinux_aarch64.sh
+# reported RESULT: OK (wheel accepted, installed into a compiler-less, index-less venv, SMOKE OK,
+# check_bindings.py --wheel exit 0, auditwheel stamped and the stamped artifact re-accepted), the shell
+# suite reported 91 passed on each of cp39/cp310/cp311/cp312/cp313 (the image ships no cp38), and that
+# same wheel installed and smoke-tested OK in all five. Still unmeasured: the runner label itself, and
+# the declared 3.9 floor as a floor. See the ledger V110 for the numbers.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  python:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      # Tests are off in the CMake build inside build_native.py: this job is about the package, and the
+      # C++ suite has its own jobs in ci.yml.
+      - name: Build the native library into the package
+        run: python python/tools/build_native.py --build-dir build-python --config Release
+
+      # The shell, the C ABI contract and the conformance fixture. 91 assertions, and the count matters:
+      # a silently skipped case is the failure mode this gate exists to catch.
+      - name: Run the shell tests
+        working-directory: python
+        run: python -m pytest tests -q
+
+      - name: Build the wheel
+        working-directory: python
+        run: python -m pip wheel . --no-build-isolation --no-deps -w dist
+
+      # The packaged member set must match the source tree: pip wheel leaves intermediates in
+      # python/build/lib/, so a module deleted from the source can otherwise be shipped again.
+      - name: Check the wheel against the source tree
+        shell: bash
+        run: |
+          wheel=$(ls python/dist/*.whl 2>/dev/null | head -n 1)
+          if [ -z "$wheel" ]; then
+            echo "no wheel in python/dist: the build step produced none, so there is nothing to check" >&2
+            exit 1
+          fi
+          python python/tools/check_wheel.py "$wheel"
+
+      # check_wheel.py compares the packaged members byte for byte; this asks the artifact the other
+      # questions -- the wheel is also a consumer of the version chain, the dialect set, the C ABI and the
+      # installed headers, and until 2026-10-02 those were only ever asked of the nupkg, in the C# job.
+      - name: Check the wheel against the binding contract
+        shell: bash
+        run: |
+          wheel=$(ls python/dist/*.whl 2>/dev/null | head -n 1)
+          if [ -z "$wheel" ]; then
+            echo "no wheel in python/dist: the build step produced none, so there is nothing to check" >&2
+            exit 1
+          fi
+          python tools/check_bindings.py --wheel "$wheel"
+
+      # A venv with no index and no build isolation: if the wheel were missing anything, or needed a
+      # compiler, this step is where it shows. The smoke script is a tracked file so that the local run
+      # and this one execute the same bytes.
+      - name: Install into a clean environment and smoke-test it
+        shell: bash
+        run: |
+          wheel=$(ls python/dist/*.whl | head -n 1)
+          echo "wheel: $wheel"
+          if [ -z "$wheel" ]; then
+            echo "no wheel in python/dist: the build step produced none, so there is nothing to install" >&2
+            exit 1
+          fi
+          python -m venv "$RUNNER_TEMP/cpp-venv"
+          VENV_PY="$RUNNER_TEMP/cpp-venv/bin/python"
+          [ -x "$VENV_PY" ] || VENV_PY="$RUNNER_TEMP/cpp-venv/Scripts/python"
+          "$VENV_PY" -m pip install --no-index --no-deps "$wheel"
+          "$VENV_PY" python/tools/smoke_installed.py --wheel "$wheel"
+
+      - name: Upload the wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: python/dist/*.whl
+          if-no-files-found: error
+
+      # The multi-version job below installs THIS wheel; `matrix.os` is in the artifact name above to
+      # keep the three per-OS wheels apart, which is also why the shared one needs its own name.
+      - name: Upload the wheel for the multi-version job
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-for-multiversion
+          path: python/dist/*.whl
+          if-no-files-found: error
+
+  python_versions:
+    # THE MULTI-VERSION LEG. The wheels are `py3-none-<platform>`, so ONE artifact has to serve every
+    # Python this package supports. That claim was measured on the aarch64 board on 2026-10-02
+    # (cp39/cp310/cp311/cp312/cp313: one wheel installed and smoke-tested in each -- the manylinux
+    # image ships no cp38), but nothing in CI exercised it until this job: every job above runs a
+    # single modern interpreter per operating system, which is exactly what this file's header used
+    # to flag as a gap. The declared floor is 3.9 (`Requires-Python: >=3.9` in python/setup.py, the only
+    # authority -- raised from 3.8 by user decision on 2026-10-10 precisely so that the floor and this
+    # matrix's oldest interpreter are the same number; 3.8 could never be exercised, only asserted).
+    needs: python
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheel-for-multiversion
+          path: wheelhouse
+
+      # --no-index and --no-deps on purpose: the question is whether THIS artifact installs and runs
+      # with no compiler and no network, which is the same question smoke_installed.py asks.
+      - name: Install the single wheel into this interpreter and answer a query
+        run: |
+          wheel=$(ls wheelhouse/*.whl | head -n 1)
+          python -m pip install --no-index --no-deps "$wheel"
+          python python/tools/smoke_installed.py --wheel "$wheel"
+
+  # aarch64, in the container that can actually earn a manylinux tag.
+  #
+  # WHY A SECOND JOB. The matrix above builds the wheel with the platform's own toolchain, which on Linux
+  # means a plain linux_x86_64 wheel: correct, but installable only where the glibc is new enough, and never
+  # on arm. The plan asks for the wider wheel matrix (section 6.7.10), and this file's header used to state
+  # that the aarch64 leg was not wired. This is that leg.
+  #
+  # The runner is an arm64 one on purpose. Inside the manylinux image sits an aarch64 toolchain, and a wheel
+  # built there is a wheel for the architecture it was built on -- emulation or cross-compilation would
+  # produce an artifact nobody executed, which is the trade this repository keeps refusing to make.
+  #
+  # The steps live in a tracked script rather than in a dozen inline ones: every command in it was measured on
+  # a real aarch64 board on 2026-10-02, including auditwheel's stamp and the acceptance of the stamped
+  # artifact, so the board and this runner execute the same bytes.
+  #
+  # UNVERIFIED, deliberately: the runner label, the image pull, and the runner's Docker. ci.yml's MinGW and
+  # 32-bit jobs carry the same note for the same reason -- treat this job's first failure as information
+  # about the wiring, not as a regression.
+  python_aarch64:
+    name: Python wheel (linux aarch64, manylinux container)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and verify the wheel inside the manylinux container
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -v "$PWD":/work -w /work \
+            quay.io/pypa/manylinux_2_28_aarch64 \
+            /bin/bash python/tools/ci_manylinux_aarch64.sh
+
+      # Both artifacts, on purpose: the linux_aarch64 wheel is what our own build produces, and the stamped
+      # one is what auditwheel says it is worth. Keeping both makes the difference reviewable.
+      - name: Upload the wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-linux-aarch64
+          path: |
+            python/dist/*.whl
+            python/repaired/*.whl
+          if-no-files-found: error

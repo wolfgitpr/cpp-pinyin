@@ -1,56 +1,277 @@
 name: C/C++ CI
 
+# Called by test_runner.yml, which owns the push, pull_request and tag triggers for the whole
+# repository. Two reasons this workflow no longer triggers itself (decided in the P3c work):
+#
+#   * the aggregate required check in test_runner.yml can only claim to cover the C++ suite if this
+#     workflow can be called at all -- a caller job needs `workflow_call`;
+#   * its old branch-only triggers are the reason a release tag ran no CI whatsoever, so nothing ever
+#     compared the tag against the one version source. test_runner.yml triggers on tags as well.
+#
+# Consequence to keep in mind: until test_runner.yml is on the default branch and registered, nothing
+# triggers this workflow. The jobs themselves are unchanged.
 on:
-  push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
+  workflow_call:
 
 jobs:
+  # NOTE: the jobs below used to check out with `fetch-depth: 0`. Nothing that runs here calls git
+  # (the gates are Python scripts and CMake scripts -- verified), and this repository's .git is
+  # ~165 MiB of loose objects, so each job paid for a full history it never read. If a future gate
+  # needs tags or history, add `fetch-depth: 0` back to THAT job only.
   # Linux Job
   linux:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - api: jack
-            APIcmake: JACK
-            deps: libjack-dev
-          - api: alsa
-            APIcmake: ALSA
-            deps: libasound-dev
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake autoconf-archive ${{ matrix.deps }}
-      - name: Build with CMake (Linux)
+          sudo apt-get install -y build-essential cmake python3
+      - name: Configure with CMake
         run: |
           mkdir -p build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DRTMIDI_API_JACK=OFF -DRTMIDI_API_ALSA=OFF -DRTMIDI_API_${{ matrix.APIcmake }}=ON
-          cmake --build . --config Release
+          # Examples are a deliverable (docs/DECISIONS.md measures AC-1 with one) and the option is
+          # OFF by default, so nothing compiled them -- they could rot unnoticed. Same flag in the
+          # macOS and windows jobs.
+          #
+          # WERROR (2026-10-20 audit, G09): the 17 strict warning flags are PRIVATE, so a new warning
+          # could never fail anything -- only a human reading a log would notice. The option is OFF by
+          # default so a consumer building this tree is not held hostage by their compiler, and ON here
+          # because in this job the warnings are ours.
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPP_PINYIN2_BUILD_TESTS=ON \
+            -DCPP_PINYIN2_BUILD_EXAMPLES=ON \
+            -DCPP_PINYIN2_WERROR=ON
+      - name: Build
+        run: cmake --build build --config Release -j $(nproc)
+      # The format gate is not part of ctest (it needs an LLVM this image does not ship), and until
+      # 2026-10-20 nothing in CI ran it at all -- while locally it printed SKIP and exited 0 whenever
+      # clang-format was missing, so "passed" and "never ran" looked identical. `--require` is what
+      # makes the two distinguishable (audit round 2, G08).
+      - name: Check formatting
+        run: |
+          sudo apt-get install -y clang-format
+          python3 tools/check_format.py --require
+      # ctest, not ./CppPinyinTests: the bare binary is one of the registered entries, and it
+      # covers none of the five data-side corpus gates, the dict-dump equivalence gate, the header
+      # self-containment build, the load-time gate or the installed-tree consumer smoke -- checks
+      # that already existed but were never run in CI. Measured locally 2026-09-29: full suite
+      # 12.3 s serial, 5.3 s at -j4. Entry counts live in `ctest -N`, not here.
+      - name: Run tests
+        run: ctest --test-dir build -j $(nproc) --output-on-failure
+
+      # The whole gate suite, ON THE RUNNER, with the CTest inventory the inventory gate needs. Before this
+      # step several gates were reachable only by a developer typing the runner by hand (2026-10-20, audit
+      # round 2 §12.2): check_gate_inventory above all, which refuses to run without an inventory file that
+      # only exists around `ctest --show-only`. The three gates that need no inventory are also registered as
+      # CTest entries, so a local `ctest` covers them; this step is what makes the inventory one actually run.
+      - name: Full gate suite
+        env:
+          TEMP: ${{ github.workspace }}/.tmp/tmpdir
+          TMP: ${{ github.workspace }}/.tmp/tmpdir
+        run: |
+          mkdir -p .tmp/tmpdir
+          ctest --test-dir build --show-only=json-v1 > .tmp/mk-default-inventory.json
+          # NO second `check_gate_inventory --expect-total <n>` here. It used to be, with its own copy of
+          # the count, and the copy drifted (49 here vs 50 in `tools/run_all_gates.py`): the two would run
+          # back to back in this job and one of them had to be red. The count assertion lives in
+          # `run_all_gates` alone (audit round 3, H16).
+          python3 tools/run_all_gates.py --with-build
+
+  # Sanitizer Job
+  #
+  # WHY IT EXISTS. docs/BACKLOG.md carried "no ASan/UBSan CMake option" with the reason written next to
+  # it: the development machine is MinGW, which has no libasan. That reason does not apply here -- a
+  # Linux runner does have the runtimes -- so CPP_PINYIN2_SANITIZE was added on 2026-10-02 and this job is
+  # what turns the flag into a check instead of another claim.
+  #
+  # It runs the SAME suite as the linux job on purpose: the value is in what the sanitizers say about the
+  # code those jobs already run, not in a different set of tests. -fno-sanitize-recover=all lives in the
+  # CMake option, so a UBSan report fails the job rather than printing and continuing.
+  #
+  # Measured before it was wired: the configure/build/ctest commands were run on the development board
+  # inside quay.io/pypa/manylinux_2_28_aarch64 (GCC 14.2.1) on 2026-10-02, together with a two-sided
+  # probe proving the sanitizers were actually armed. What is NOT verified is this job's wiring on the
+  # runner itself, and the runner's GCC version need not match the one measured.
+  linux-sanitizers:
+    runs-on: ubuntu-latest
+    env:
+      ASAN_OPTIONS: detect_leaks=1
+      UBSAN_OPTIONS: print_stacktrace=1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+      - name: Configure with the sanitizers on
+        run: |
+          mkdir -p build
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCPP_PINYIN2_BUILD_TESTS=ON \
+            -DCPP_PINYIN2_SANITIZE=ON
+      - name: Build
+        run: cmake --build build --config RelWithDebInfo -j $(nproc)
+      - name: Run tests under the sanitizers
+        run: ctest --test-dir build -C RelWithDebInfo --output-on-failure
 
   # macOS Job
   macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install dependencies (macOS)
-        run: |
-          brew install cmake autoconf-archive automake
-      - name: Build with CMake (macOS)
+      - name: Install dependencies
+        run: brew install cmake
+      - name: Configure with CMake
         run: |
           mkdir -p build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          cmake --build . --config Release
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPP_PINYIN2_BUILD_TESTS=ON \
+            -DCPP_PINYIN2_BUILD_EXAMPLES=ON
+      - name: Build
+        run: cmake --build build --config Release -j $(sysctl -n hw.logicalcpu)
+      # Same reason as the Linux job: run the registered CTest entries, not one binary.
+      - name: Run tests
+        run: ctest --test-dir build -j $(sysctl -n hw.logicalcpu) --output-on-failure
+      # macOS 10.14 x64 is a declared floor (plan section 5), and the step above does NOT check it: it
+      # pins neither a deployment target nor an architecture, so its binaries silently inherit the
+      # runner's own minimum. This leg pins both. It is BUILD-ONLY on purpose: the runners are arm64
+      # and executing an x86_64 binary there needs Rosetta, which is not guaranteed -- a test run here
+      # would be a coin flip dressed up as a check. Tests are off, so this is a pure library compile
+      # against the declared floor.
+      #
+      # UNVERIFIED: no macOS toolchain on the machine this was written on.
+      - name: Build the declared macOS floor (10.14, x86_64, library only)
+        run: |
+          cmake -S . -B build-floor \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+            -DCPP_PINYIN2_BUILD_TESTS=OFF
+          cmake --build build-floor --config Release
+
+  # Windows Job
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure with CMake
+        run: |
+          mkdir -p build
+          cmake -S . -B build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCPP_PINYIN2_BUILD_TESTS=ON `
+            -DCPP_PINYIN2_BUILD_EXAMPLES=ON
+      - name: Build
+        run: cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
+      # -C Release is required here: the default generator on windows-latest is multi-config.
+      - name: Run tests
+        run: ctest --test-dir build -C Release -j $env:NUMBER_OF_PROCESSORS --output-on-failure
+
+  # MinGW Job
+  #
+  # WHY IT EXISTS. MinGW/GCC is the toolchain the project is developed and end-to-end verified on
+  # (plan §5 row "MinGW as the deliverable toolchain": it is the toolchain the published artifacts are
+  # built with, and the one the published C API was measured against), and it was the only supported
+  # configuration with no job at all -- the old MinGW job was template inheritance and was deleted on
+  # 2024-11-23. It is also the only toolchain that exercises the visibility scheme's other branch:
+  # `-fvisibility=hidden` plus `__declspec(dllexport)` on MinGW, where the 250+ leaked internal symbols
+  # this repository once had were actually found. A change that only breaks GCC/MinGW used to ship
+  # green.
+  #
+  # The commands are the ones measured locally on 2026-10-01 (GCC 16.1.0, CMake 3.30.4, Ninja):
+  # shared build 22/22, static build 21/21, both with nothing skipped. What could NOT be verified
+  # locally is the workflow wiring itself -- `msys2/setup-msys2` and the package names -- so this job
+  # is UNVERIFIED until it runs once on CI, and this comment says so deliberately.
+  mingw:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-python
+      - name: Configure with CMake
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPP_PINYIN2_BUILD_TESTS=ON \
+            -DCPP_PINYIN2_BUILD_EXAMPLES=ON
+      - name: Build
+        run: cmake --build build
+      # Same reason as the other jobs: every registered entry, not one binary.
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
+      # The static configuration is a supported build, and ExportGate deliberately does not register
+      # there (no dynamic symbol table to read: it says so at configure time). This second configure
+      # keeps the rest of the suite honest for consumers who link statically -- measured locally
+      # 21/21, one entry fewer than the shared build.
+      - name: Configure the static build
+        run: |
+          cmake -S . -B build-static -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DCPP_PINYIN2_BUILD_TESTS=ON
+      - name: Build the static library and its tests
+        run: cmake --build build-static
+      - name: Run the static-build tests
+        run: ctest --test-dir build-static --output-on-failure
+
+  # MinGW 32-bit Job
+  #
+  # WHY. 32-bit Windows is part of the wide platform floor the user chose (plan section 5, row
+  # "Windows x86 (32 bit)"). The audit for that row found no 32-bit assumption anywhere in this
+  # library: i686/-m32 match only vendored catch2, and winrc.cmake, the PE gates and the C ABI check
+  # are all word-size independent. So this job should need no code change at all -- it exists to turn
+  # "should need no code change" into something that is checked instead of assumed. This job leaves
+  # `CPP_PINYIN2_WERROR` OFF on purpose: a warning that only a 32-bit
+  # target can produce is worth seeing in the log but is not ours to force a fix for here.
+  #
+  # SCOPE, deliberately narrower than the 64-bit job: the library and the example are built, the test
+  # suite is not. The suite needs Python (tests/CMakeLists.txt requires it since R3b) and the 32-bit
+  # MSYS2 environment is not guaranteed to provide one, so this leg claims exactly what it proves --
+  # "the library and a consumer compile and link for i686" -- and nothing more. Running the suite and
+  # the export-face gate on 32-bit stays UNVERIFIED; docs/HISTORY.md records it among the things only a
+  # 32-bit machine can settle.
+  #
+  # UNVERIFIED: only a 64-bit MinGW exists on the machine this was written on, so not one command of
+  # this job has ever run. Treat its first failure as information, not as a regression.
+  mingw32:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          install: >-
+            mingw-w64-i686-gcc
+            mingw-w64-i686-ninja
+            mingw-w64-i686-cmake
+      - name: Configure (library + example, no tests)
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPP_PINYIN2_BUILD_TESTS=OFF \
+            -DCPP_PINYIN2_BUILD_EXAMPLES=ON
+      - name: Build
+        run: cmake --build build
+      # The example is a runtime check that this 32-bit build can actually load its dictionaries. It
+      # resolves "dict" relative to the CURRENT directory (examples/mandarin_example.cpp:15) and the
+      # copy target puts the dictionaries in build/bin, so it has to run from there.
+      - name: Run the example
+        run: |
+          cd build/bin
+          ./mandarin_example.exe

@@ -1,0 +1,76 @@
+name: All tests
+
+# THE SCHEDULER, and the only workflow in this repository that owns push and pull_request triggers. It
+# calls the three reusable workflows -- the C/C++ one, the C# bindings and the Python bindings -- and it
+# owns the single required status check, all-blocking-tests.
+#
+# NO paths: FILTERS, DELIBERATELY (decided with the maintainer during the P3c work). A path filter on a
+# workflow whose job is a required check is how a repository ends up with a green check that ran nothing:
+# the whole workflow is skipped, the required job never reports at all, and a branch protection rule
+# either blocks forever on a check that will never arrive or -- if it was told to accept a skip --
+# waves through a change nobody tested. Those filters would also be dishonest here, because the three
+# languages share one tree: the C++ sources, data/dialects and the conformance fixture feed all of them.
+# The cost is that a documentation-only change runs the full suite; that is the cheaper mistake.
+#
+# TAGS ARE INCLUDED, and they matter more than branches: version chain place 1b (a release tag agreeing
+# with the single version source) can only be exercised by a tag, and the previous trigger set -- present
+# only in ci.yml, branches only -- meant a tag ran no CI at all. That is exactly how a release could have
+# shipped with a tag that disagreed with CMakeLists.txt and nothing would have said a word.
+#
+# NOT WIRED YET, and deliberately stated rather than implied: this file's runner wiring is unverified
+# until it runs on GitHub (see the header of test_csharp.yml for how the individual commands were
+# verified locally), and no publishing lives here -- a PyPI or NuGet upload must be a separate,
+# manually dispatched workflow.
+
+on:
+  push:
+    branches: [main, dev, v2]
+    tags: ['v*']
+  pull_request:
+    branches: [main, dev, v2]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cpp:
+    name: C and C++ (linux, macos, windows, mingw)
+    uses: ./.github/workflows/ci.yml
+
+  csharp:
+    name: C# bindings
+    uses: ./.github/workflows/test_csharp.yml
+
+  python:
+    name: Python bindings
+    uses: ./.github/workflows/test_python.yml
+
+  # The one required check (the protobuf-skeleton pattern): branch protection should require this and
+  # nothing else, so that adding a language does not mean editing branch protection.
+  #
+  # `if: always()` is not decoration. Without it, a failure in any caller makes this job skip, the
+  # required check never reports a verdict, and a branch protection rule cannot tell that apart from a
+  # check that is still running.
+  #
+  # `skipped` counts as failure on purpose: with no path filters nothing should be skipped, so a skip
+  # means the wiring changed, and "it did not run" must never read as green.
+  all-blocking-tests:
+    name: all blocking tests
+    if: always()
+    needs: [cpp, csharp, python]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Everyone succeeded
+        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'skipped') }}
+        run: |
+          echo "cpp, csharp and python all succeeded"
+          echo "results: ${{ join(needs.*.result, ', ') }}"
+      - name: Something did not succeed
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}
+        run: |
+          echo "results: ${{ join(needs.*.result, ', ') }}"
+          echo "At least one language workflow failed, was cancelled, or was skipped. The aggregate gate"
+          echo "refuses to report success unless every language reported success."
+          exit 1

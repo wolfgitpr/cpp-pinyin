@@ -1,0 +1,142 @@
+name: C# binding
+
+# WHY THIS FILE EXISTS. The C# shell is a consumer of the same conformance fixture as the Python one
+# (43 cases, pinned by sha256) and of the same C ABI, but nothing in CI built it. This is the
+# protobuf-skeleton reusable workflow the plan asks for (doc section 6.7.7): the job list below is
+# small on purpose, because the *scheduler* (test_runner.yml) owns the path filters and the single
+# required check.
+#
+# WHAT IS VERIFIED AND WHERE. Every command in this file has been run on the development machine
+# (Windows, MinGW GCC 16.1.0, CMake 3.30.4, dotnet SDK 10.0.400) at some point in the P3a-2c work:
+#   * cmake configure + build: the same lines ci.yml already runs (ci.yml is deliberately not modified).
+#   * emit_build_info.py --native/--commit: P3a-2c part 1.
+#   * dotnet build (3 target frameworks, warnings as errors): P3a-2c part 2 / D37.
+#   * dotnet test on net7.0 AND net10.0: 54/54 with 0 skipped on each (D37 round).
+#   * dotnet pack with an explicit rid: 1 nupkg with lib/<tfm>/ x3 plus runtimes/<rid>/native/.
+#   * check_bindings.py --nupkg: PASS, and it goes red when runtimes/ is stripped from the package.
+#
+# WHAT IS NOT VERIFIED, deliberately stated: the runner wiring itself. The native output directory
+# differs by platform (CMakeLists.txt sets a runtime output directory of <build>/bin and a library
+# output directory of <build>/lib, so a Windows DLL lands in bin and a Linux/macOS shared object in
+# lib), the macOS runner is arm64, and no Linux or macOS toolchain exists on the development machine.
+# This job has never run. Treat its first failure as information, not as a regression.
+#
+# BOARD/DEV-MEASURED (2026-10-02, rounds 4-5): the Darwin and Linux legs are still unmeasured, but the
+# Windows leg's steps were run on the development machine and it FOUND A DEFECT: RepoLayout.cs still
+# pointed at res/dict, so 46 of 54 tests failed after the layout refactor moved the dictionaries to
+# data/dialects. Fixed and pushed locally in commit 5d3733c; after the fix both target frameworks
+# report 54/54, dotnet pack --rid win-x64 then check_bindings.py --nupkg --rid win-x64 reports PASS,
+# and CppPinyin.ConsumerSmoke prints RESULT: OK on net7.0 and net10.0. See the ledger V110.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  csharp:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            native_subdir: bin
+            rid: win-x64
+          - os: ubuntu-latest
+            native_subdir: lib
+            rid: linux-x64
+          - os: macos-latest
+            native_subdir: lib
+            rid: osx-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Both target frameworks the test project builds for. net7.0 is past end of life but is still a
+      # declared target (D37), and a test run that silently skipped it would hide a consumer regression.
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            10.0.x
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      # Tests off: this build exists to produce the library for the bindings, and the C++ suite has
+      # its own jobs in ci.yml. Building it twice would double the wall clock for no extra evidence.
+      - name: Build the native library
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCPP_PINYIN2_BUILD_TESTS=OFF
+          cmake --build build
+
+      # Generated, never tracked (csharp/CppPinyin/version.props and BuildInfo.g.cs). The version comes
+      # from CMakeLists.txt, the library NAME comes from the file that was actually built, and the
+      # project refuses to build without both: D20=A is why no shell may hardcode the name.
+      - name: Generate the build info
+        shell: bash
+        run: |
+          lib=$(ls build/${{ matrix.native_subdir }}/*cpp-pinyin2.* | head -n 1)
+          echo "native library: $lib"
+          python csharp/tools/emit_build_info.py --native "$lib" --commit "$GITHUB_SHA"
+
+      - name: Build every target framework (warnings as errors)
+        run: dotnet build csharp/CppPinyin/CppPinyin.csproj -c Release
+
+      # -p:CppPinyinNativeDir is mandatory: the tests do not skip when the library is missing, by
+      # design, so a missing path is a red build rather than a quietly smaller number of tests.
+      - name: Run the conformance tests on net7.0 and net10.0
+        run: dotnet test csharp/CppPinyin.Tests/CppPinyin.Tests.csproj -c Release -p:CppPinyinNativeDir=${{ github.workspace }}/build/${{ matrix.native_subdir }}
+
+      # The rid is required and never defaulted: a guessed rid ships a package that installs cleanly
+      # and then fails on the user's machine, which is the one outcome the packaging section refuses.
+      - name: Pack the binding
+        run: dotnet pack csharp/CppPinyin/CppPinyin.csproj -c Release -p:CppPinyinNativeDir=${{ github.workspace }}/build/${{ matrix.native_subdir }} -p:CppPinyinRid=${{ matrix.rid }} -o dist
+
+      # One gate, several places of the version chain: the nuspec (place 6), the generated C# props
+      # (place 5) and, on a tag build, the tag itself (place 1b). The tag matters because ci.yml
+      # triggers on branches only, so before this nothing checked a release tag at all.
+      - name: Gate the package and the version chain
+        shell: bash
+        run: |
+          pkg=$(ls dist/*.nupkg | head -n 1)
+          echo "package: $pkg"
+          if [ "${{ startsWith(github.ref, 'refs/tags/') }}" = "true" ]; then
+            python tools/check_bindings.py --nupkg "$pkg" --rid "${{ matrix.rid }}" --tag "${{ github.ref_name }}"
+          else
+            python tools/check_bindings.py --nupkg "$pkg" --rid "${{ matrix.rid }}"
+          fi
+
+      # The end-to-end proof: a project that only adds a PackageReference can load the native library out
+      # of runtimes/<rid>/native/, find the packaged dictionaries next to its own assembly, and run a
+      # real query. The project is tracked (csharp/CppPinyin.ConsumerSmoke) so that this is reproducible
+      # instead of a scratch directory. Both of its inputs are passed in rather than written down: the
+      # version comes from the single version source, and the restore packages directory points at an
+      # empty folder. That last part is not decoration: a run was measured in which packing had actually
+      # failed and the consumer still printed RESULT: OK, because the default NuGet cache already held a
+      # copy of the same version from an earlier round. Restoring into an empty directory makes the file
+      # produced by the previous step the only possible source of this package identity.
+      - name: Consumer smoke (PackageReference end to end)
+        shell: bash
+        run: |
+          version=$(python tools/check_bindings.py --print-version)
+          echo "version: $version"
+          for tfm in net7.0 net10.0; do
+            echo "--- $tfm ---"
+            dotnet run --project csharp/CppPinyin.ConsumerSmoke -c Release -f "$tfm" \
+              -p:CppPinyinSmokeVersion="$version" \
+              -p:RestorePackagesPath="$RUNNER_TEMP/pkgs-$tfm" \
+              -p:RestoreAdditionalProjectSources="${{ github.workspace }}/dist" \
+              -- "${{ github.workspace }}/data/dialects"
+          done
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-${{ matrix.rid }}
+          path: dist/*.nupkg
+          if-no-files-found: error
