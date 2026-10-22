@@ -300,13 +300,18 @@ set(_env "${_env};DYLD_LIBRARY_PATH=${_prefix}/${INSTALL_LIBDIR};$ENV{DYLD_LIBRA
 # The phase banners below exist because a TIMEOUT is invisible to this script: the consumer's configure/build
 # output is captured into variables and printed only when the build FAILS, so a run that stalls prints the last
 # banner and nothing after it -- which is what a reader of the Windows job needed (2026-10-22).
-message(STATUS "install consumer smoke: phase 4a (configuring the out-of-tree consumer)")
+message(STATUS "install consumer smoke: phase 4b (running the out-of-tree consumer: ${_exe})")
+# TIMEOUT, because a process that never returns is invisible to this script: `OUTPUT_VARIABLE` swallows its
+# output, and ctest's own limit only arrives minutes later as a bare "(Timeout)". Measured 2026-10-22 on the
+# Windows runner: the run step held for the full 1200 s ctest budget and printed nothing after the banner.
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E env "${_env}" "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
+    TIMEOUT 300
     RESULT_VARIABLE _run_rc OUTPUT_VARIABLE _run_out ERROR_VARIABLE _run_err)
 string(STRIP "${_run_out}" _run_out)
 if (NOT _run_rc EQUAL 0)
-    message(FATAL_ERROR "installed consumer exited ${_run_rc}: ${_run_out}${_run_err}")
+    message(FATAL_ERROR "installed consumer exited ${_run_rc} (prefix ${_prefix}, executable ${_exe}, "
+            "environment ${_env}): stdout '${_run_out}' stderr '${_run_err}'")
 endif ()
 if (NOT _run_out STREQUAL "zhong1 guo2 ren2 min2")
     message(FATAL_ERROR "installed consumer printed '${_run_out}', expected 'zhong1 guo2 ren2 min2'")

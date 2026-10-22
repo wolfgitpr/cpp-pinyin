@@ -35,6 +35,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake python3
+      - name: Set up the .NET SDK for the C# shell gate
+        # `check_csharp_shell` runs `dotnet test` once a built native library exists, and this job now stages one.
+        # The runner's system dotnet cannot build `net10.0`, which the tests target, so the suite failed in 2.6 s
+        # (measured 2026-10-22) -- and `check_doc_claims` could not measure the suite's count for the same reason,
+        # which is the second red gate. Same two versions `test_csharp.yml` installs.
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            7.0.x
       - name: Configure with CMake
         run: |
           mkdir -p build
