@@ -307,7 +307,7 @@ message(STATUS "install consumer smoke: phase 4b (running the out-of-tree consum
 # An EMPTY INPUT FILE, because a child that reads stdin never returns: `execute_process` hands it no stdin, but
 # no EOF either, and on the Windows runner this step held until the timeout (measured 2026-10-22). A child that
 # does not read input cannot notice the difference.
-set(_stdin "${_work}/empty-stdin.txt")
+set(_stdin "${CMAKE_CURRENT_BINARY_DIR}/empty-stdin.txt")
 file(WRITE "${_stdin}" "")
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E env "${_env}" "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
