@@ -304,8 +304,14 @@ message(STATUS "install consumer smoke: phase 4b (running the out-of-tree consum
 # TIMEOUT, because a process that never returns is invisible to this script: `OUTPUT_VARIABLE` swallows its
 # output, and ctest's own limit only arrives minutes later as a bare "(Timeout)". Measured 2026-10-22 on the
 # Windows runner: the run step held for the full 1200 s ctest budget and printed nothing after the banner.
+# An EMPTY INPUT FILE, because a child that reads stdin never returns: `execute_process` hands it no stdin, but
+# no EOF either, and on the Windows runner this step held until the timeout (measured 2026-10-22). A child that
+# does not read input cannot notice the difference.
+set(_stdin "${_work}/empty-stdin.txt")
+file(WRITE "${_stdin}" "")
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E env "${_env}" "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
+    INPUT_FILE "${_stdin}"
     TIMEOUT 300
     RESULT_VARIABLE _run_rc OUTPUT_VARIABLE _run_out ERROR_VARIABLE _run_err)
 string(STRIP "${_run_out}" _run_out)

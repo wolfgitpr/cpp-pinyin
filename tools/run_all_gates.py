@@ -172,8 +172,12 @@ def main() -> int:
         print(f"  {status}  {name:<22} {verdict}")
         if completed.returncode != 0:
             failures.append((name, why))
-            for line in output[:-1][-4:]:
-                print(f"          {line[:96]}")
+            # 25 lines, 160 characters. Four lines at 96 characters is what made a failing gate report
+            # "Time Elapsed 00:00:02.80" and nothing else while the tool had printed a 20-line tail explaining
+            # itself (measured 2026-10-22, job `linux`). A gate that fails without showing why costs a whole CI
+            # round to read a log that was already produced.
+            for line in output[:-1][-25:]:
+                print(f"          {line[:160]}")
 
     print()
     if skipped:
