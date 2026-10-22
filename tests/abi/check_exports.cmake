@@ -201,16 +201,21 @@ if (NOT EXISTS "${LIB}")
             "(this gate only applies to BUILD_SHARED_LIBS=ON builds)")
 endif ()
 
-get_filename_component(_lib_ext "${LIB}" EXT)
+# LAST_EXT, not EXT: CMake's EXT is the LONGEST extension, so a versioned Mach-O name
+# (`libcpp-pinyin2.2.0.0.dylib`) answers `.2.0.0.dylib` and the `.dylib` branch below never ran -- on the first CI
+# run that sent GNU `nm -D` to Apple's nm, which rejects it (measured with `cmake -P`, 2026-10-22).
+get_filename_component(_lib_ext "${LIB}" LAST_EXT)
 if (_lib_ext STREQUAL ".dll")
     # PE: objdump -p prints the export table; the names are in the "[Ordinal/Name Pointer] Table"
     # section (the "Export Address Table" above it lists RVAs only).
     set(_tool_kind objdump)
     set(_tool_args -p)
 elseif (_lib_ext STREQUAL ".dylib")
-    # Mach-O: nm -g on the library lists external defined symbols.
+    # Mach-O: `nm -g` lists external symbols; the defined ones carry a type letter and the undefined ones
+    # show as `U`, which the parser below drops because their names never match `cppp2_*`. Apple's nm has no
+    # `--defined-only` (that spelling is GNU's), so the flag is deliberately absent here.
     set(_tool_kind nm)
-    set(_tool_args -g --defined-only)
+    set(_tool_args -g)
 else ()
     # ELF: -D is the dynamic symbol table -- the only one a dlopen/ctypes consumer can see.
     set(_tool_kind nm)

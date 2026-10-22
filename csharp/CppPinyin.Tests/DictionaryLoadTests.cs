@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -105,7 +106,12 @@ namespace CppPinyin2.Tests
         /// <summary>Write one scratch table under the repository's ignored <c>.tmp</c> and return its path.</summary>
         private static string WriteTable(string name, string content)
         {
-            string directory = Path.Combine(RepoLayout.Root, ".tmp", "csharp-dictionary-load-tests");
+            // One directory per PROCESS. `dotnet test` runs net7.0 and net10.0 at the same time, and a shared
+            // directory made the two runs write the same table name: measured on CI (2026-10-22) as
+            // "IOException: The process cannot access the file '...trans-xue.txt'". The class itself is
+            // serialised by xUnit, so the process id is the missing part of the key.
+            string directory = Path.Combine(
+                RepoLayout.Root, ".tmp", "csharp-dictionary-load-tests", $"pid{Environment.ProcessId}");
             Directory.CreateDirectory(directory);
             string path = Path.Combine(directory, name);
             File.WriteAllText(path, content, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));

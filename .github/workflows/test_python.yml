@@ -75,7 +75,10 @@ jobs:
       - name: Install the test runner
         # Measured on the first CI run (2026-10-22): every Python job died at the next step with
         # "No module named pytest". The shell's tests need pytest and nothing else.
-        run: python -m pip install --quiet --disable-pip-version-check pytest
+        # setuptools and wheel too: the wheel step below passes --no-build-isolation, so the build backend
+        # has to already be importable. Without it the build died with
+        # "BackendUnavailable: Cannot import 'setuptools.build_meta'" (first CI run, 2026-10-22).
+        run: python -m pip install --quiet --disable-pip-version-check pytest setuptools wheel
       - name: Run the shell tests
         working-directory: python
         run: python -m pytest tests -q

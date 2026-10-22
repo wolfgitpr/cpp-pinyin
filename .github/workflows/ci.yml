@@ -14,15 +14,22 @@ on:
   workflow_call:
 
 jobs:
-  # NOTE: the jobs below used to check out with `fetch-depth: 0`. Nothing that runs here calls git
-  # (the gates are Python scripts and CMake scripts -- verified), and this repository's .git is
-  # ~165 MiB of loose objects, so each job paid for a full history it never read. If a future gate
-  # needs tags or history, add `fetch-depth: 0` back to THAT job only.
-  # Linux Job
+  # FULL HISTORY, NOT THE DEFAULT SHALLOW ONE (2026-10-22, the first time this workflow ever ran). The note
+  # that used to live here said no job calls git and that the ~165 MiB `.git` was paid for nothing. Three
+  # gates do call git -- conformance provenance, doc anchors, link checks -- and they failed on the first
+  # run with verdicts about a commit missing from a shallow clone. The cost is real and accepted: these
+  # are the jobs that measure the tree.
   linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # FULL HISTORY, deliberately, in every job of this file. The old note here said nothing in
+          # this workflow calls git; the first CI run (2026-10-22) proved that wrong in three gates --
+          # the conformance provenance gate quotes the commit that generated `cases.json`, the anchor
+          # audit resolves anchors against the index, and the link checks follow file history. A
+          # shallow checkout fails all three with messages about a commit nobody can see.
+          fetch-depth: 0
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -50,8 +57,11 @@ jobs:
       # clang-format was missing, so "passed" and "never ran" looked identical. `--require` is what
       # makes the two distinguishable (audit round 2, G08).
       - name: Check formatting
+        # PINNED FROM PyPI, not apt. Ubuntu's clang-format is 18 and this tree is formatted with 22; the two
+        # disagree about two files (`tests/benchmark.cpp`, `tests/cpp/test_accuracy_v2.cpp`), so the gate
+        # reported a version skew as a formatting defect on the first CI run (2026-10-22).
         run: |
-          sudo apt-get install -y clang-format
+          python3 -m pip install --quiet --disable-pip-version-check clang-format==22.1.4
           python3 tools/check_format.py --require
       # ctest, not ./CppPinyinTests: the bare binary is one of the registered entries, and it
       # covers none of the five data-side corpus gates, the dict-dump equivalence gate, the header
@@ -101,6 +111,8 @@ jobs:
       UBSAN_OPTIONS: print_stacktrace=1
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -122,6 +134,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Install dependencies
         run: brew install cmake
       - name: Configure with CMake
@@ -159,6 +173,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Configure with CMake
         run: |
           mkdir -p build
@@ -194,6 +210,8 @@ jobs:
         shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -254,6 +272,8 @@ jobs:
         shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32

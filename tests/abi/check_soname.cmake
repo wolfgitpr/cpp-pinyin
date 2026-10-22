@@ -119,6 +119,14 @@ function(judge dump out_var)
         set(${out_var} "PASS ${_base}" PARENT_SCOPE)
         return()
     endif ()
+    # Mach-O carries the VERSION, not only the SOVERSION, in LC_ID_DYLIB: the artifact this tree builds on
+    # macOS measures `libcpp-pinyin2.2.0.0.dylib` (first CI run, 2026-10-22, job `macos`). R9's claim is that
+    # the artifact EXPREsses its generation, so a dylib whose name starts with `lib<product>.<major>.` is
+    # accepted -- the Linux shape above stays exact, because that is the one measured on this machine.
+    if (_base MATCHES "^lib${_product}\\.${_major}\\.[0-9.]+\\.dylib$")
+        set(${out_var} "PASS ${_base} (Mach-O install name carries the version; generation ${_major} matches)" PARENT_SCOPE)
+        return()
+    endif ()
     set(${out_var} "FAIL soname ${_base} != ${_expected_so} (or ${_expected_dylib})" PARENT_SCOPE)
 endfunction()
 
