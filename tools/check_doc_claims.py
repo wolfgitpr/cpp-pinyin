@@ -750,9 +750,12 @@ def report(root, measured, verbose, siblings=None, build_root=None, judge_covera
     # A tool this run could not measure is reported before anything is judged: claims about its self-test
     # count would otherwise be compared against nothing and pass. See measure_selftests().
     for name, why in measured.get("unmeasurable_selftests", []):
+        # THE REASON COMES FIRST. Readers truncate this line (the gate runner keeps 160 characters) and the
+        # boilerplate that used to lead it was 130 of them, so the only part that names the problem never
+        # reached the log (measured 2026-10-23).
         problems.append((f"measurement/{name}", 0, "unmeasurable",
-                         f"this run could not measure {name}'s self-test count, so any document claim about "
-                         f"it would be judged against nothing: {why}", ["a number"], ["nothing"], ""))
+                         f"{why} (so a document claim about {name}'s self-test count is judged against "
+                         f"nothing)", ["a number"], ["nothing"], ""))
     for rel, line_no, line, claim, match in found:
         ok, want, stated = check_one(claim, match, measured, siblings)
         if ok:
