@@ -312,7 +312,10 @@ file(WRITE "${_stdin}" "")
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E env "${_env}" "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
     INPUT_FILE "${_stdin}"
-    TIMEOUT 300
+    # 45, not 300: the runner outside gives each test its own budget, and a script timeout that sits ABOVE it never
+    # fires -- ctest kills the test first and the diagnostic branch below never runs (measured 2026-10-23, the
+    # probe printed nothing). The budget has to be lower than whoever is watching.
+    TIMEOUT 45
     RESULT_VARIABLE _run_rc OUTPUT_VARIABLE _run_out ERROR_VARIABLE _run_err)
 string(STRIP "${_run_out}" _run_out)
 

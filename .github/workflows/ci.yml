@@ -265,7 +265,9 @@ jobs:
           Write-Host "=== executables installed under build/tests/install ==="
           $exe | Select-Object FullName, Length | Format-Table -AutoSize | Out-String | Write-Host
           Write-Host "=== run it through ctest, 120 s, and keep whatever it printed ==="
-          ctest --test-dir build -C Release -R '^InstallConsumerSmoke$' --output-on-failure --timeout 120
+          # 400 s, so the script's own 45 s budget fires first and its two fallback attempts (30 s each) get
+          # to report. The first attempt at 120 s never reached them.
+          ctest --test-dir build -C Release -R '^InstallConsumerSmoke$' --output-on-failure --timeout 400
           Write-Host "ctest exit: $LASTEXITCODE (either way, this step continues)"
           if (Test-Path build/Testing/Temporary/LastTest.log) {
             Write-Host "=== LastTest.log, last 80 lines ==="
