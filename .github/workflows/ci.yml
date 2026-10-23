@@ -250,6 +250,28 @@ jobs:
         # about launching that consumer on this image does not return.
         run: ctest --test-dir build -C Release -j $env:NUMBER_OF_PROCESSORS --output-on-failure --timeout 1200 -E '^InstallConsumerSmoke$'
 
+      # THE OPEN QUESTION, ASKED OUT LOUD. `InstallConsumerSmoke` is excluded from the run above because it
+      # never completes here; this step runs it anyway, on its own, with a short budget, and reports what the
+      # machine can see instead of a verdict. `continue-on-error` keeps it from deciding the job: it is a probe,
+      # and a probe that can turn the job red would be deleted the first time it was inconvenient.
+      - name: Probe the consumer smoke (diagnostic, never fails the job)
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Write-Host "=== where the consumer would run from ==="
+          Get-ChildItem build/tests/install/prefix -Recurse -Filter *.dll -ErrorAction SilentlyContinue |
+            Select-Object FullName, Length | Format-Table -AutoSize | Out-String | Write-Host
+          $exe = Get-ChildItem build/tests/install -Recurse -Filter *.exe -ErrorAction SilentlyContinue | Select-Object -First 5
+          Write-Host "=== executables installed under build/tests/install ==="
+          $exe | Select-Object FullName, Length | Format-Table -AutoSize | Out-String | Write-Host
+          Write-Host "=== run it through ctest, 120 s, and keep whatever it printed ==="
+          ctest --test-dir build -C Release -R '^InstallConsumerSmoke$' --output-on-failure --timeout 120
+          Write-Host "ctest exit: $LASTEXITCODE (either way, this step continues)"
+          if (Test-Path build/Testing/Temporary/LastTest.log) {
+            Write-Host "=== LastTest.log, last 80 lines ==="
+            Get-Content build/Testing/Temporary/LastTest.log -Tail 80 | Write-Host
+          }
+
   # MinGW Job
   #
   # WHY IT EXISTS. MinGW/GCC is the toolchain the project is developed and end-to-end verified on
