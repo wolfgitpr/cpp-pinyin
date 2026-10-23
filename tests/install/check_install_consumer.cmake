@@ -315,6 +315,37 @@ execute_process(
     TIMEOUT 300
     RESULT_VARIABLE _run_rc OUTPUT_VARIABLE _run_out ERROR_VARIABLE _run_err)
 string(STRIP "${_run_out}" _run_out)
+
+# WHEN THE FIRST ATTEMPT DOES NOT RETURN, ASK A SECOND WAY. A process that never returns says nothing about WHY,
+# and each guess costs a CI round. So the failure path re-runs the same executable (a) from the prefix's own bin
+# directory and (b) without the `cmake -E env` wrapper, each with a short budget, and reports all three outcomes
+# together. If either fallback works the culprit is the launch form, not the consumer; if neither does, the
+# evidence says so and the next round does not have to re-guess it. Measured 2026-10-23: the Windows runner stalls
+# at this step with an install tree that holds no DLL and no EXE at all.
+if (NOT _run_rc EQUAL 0)
+    file(GLOB _bin_contents "${_prefix}/bin/*")
+    get_filename_component(_exe_dir "${_exe}" DIRECTORY)
+    file(GLOB _exe_siblings "${_exe_dir}/*")
+    message(STATUS "install consumer smoke: attempt 1 exited '${_run_rc}'")
+    message(STATUS "install consumer smoke: prefix/bin holds: ${_bin_contents}")
+    message(STATUS "install consumer smoke: the consumer's own directory holds: ${_exe_siblings}")
+    execute_process(
+        COMMAND "${CMAKE_COMMAND}" -E env "${_env}" "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
+        WORKING_DIRECTORY "${_prefix}/bin"
+        INPUT_FILE "${_stdin}"
+        TIMEOUT 30
+        RESULT_VARIABLE _run2_rc OUTPUT_VARIABLE _run2_out ERROR_VARIABLE _run2_err)
+    message(STATUS "install consumer smoke: attempt 2 (cwd = prefix/bin) exited '${_run2_rc}' "
+            "stdout '${_run2_out}' stderr '${_run2_err}'")
+    execute_process(
+        COMMAND "${_exe}" "${_prefix}/share/cpp-pinyin2/dict"
+        INPUT_FILE "${_stdin}"
+        TIMEOUT 30
+        RESULT_VARIABLE _run3_rc OUTPUT_VARIABLE _run3_out ERROR_VARIABLE _run3_err)
+    message(STATUS "install consumer smoke: attempt 3 (no env wrapper) exited '${_run3_rc}' "
+            "stdout '${_run3_out}' stderr '${_run3_err}'")
+endif ()
+
 if (NOT _run_rc EQUAL 0)
     message(FATAL_ERROR "installed consumer exited ${_run_rc} (prefix ${_prefix}, executable ${_exe}, "
             "environment ${_env}): stdout '${_run_out}' stderr '${_run_err}'")
