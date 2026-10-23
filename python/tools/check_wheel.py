@@ -634,7 +634,11 @@ def self_test() -> int:
         write_synthetic_wheel(dirs_wheel, files, version, platform_tag, directories=True)
         expect("a wheel that stores directory entries is still accepted", check(dirs_wheel), True)
 
-        second_tag = "manylinux_2_28_x86_64"
+        # NOT a manylinux tag, deliberately. This case is about the FILE NAME parser accepting a compressed tag
+        # set; a manylinux member would also exercise the policy line ("a wheel built on glibc 2.39 that claims
+        # manylinux_2_28 is refused"), which is a different rule with its own case. On the linux CI runner the
+        # two collided and this case failed there while passing on Windows and macOS (measured 2026-10-23).
+        second_tag = "linux_aarch64"
         multi = tmp / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.{second_tag}.whl"
         write_synthetic_wheel(
             multi, files, version, f"{platform_tag}.{second_tag}",
