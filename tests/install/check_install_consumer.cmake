@@ -286,7 +286,12 @@ foreach (_cand IN ITEMS
         "${_proj}/build/consumer" "${_proj}/build/consumer.exe"
         "${_proj}/build/Release/consumer.exe" "${_proj}/build/Release/consumer"
         "${_proj}/build/Debug/consumer.exe")
-    if (EXISTS "${_cand}")
+    # FIRST MATCH WINS, not last: the lists are ordered Release-first and put `build/Debug/...` last,
+    # so a last-wins loop prefers a DEBUG executable whenever one exists -- and a Debug consumer
+    # (MSVC `/MDd`) against a Release `cpp-pinyin2.dll` (`/MD`) is the CRT split documented above:
+    # the C++ consumer prints "not ready: " with an EMPTY detail and then does not return. Measured
+    # 2026-10-23 on the Windows runner, where the script ran `build/Debug/capi.exe`.
+    if (NOT _exe AND EXISTS "${_cand}")
         set(_exe "${_cand}")
     endif ()
 endforeach ()
@@ -392,7 +397,12 @@ foreach (_cand IN ITEMS
         "${_proj}/plugin-build/plugin_dialect" "${_proj}/plugin-build/plugin_dialect.exe"
         "${_proj}/plugin-build/Release/plugin_dialect.exe" "${_proj}/plugin-build/Release/plugin_dialect"
         "${_proj}/plugin-build/Debug/plugin_dialect.exe")
-    if (EXISTS "${_cand}")
+    # FIRST MATCH WINS, not last: the lists are ordered Release-first and put `build/Debug/...` last,
+    # so a last-wins loop prefers a DEBUG executable whenever one exists -- and a Debug consumer
+    # (MSVC `/MDd`) against a Release `cpp-pinyin2.dll` (`/MD`) is the CRT split documented above:
+    # the C++ consumer prints "not ready: " with an EMPTY detail and then does not return. Measured
+    # 2026-10-23 on the Windows runner, where the script ran `build/Debug/capi.exe`.
+    if (NOT _plugin_exe AND EXISTS "${_cand}")
         set(_plugin_exe "${_cand}")
     endif ()
 endforeach ()
@@ -446,7 +456,12 @@ foreach (_cand IN ITEMS
         "${_proj}/build/capi" "${_proj}/build/capi.exe"
         "${_proj}/build/Release/capi.exe" "${_proj}/build/Release/capi"
         "${_proj}/build/Debug/capi.exe")
-    if (EXISTS "${_cand}")
+    # FIRST MATCH WINS, not last: the lists are ordered Release-first and put `build/Debug/...` last,
+    # so a last-wins loop prefers a DEBUG executable whenever one exists -- and a Debug consumer
+    # (MSVC `/MDd`) against a Release `cpp-pinyin2.dll` (`/MD`) is the CRT split documented above:
+    # the C++ consumer prints "not ready: " with an EMPTY detail and then does not return. Measured
+    # 2026-10-23 on the Windows runner, where the script ran `build/Debug/capi.exe`.
+    if (NOT _capi_exe AND EXISTS "${_cand}")
         set(_capi_exe "${_cand}")
     endif ()
 endforeach ()
