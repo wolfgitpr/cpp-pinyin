@@ -637,8 +637,10 @@ def self_test() -> int:
         # NOT a manylinux tag, deliberately. This case is about the FILE NAME parser accepting a compressed tag
         # set; a manylinux member would also exercise the policy line ("a wheel built on glibc 2.39 that claims
         # manylinux_2_28 is refused"), which is a different rule with its own case. On the linux CI runner the
-        # two collided and this case failed there while passing on Windows and macOS (measured 2026-10-23).
-        second_tag = "linux_aarch64"
+        # `linux_s390x`, because two later cases need a tag that is NOT the host's (they assert the check
+        # catches "another platform"); `linux_aarch64` collided with the aarch64 manylinux container and
+        # broke both of them (measured 2026-10-23).
+        second_tag = "linux_s390x"
         multi = tmp / f"cpp_pinyin2-{version}-py3-none-{platform_tag}.{second_tag}.whl"
         write_synthetic_wheel(
             multi, files, version, f"{platform_tag}.{second_tag}",
