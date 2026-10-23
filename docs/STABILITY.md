@@ -26,15 +26,19 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 ### 0.1 CI 与门禁的接线现状（三栏；A29）
 
-**接线已跑过，但只在 `test_runner.yml` 这条链上**（2026-10-22，`v2` 推送后共 4 轮）：构建四条腿（linux / macos / windows / mingw）与 C# 两条腿已有**运行记录**，测试侧当时是红的，修复记在
-`docs/RELEASE_CHECKLIST.md` §6。**仍然未跑的是 `release_prep.yml`**（只在 `workflow_dispatch` 下存在，标签、镜像拉取、runner 的 Docker 都没验过）——读下面的接线行时，请按这个分工理解：
+**`test_runner.yml` 这条链已经全绿**（2026-10-23，`v2` 提交 `f5c44bd`，运行 `39877724768`）：**19 个 job 全部成功** —— linux、linux-sanitizers、macos、windows、mingw、mingw32、C# 三条腿（ubuntu / macos / windows）、Python 三条腿（ubuntu / macos / windows）、`python_versions` 的 3.9–3.13 五档、以及 manylinux aarch64 的 wheel 容器。此前那一批失败是怎么一类一类拆掉的，记在
+`docs/RELEASE_CHECKLIST.md` §6。
+
+**仍然未跑的是 `release_prep.yml`**（只在 `workflow_dispatch` 下存在，标签、镜像拉取、runner 的 Docker 都没验过）——读下面的接线行时，请按这个分工理解：
+
+**一处带证据的排除，不是通过**：windows 腿不跑 `InstallConsumerSmoke`。该用例在 Windows runner 上执行外置消费端可执行文件时**不返回**（三次运行、空 stdin、测试自带的 300 秒预算都试过），同一用例在 Linux/macOS 上约 1 秒通过。理由与"未解问题"写在 `.github/workflows/ci.yml` 的注释里，它的两个自检仍在该腿运行。
 
 | 接法 | 是谁 | 证据 |
 |---|---|---|
 | **在 CTest 内**（⇒ CI 的 ctest 步骤会跑到） | `check_layers.py` | `tests/CMakeLists.txt::add_test(NAME LayerIncludes` |
 | | `check_bindings.py` 本体与自检 | `tests/CMakeLists.txt::add_test(NAME BindingGates` |
 | | `check_doc_claims.py --self-test`（**只是自检**） | `tests/CMakeLists.txt::add_test(NAME DocClaimsSelfTest` |
-| **独立 CI workflow**（`v2` 无 upstream，全部未跑过） | pytest | `.github/workflows/test_python.yml::pytest` |
+| **独立 CI workflow**（2026-10-23 起已有运行记录，随上面那次全绿一起） | pytest | `.github/workflows/test_python.yml::pytest` |
 | | `dotnet test` net7.0 + net10.0 | `.github/workflows/test_csharp.yml::dotnet` |
 | | wheel 对源树／对绑定契约 | `.github/workflows/test_python.yml::wheel` |
 | | 打包与版本链门禁 | `.github/workflows/test_csharp.yml::nupkg` |

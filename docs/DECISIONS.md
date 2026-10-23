@@ -172,6 +172,22 @@ policy line 2.28`）——那个 wheel 的标签就是 `linux_x86_64`，它**没
 **控制项**：`--self-test` 同时有"PEP 639 布局必须绿"与"缺第三方声明必须红"两条；后一条此前是**假控制**
 （用了 6 段文件名，`check()` 在解析处就返回了），本轮一并修成真控制。
 
+### D44｜生成文件必须由 configure 或 job 显式产出，不能让下游项目替它猜（2026-10-23）
+
+**裁定**：仓库里每个**生成**的文件（`csharp/CppPinyin/version.props`、`BuildInfo.g.cs`、`python/cpp_pinyin2/_version.py` 等）都要有一个**明确的产出点**——CMake configure 期，或该 job 里一条写清名字的命令。消费它的项目只允许**报错并给出可执行的修复命令**，不得自己生成、不得静默降级。
+
+**为什么**：C# 门禁在两个 job 上连红两轮，原因不是代码，而是"文件没人生产"。linux 腿先缺 `version.props`，补上后又缺 `BuildInfo.g.cs`（`CppPinyin.csproj(145,5)` 报的就是它）。两次都是**同一条规则的另一半**：谁生产、谁消费，必须在 CI 里对齐。
+
+**控制项**：`tests/CMakeLists.txt` 在 configure 期调 `emit_build_info.py --version-props-only`（版本不需要库）；linux 腿在 stage 之后调完整的 `emit_build_info.py --native/--commit`。`CppPinyin.csproj` 的 `RequireGeneratedBuildInfo` 目标保留——它的报错文案就是修复命令。
+
+### D45｜平台相关的排除必须带证据与未解问题，且排除面尽量小（2026-10-23）
+
+**裁定**：某个用例在某个平台上跑不了时，允许排除，但必须同时写清三件事：**观测到的证据**（日期、次数、试过什么）、**未解问题是什么**、**为什么排除面这么小**（同类自检仍在该平台运行）。排除不是"通过"，文档里也不许把它记成通过。
+
+**为什么**：windows 腿上 `InstallConsumerSmoke` 运行外置消费端可执行文件时**不返回**——三次运行、空 stdin、测试自带的 300 秒预算都试过，同用例在 Linux/macOS 上约 1 秒通过。它的两个自检（证明门禁能红的那两条）仍在该腿运行，所以排除的是**一个用例**，不是一条规则。
+
+**反面参考**：msys2 腿的 `ConformanceProvenanceGateSelfTest` 也是按这条裁定的方式排除的——它建临时 git 仓库断言"不可达提交必须被拒"，在 MSYS2 git 上 6 例里 4 例失败，而原生 `windows` 腿 6 例全绿；该腿同时跑了**两个**构建目录，排除必须同时落在两处，否则只是排除了半个 job。
+
 
 ## 4. 退役记号里仍然重要的裁定（retired，但代码里还在引用）
 
