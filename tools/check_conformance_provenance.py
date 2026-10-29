@@ -1,47 +1,34 @@
 #!/usr/bin/env python3
 """Does `conformance/cases.json` name a commit THIS repository actually contains?
 
-WHY THIS EXISTS. The fixture's `generated_by_commit` field is the only thing that ties the emitted
-conformance cases to a state of this tree, and it rotted twice without a single gate noticing:
+The fixture's `generated_by_commit` field is the only thing tying the conformance cases to a state of this
+tree, and it can rot without any other gate noticing: every gate reads the fixture's CASES, none reads the
+field. A value this repository cannot resolve means "what did the fixture look like when it was generated"
+has nothing to check out.
 
-  * the field said `03b28db`, which `git cat-file -e` cannot resolve **in this repository at all** -- not a
-    short hash whose object is missing, but a value from somewhere else entirely. A consumer that wants "what
-    did the fixture look like when it was generated" has nothing to check out.
-  * it was repaired once by hand to `e33f6f6` (round R9), and the repair was again witnessed by a human
-    running `git cat-file -t`, not by anything the suite runs. The next regeneration can rot it again and
-    every other gate stays green, because they all read the fixture's CASES and none read its PROVENANCE.
+What this checks (one rule, plus the ways it can refuse to speak):
 
-What this checks (one rule, plus the two ways it can refuse to speak):
-
-  1. `conformance/cases.json` must exist, and its `generated_by_commit` must be a 7..40-character lowercase
-     hex string -- the shape `git rev-parse --short` and the emitter's own `[<commit>]` argument produce.
-     A missing file, a missing field, a non-string or a malformed value is a FAILURE, not a skip: those are
-     readable from the tree itself and never depend on git.
-  2. `git -C <root> cat-file -e <value>^{commit}` must succeed, i.e. the value must name a commit object --
-     `^{commit}` and not a bare `-e` on purpose: a blob or a tree with the same prefix is not provenance.
-  3. When the tree is not a checkout of ITSELF, the provenance question cannot be answered and this tool
-     says SKIP rather than PASS. "Itself" is load-bearing: `git rev-parse --git-dir` alone also succeeds in
-     a directory that merely SITS INSIDE somebody else's work tree (this repository's own `.tmp/` is such a
-     directory), so the rule compares `rev-parse --show-toplevel` with `--root`. That distinction is what
-     makes `--self-test`'s non-git control non-vacuous -- see the note in `self_test()`.
-     With `--require` (the form `tools/run_all_gates.py` uses) a skip becomes exit 2, the same convention as
-     `tools/check_format.py`: a caller that cannot tolerate a silent skip asks for the strict form, because
-     a gate that prints SKIP and exits 0 has not run. Exit codes: 0 pass (or skip), 1 finding, 2 required
-     but unanswerable.
+  1. `conformance/cases.json` must exist, and `generated_by_commit` must be a 7..40-char hex string. A
+     missing file, a missing field, a non-string or a malformed value is a FAILURE, not a skip -- all of
+     that is readable from the tree and never depends on git;
+  2. `git -C <root> cat-file -e <value>^{commit}` must succeed: `^{commit}` and not a bare `-e`, because a
+     blob or a tree with the same prefix is not a commit;
+  3. when the tree is not a checkout of ITSELF, the question cannot be answered and the tool says SKIP, not
+     PASS. "Itself" is load-bearing: `git rev-parse --git-dir` alone also answers for a directory that
+     merely SITS INSIDE somebody else's work tree, so the rule compares `rev-parse --show-toplevel` with
+     `--root`. With `--require` (the form `tools/run_all_gates.py` uses) a skip becomes exit 2, the same
+     convention as `tools/check_format.py`: a gate that prints SKIP and exits 0 has not run.
 
 WHAT IT DOES NOT DO. It does not check that the fixture's CASES match that commit -- that would need a
-second build of an older tree, and R9 already showed the cheap half (regenerate into `.tmp/` and diff line by
-line) is the human step. It does not verify `cases.sha256`, which `python/tests/test_conformance.py` owns.
-And it requires the named commit to be REACHABLE from some ref, not merely present: `cat-file -e` answers
-"does this repository contain the object", which is TRUE for an object left behind by a history rewrite and FALSE
-for every fresh clone of the same branch -- measured 2026-10-21, when the fixture named a pre-squash commit that no
-clone contains and the gate passed here while CI would have failed. Reachability is the property that makes the
-provenance checkable by the person who clones this repository.
+second build of an older tree. It does not verify `cases.sha256`, which the Python suite owns. And it
+requires the named commit to be REACHABLE, not merely present: `cat-file -e` answers "does this repository
+contain the object", which is TRUE for an object left behind by history rewriting but false for a fresh
+clone of the same branch -- reachability is the property a person who clones this repository can check.
 
 USAGE
     python tools/check_conformance_provenance.py               # exit 1 on a finding
-    python tools/check_conformance_provenance.py --require     # exit 2 instead of skipping outside git
-    python tools/check_conformance_provenance.py --self-test    # four sandbox controls, then exit
+    python tools/check_conformance_provenance.py --require     # exit 2 instead of skipping
+    python tools/check_conformance_provenance.py --self-test   # four sandbox controls
 """
 
 from __future__ import annotations

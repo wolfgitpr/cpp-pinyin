@@ -10,8 +10,8 @@ migration converged on, and it is deliberately narrow so that everything kept on
     next to it is an example; a quoted contract sentence is quoted.
 
 Exit codes: 0 = nothing to report, 1 = at least one line found (each printed with its location), 2 = setup
-failure. `tools/self_test_common.py` is not used here: the checker must work when it is the only file present,
-so the fixture construction is inline.
+failure. The fixture construction is inline rather than shared with the other checkers, because this
+file has to work when it is the only one present.
 """
 from __future__ import annotations
 
@@ -61,7 +61,7 @@ def scan(root: pathlib.Path, globs=DEFAULT_GLOBS) -> tuple[list[tuple[str, int, 
     examined = 0
     for pattern in globs:
         for path in sorted(root.glob(pattern)):
-            if any(part in SKIP_PARTS for part in path.parts):
+            if any(part in SKIP_PARTS for part in path.relative_to(root).parts):
                 continue
             examined += 1
             rel = path.relative_to(root).as_posix()
@@ -149,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.verbose:
         for pattern in DEFAULT_GLOBS:
             for path in sorted(root.glob(pattern)):
-                if not any(part in SKIP_PARTS for part in path.parts):
+                if not any(part in SKIP_PARTS for part in path.relative_to(root).parts):
                     print(f"  examined {path.relative_to(root).as_posix()}")
 
     print(f"comment language: {examined} file(s) examined, {len(findings)} problem(s)")

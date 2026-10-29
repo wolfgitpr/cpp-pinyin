@@ -2,7 +2,7 @@
 //
 // Why this file exists: earlier byte-equivalence evidence came from a tool that lived only in a gitignored
 // scratch directory, so a later change could not re-verify itself and nobody else could reproduce the gate
-// (audit finding V-01). It is that tool, in the repo, with its own SHA-256 so one command is the whole gate.
+// It is that tool, in the repo, with its own SHA-256 so one command is the whole gate.
 //
 // What it does: query all four datasets for includeCandidates in {false,true}, stream every syllable of every
 // query to a canonical byte stream and hash it on the way. Two builds with the same digest are byte-equivalent

@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """Check the numbers this repository's documentation claims against the tree they describe.
 
-Why this exists: the absence of such a tool cost four separate defects -- an example gate that was never
-registered on a fresh build directory, a ledger still saying "static 26/24" after the entry count changed, a
-playbook bullet that "described drift" by naming the same path on both sides, and a checklist argument that
-was never passed to cmake while the run still reported PASS.
-
-Design rules, because a doc checker that guesses is worse than none (a false positive gets it switched off):
+Design rules, because a doc checker that guesses is worse than none -- a false positive gets ignored, and an
+ignored gate protects nothing:
 
   * only claims this tool can MEASURE are in the table, and each names what measures it;
-  * patterns are anchored on the exact surrounding words used in this repository. The first version of the
-    frozen-surface claim -- "three numbers separated by slashes" -- also matched dates, line-number triples
-    (165/46/204), bucket sizes (2/3/4) and commit lists (1/2/6): nine of its twelve hits were noise;
+  * patterns are anchored on the exact surrounding words used in this repository. The first attempt --
+    "three numbers separated by slashes" -- also matched dates, line numbers, bucket sizes and commit
+    lists; nine of its twelve hits were wrong;
   * a deliberately HISTORICAL line carries `<!-- doc-claims: historical -->`; silence is not an exemption,
     and the marker shows up in review;
   * fenced code blocks are skipped -- they are commands, not claims;
@@ -22,10 +18,10 @@ Usage:
     python tools/check_doc_claims.py --ctest-inventory <dir> --tools-root <repo> --root <sandbox>
     python tools/check_doc_claims.py --self-test --ctest-inventory <dir>
 
-`--root` is where the DOCUMENTS are read from and `--tools-root` is where the MEASUREMENT commands run.
-Separate on purpose: the negative control must scan a document with a planted wrong number while measuring
-the real tree, and one path for both made that control return a setup error instead of the mismatch it
-exists to produce.
+`--root` is where the DOCUMENTS are read from and `--tools-root` is where the MEASUREMENT comes from.
+Separate on purpose: the negative control must scan a document with a planted wrong number while the tools
+measure the real tree, and one path for both made that control return a setup error instead of the mismatch
+it exists to produce.
 
 Exit codes: 0 = every recognised claim matches; 1 = at least one mismatch, or nothing was recognised;
 2 = setup failure.
@@ -110,7 +106,12 @@ def measure_layers(root):
 # The configuration the documents describe when they state a single number. It is a fixed path rather
 # than "the build directory the caller passed", because the caller's build is the thing under test -- using
 # it as the reference made the verdict depend on which build was handed in.
-CANONICAL_BUILD = ".tmp/mk-default"
+#
+# OVERRIDABLE since 2026-10-27, because the error message below has told the reader to "point CANONICAL_BUILD
+# at the configuration you want" since the message was written, and there was no way to do it: the constant
+# is not a CLI flag and nothing read an environment variable. A message that offers an action the code does
+# not have is worse than no message -- it is what a person reaches for when they are already stuck.
+CANONICAL_BUILD = os.environ.get("CPP_PINYIN2_CANONICAL_BUILD", ".tmp/mk-default")
 
 
 def measure_static(root):
@@ -223,12 +224,29 @@ def measure_selftests(root):
     return measured, sorted(unmeasurable.items())
 
 
+def measure_gates(root: Path) -> "dict[str, int]":
+    """How many gates `tools/run_all_gates.py` actually runs.
+
+    Added 2026-10-27 after a poison test: the checklist said "all 21 gates pass" while the runner had 20,
+    and this gate stayed green -- the number was stated in prose and measured by nothing. The runner is
+    IMPORTED, not parsed: it has a `__main__` guard, so importing it runs nothing, and an import cannot
+    disagree with the list it is counting.
+    """
+    tools_dir = str(root / "tools")
+    if tools_dir not in sys.path:
+        sys.path.insert(0, tools_dir)
+    import run_all_gates                                        # noqa: PLC0415 -- deliberate, see docstring
+
+    return {"total": len(run_all_gates.GATES)}
+
+
 def measure_all(inventory, root):
     """`inventory` is measured for reference (labels/registry shape); the canonical counts come from the
     configuration named above, so a run against a static build is still judged against the default."""
     selftests, unmeasurable = measure_selftests(root)
     measured = {"ctest": measure_ctest(inventory, root), **measure_static(root),
-                "selftests": selftests, "unmeasurable_selftests": unmeasurable}
+                "selftests": selftests, "unmeasurable_selftests": unmeasurable,
+                "gates": measure_gates(root)}
     canonical = root / CANONICAL_BUILD
     if (canonical / "CMakeCache.txt").is_file():
         try:
@@ -239,8 +257,8 @@ def measure_all(inventory, root):
         raise SystemExit(
             f"the canonical build is missing at {canonical}. It is what the documents' headline numbers "
             f"describe, so the check cannot run without it -- run the pre-delivery checklist first "
-            f"(bash tools/board/run_local_gate.sh --checklist .tmp/mk-default), or point CANONICAL_BUILD "
-            f"at the configuration you want the documents judged against.")
+            f"(bash tools/board/run_local_gate.sh --checklist .tmp/mk-default), or set "
+            f"CPP_PINYIN2_CANONICAL_BUILD to the configuration you want the documents judged against.")
     return measured
 
 
@@ -308,6 +326,11 @@ def claims():
          r"注册用例数[：:]\s*\**\s*(\d+)", (1,), ("ctest", "registered"), ()),
         ("gate-registered-en", "registered CTest entries: 'N registered'",
          r"(\d+)\s*registered\b", (1,), ("ctest", "registered"), ()),
+        # How many gates the runner runs (2026-10-27). The phrasing is the runner's own output line, which
+        # is what a document quotes: `RESULT: all N gates pass, and each gate's own self-test passes`.
+        # Poisoned before this existed: the document said 20, the runner had 21, and nothing noticed.
+        ("gate-total", "the runner's gate count, as 'all N gates pass'",
+         r"all\s+(\d+)\s+gates\s+pass", (1,), ("gates", "total"), ()),
         # Per-label counts as stated in prose: "`abi` 6 条". A stale label NAME is caught too, because the
         # name is looked up in the same inventory the counts come from.
         ("label-counts", "per-label selection counts, as '`<label>` N 条'",
@@ -875,6 +898,16 @@ def main():
 
     print(f"canonical ({CANONICAL_BUILD}): {measured['canonical']['registered']} registered, "
           f"{measured['canonical']['slow']} labelled slow")
+    # Say it out loud when the reference configuration is not the documented one. Overriding it is a
+    # deliberate act ("judge the documents against THIS"), and the outcome is that a document stating the
+    # DEFAULT configuration's number disagrees -- which is the override working, not a stale document.
+    # Without this line the two look identical in the report (measured 2026-10-27 by pointing the
+    # canonical at the examples-on tree: one registered-count mismatch and nothing explaining why).
+    if os.environ.get("CPP_PINYIN2_CANONICAL_BUILD"):
+        print("note: CPP_PINYIN2_CANONICAL_BUILD is set, so the documents are judged against "
+              f"{CANONICAL_BUILD} rather than the documented default. A claim that states the default "
+              "configuration's number will therefore disagree, and that disagreement is this override "
+              "doing its job.")
     print(f"under test    ({args.ctest_inventory}): {measured['ctest']['registered']} registered")
     print(f"frozen surfaces {measured['bindings']['headers']}/{measured['bindings']['symbols']}/"
           f"{measured['bindings']['declarations']}; AC-3 scans {measured['layers']['files_scanned']} files")
@@ -1002,6 +1035,25 @@ def self_test(inventory, tools_root):
         print()
         print("SELF-TEST: ok -- a stale self-test count is reported, in both the file-name and the "
               "role-name phrasing, and the current one passes")
+
+        # The runner's gate count (2026-10-27). Same shape as the block above and for the same reason: this
+        # axis was added because a poison test showed the number was measured by nothing, so the control
+        # that has to exist is the one that would have caught it.
+        measured["gates"] = {"total": 21}
+        fresh_gates = fixture("fresh-gates", "RESULT: all 21 gates pass, and each gate's own self-test passes\n")
+        stale_gates = fixture("stale-gates", "RESULT: all 20 gates pass, and each gate's own self-test passes\n")
+        if "gate-total" not in sorted({rec[3][0] for rec in scan(sandbox / "stale-gates")}):
+            print("SELF-TEST FAILED: the 'all N gates pass' line is not recognised as 'gate-total', so the "
+                  "control proves nothing")
+            return 1
+        if report(fresh_gates, measured, verbose=False, judge_coverage=False) != 0:
+            print("SELF-TEST: FAILED -- the CURRENT gate count was rejected")
+            return 1
+        if report(stale_gates, measured, verbose=False, judge_coverage=False) != 1:
+            print("SELF-TEST: FAILED -- a stale gate count was not reported")
+            return 1
+        print()
+        print("SELF-TEST: ok -- a stale gate count is reported and the current one passes")
 
         # The name class. Its fixtures need an `include/` tree, because `report` only runs the name scan
         # when one is present (a sandbox without headers is not a tree that can declare anything).

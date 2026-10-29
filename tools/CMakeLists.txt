@@ -23,11 +23,18 @@ target_compile_features(DumpEquivalence PRIVATE cxx_std_17)
 # polyphone 95.52% -> 96.52%", 2026-09-29). The gate had been failing since that commit -- in every
 # environment, not just one machine -- while the docs still described it as green.
 #
-# The byte format did NOT change, and the old value stays reproducible from that revision's inputs:
-#   git worktree add <tmp> 8e992bc^
+# The byte format did NOT change, and the old value stays reproducible from that revision's inputs --
+# BUT NOT FROM THIS CHECKOUT. Measured 2026-10-27: `git cat-file -e` fails for both `8e992bc` (below) and
+# `e03a772` (above). The v2 tree arrives here as one import commit (`8e9cd00`, 2026-10-22) on top of the
+# 2024 history, so the 2026-09 revisions that the digests were recorded against are not in this
+# repository at all. The recipe is kept because it records what was actually done at the time, and it is
+# annotated because anyone pasting it gets "unknown revision" -- a recipe that cannot be run has to say so
+# where it is written. docs/REQUIREMENTS.md:176 already carries the same warning; this comment did not.
+#   git worktree add <tmp> 8e992bc^          # "unknown revision" here -- see above
 #   dump_equivalence <tmp>/data/dialects <tmp>/tests/data/verified/source --expect b871e3b7... --quiet
-# Dated records quoting the old digest/byte count: docs/HISTORY.md, docs/PERFORMANCE.md
-# (§1003, §1259), docs/BACKLOG.md, docs/REQUIREMENTS.md §3.3. They stay as history -- the CURRENT
+# Dated records quoting the old digest/byte count: process ledgers that are not in this tree
+# (docs/HISTORY.md, docs/BACKLOG.md), docs/PERFORMANCE.md
+# (§1003, §1259), docs/REQUIREMENTS.md §3.3. They stay as history -- the CURRENT
 # value exists only here, so a document that quotes a byte count must say which era it belongs to.
 #
 # CACHE STRING, so an existing build tree keeps its old value: after updating it here, re-run

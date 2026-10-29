@@ -1,10 +1,10 @@
 // load_check -- a load-time regression gate, the deliberately coarse kind.
 //
-// Why (docs/BACKLOG.md, "Benchmark 进构建门禁 + 内存/加载回归"): Benchmark.exe asserts nothing, and a
-// timing gate over single measurements would be pure flakiness -- Dictionary Loading swings ~12% run to run
-// (5 runs: Mandarin min 21.4 / max 23.9 ms, Cantonese 14.2 / 14.7 ms). So this compares the MINIMUM of N runs
-// against a threshold with a huge margin (500 ms vs ~24 ms worst case = 20.9x / 34x), which means it can only
-// fire on a catastrophic regression (accidental O(n^2) loading, repeated table loads, several copies of the
+// Why (an old backlog entry, "Benchmark 进构建门禁 + 内存/加载回归", in a ledger that is not in this tree):
+// Benchmark.exe asserts nothing, and a timing gate over single measurements would be pure flakiness -- Dictionary
+// Loading swings ~12% run to run (5 runs: Mandarin min 21.4 / max 23.9 ms, Cantonese 14.2 / 14.7 ms). So this compares
+// the MINIMUM of N runs against a threshold with a huge margin (500 ms vs ~24 ms worst case = 20.9x / 34x), which means
+// it can only fire on a catastrophic regression (accidental O(n^2) loading, repeated table loads, several copies of the
 // dictionary), never on jitter. It is NOT a performance measurement.
 //
 // Usage:

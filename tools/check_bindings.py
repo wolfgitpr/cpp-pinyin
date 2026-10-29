@@ -1,31 +1,29 @@
 #!/usr/bin/env python3
 """Binding-side gates that run on this machine (PLUGIN doc section 6.8.7, row 4).
 
-Every check exists because something actually went wrong. The count is deliberately NOT written out as a
-number here: it said FOUR while six kinds of check ran. What is checked instead is the shape -- items
-numbered from 1 with no gaps, every check_* function here invoked (self-test case "every defined check is invoked").
+The count of checks is deliberately not written down here -- it said FOUR while six kinds of check ran. The
+checks are numbered from 1 with no gaps, and the self-test case "every documented check runs" enforces that
+each `check_*` function is invoked.
 
-1. XML HYGIENE: no "--" in an XML comment (MSBuild refuses the project with MSB4025, or NuGet calls the
-   config invalid); the prose's dashes cost four round-trips before this became a check.
-2. VERSION CHAIN: CMakeLists.txt vs version.props, nuspec (6.8.5 place 6), supplied wheel METADATA (place 4)
-   and tag (place 1b -- unguarded, ci.yml triggers on branches only); regeneration is emit_build_info.py's job.
-   Scope note (2026-10-20, audit H45): the COMPLETE list of version projections is the seven-row table under
-   `**1. 版本号…**` in `docs/RELEASE_CHECKLIST.md`; this file covers only the places a machine check can run
+1. XML HYGIENE: no "--" in an XML comment (MSBuild refuses the project with MSB4025, or NuGet reads the
+   config as invalid).
+2. VERSION CHAIN: CMakeLists.txt vs version.props, nuspec (6.8.5 place 6), supplied wheel, and tag (place
+   1b -- unguarded, ci.yml triggers on branches only). Scope: the COMPLETE list of version projections is
+   `**1. 版本号…**` in `docs/RELEASE_CHECKLIST.md`; this file covers only the places a machine can check
    here, and the other two (`cppp2_version()` at runtime, the CHANGELOG heading) are guarded by
-   `python/tests/test_contract.py` and `tools/check_version_tokens.py`. Counting the projections by reading
-   this docstring would undercount -- it used to be quoted as "six places" while the table said seven.
-3. PACKAGING PRESENCE (nupkg supplied): native asset, managed assembly and dictionary copy all present, and
-   packaged dialects must match data/dialects; the first version packed no runtimes/ entry while pack exited 0.
-4. WORKFLOW WIRING: test_runner.yml owns the only push/pull_request triggers and its all-blocking-tests job is
-   the single required check -- silently broken by a missing workflow_call, a job absent from needs, or no `if: always()`.
-5. PUBLIC HEADER SURFACE: include/cpp-pinyin2 is the installed tree, so its set is frozen in tests/abi/
-   expected_public_headers.txt and only installed headers may be included (src/ fails consumers only).
-6. EXPORTED DECLARATIONS: c_api.h's symbols are frozen in tests/abi/expected_c_api_symbols.txt; the built
-   library is check_exports.cmake's side, this the header side -- exported C++ types are the plugin face.
+   `python/tests/test_contract.py` and `tools/check_version_tokens.py`.
+3. PACKAGING PRESENCE (nupkg supplied): native asset, managed assembly and dictionary copy; the packaged
+   dialects must match data/dialects.
+4. WORKFLOW WIRING: test_runner.yml owns the only push/pull_request triggers and its all-builds job is the
+   single required check -- silently broken by a missing workflow_call or a job absent from that list.
+5. PUBLIC HEADER SURFACE: include/cpp-pinyin2 is the installed tree, so its set is frozen in
+   expected_public_headers.txt and only installed headers may be included from it.
+6. EXPORTED DECLARATIONS: c_api.h's symbols are frozen in tests/abi/expected_c_api_symbols.txt --
+   `check_exports.cmake` checks the library side, this the header side.
 
-No flag runs the tree-verifiable subset (hygiene + version chain); --nupkg <file> adds 3, --tag v2.0.0 adds 1b,
---print-version prints the single version source, and --self-test proves each check can go red on a fixture
-tree: a gate that has never been seen failing is a gate nobody should trust.
+No flag runs the tree-verifiable subset (hygiene + version chain); `--nupkg <file>` adds 3, 4 and 5;
+`--print-version` prints the single version source; `--self-test` proves each check can go red on this
+tree -- a gate never seen failing is a gate nobody should trust.
 """
 
 from __future__ import annotations
@@ -139,8 +137,8 @@ def wheel_version(wheel: Path) -> Optional[str]:
 #: deliberately does NOT carry the generation token (R15, docs/STABILITY.md section 4.5): it is the id
 #: NuGet consumers put in their `PackageReference`, so renaming it breaks THEM for no ABI reason.
 #: Pinned to exact values here instead of living only as policy prose: a rule nobody can run is a rule
-#: that drifts, and until this check existed NO gate looked at these three properties at all (2026-10-20,
-#: audit round 3 H28). Changing one is still allowed -- as a reviewed edit of this table together with
+#: that drifts, and until this check existed NO gate looked at these three properties at all (2026-10-20).
+#: Changing one is still allowed -- as a reviewed edit of this table together with
 #: the csproj and the package docs, in one commit.
 CSHARP_IDENTITY = {"AssemblyName": "CppPinyin2", "RootNamespace": "CppPinyin2", "PackageId": "CppPinyin"}
 
@@ -202,7 +200,7 @@ def check_version_chain(root: Path, nupkg: Optional[Path], wheel: Optional[Path]
         elif match.group(1).strip() != expected:
             report.fail(f"version.props says {match.group(1).strip()} but CMakeLists.txt says {expected} (section 6.8.5 place 5)")
     else:
-        # ABSENT IS A FAILURE (2026-10-20, audit round 2 §12.6 C2). This used to be a `note`, and the file
+        # ABSENT IS A FAILURE (2026-10-20). This used to be a `note`, and the file
         # it guards is in .gitignore -- so every run that did not first execute `csharp/tools/emit_build_info.py`
         # (the C++ CI's ctest leg does not) passed the version chain with place 5 unverified. Worse, the
         # runs that DO generate it compare a file that was itself derived from CMakeLists.txt, which makes
@@ -619,7 +617,8 @@ def check_dialect_surface(root: Path, wheel: Optional[Path], report: Report) -> 
     # The manifests. Each dialect states its own file roles, so "this dialect's data is complete" stops being
     # a claim about a directory listing and becomes something a check reads -- and a file that no role claims
     # is an error rather than a quiet passenger. The three role sets are frozen HERE because the engine loads
-    # exactly these four tables (src/EngineImpl.cpp:43-46) and ships exactly these assets; a manifest that
+    # exactly these four tables (the four `{"<file>", loadDict(...)}` entries of the loader's step list in
+    # `src/EngineImpl.cpp`) and ships exactly these assets; a manifest that
     # declared a table the engine never reads would be a declaration without a reader, which is the shape
     # this repository keeps having to remove. Adding a table therefore means changing the loader, the
     # packaging whitelist and this set in one commit.
@@ -667,7 +666,7 @@ def check_dialect_surface(root: Path, wheel: Optional[Path], report: Report) -> 
             elif set(declared_roles) != expected:
                 problems.append(f"{key} is {sorted(declared_roles)}, not {sorted(expected)}")
 
-        # THE MARKER'S VALUE, NOT JUST ITS PRESENCE (2026-10-20 audit round 2, cross-repo E-series). The
+        # THE MARKER'S VALUE, NOT JUST ITS PRESENCE (2026-10-20). The
         # number in format.txt is written by the generator in pinyin-makedict (`common.DATA_FORMAT_VERSION`)
         # and compared here by `kSupportedDictFormat` (src/Engine.cpp). Those are two literals in two
         # repositories, so this is the only place that can notice the shipped data and this tree's engine
@@ -1129,7 +1128,7 @@ CSHARP_STRUCT_PAIRS = (
     ("cppp2_segment", "SegmentRaw"),
     ("cppp2_style", "StyleRaw"),
     ("cppp2_result", "ResultRaw"),
-    # Added 2026-10-20 (audit round 2 §12.2 API P1): the three switches end at 20 while `sizeof` is 24, and
+    # Added 2026-10-20: the three switches end at 20 while `sizeof` is 24, and
     # both shells transcribed only the three switches -- the two structs then agreed by PADDING, not by
     # declaration. A future field appended into that hole would have moved every member after it with this
     # table still green, which is the drift the table exists to catch.
@@ -1304,7 +1303,7 @@ def check_csharp_baseline(root: Path, report: Report) -> None:
 def check_python_baseline(root: Path, report: Report) -> None:
     """The Python shell's STATIC transcription of the C structs, field for field, in order.
 
-    WHY THIS EXISTS (2026-10-20, audit round 2 §12.2 API P1). The C# side had a field-for-field check and
+    WHY THIS EXISTS (2026-10-20). The C# side had a field-for-field check and
     the Python side had NONE: `_ffi.py` carries seven `ctypes.Structure` mirrors of `c_api.h`, and not one
     of them was compared with the header by any gate. A missing or reordered field there does not fail
     loudly -- ctypes lays the struct out from `_fields_`, so the call succeeds and reads the wrong bytes,
@@ -1936,7 +1935,7 @@ def self_test() -> int:
         "    <RootNamespace>CppPinyin2</RootNamespace>\n    <PackageId>CppPinyin</PackageId>\n"
         "    <PackageProjectUrl>https://github.com/wolfgitpr/cpp-pinyin</PackageProjectUrl>\n"
         "    <RepositoryUrl>https://github.com/wolfgitpr/cpp-pinyin</RepositoryUrl>\n"
-        "    <TargetFrameworks>netstandard2.0;net7.0;net10.0</TargetFrameworks>\n"
+        "    <TargetFrameworks>net7.0;net10.0</TargetFrameworks>\n"
         "    <PackageLicenseExpression>Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0</PackageLicenseExpression>\n"
         "  </PropertyGroup>\n</Project>\n", encoding="utf-8")
 
@@ -2608,7 +2607,7 @@ def self_test() -> int:
 
     write_lf(plugin_dialect, plugin_before.replace("        std::string id;\n", ""))
     plugin_removed = sandbox_run()
-    # The Python mirror check (audit round 2 §12.2 API P1) gets its own control: without one, a gate that
+    # The Python mirror check  gets its own control: without one, a gate that
     # compares seven ctypes classes would be a gate nobody ever saw go red.
     ffi_path = sandbox / "python" / "cpp_pinyin2" / "_ffi.py"
     ffi_before = ffi_path.read_text(encoding="utf-8")

@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 """Run the C# shell's own test suite, and say SKIP when it cannot be run.
 
-WHY THIS GATE EXISTS. The Python shell got this treatment on 2026-10-18 ("the suite existed and passed, but NOTHING
-ran it, so it rotted in silence") and the same thing then happened to the C# side, measurably: on 2026-10-20 the
-conformance consumer started demanding a handler for every op in the fixture while its own guard test listed three
-ops as C-ABI-only, and **six tests stayed red for two days** because nothing in this repository ran them. They were
-found by hand on 2026-10-21, and the run that found them was itself invalid -- it used a five-day-old native library.
+The C# suite existed and passed while nothing in this repository ran it, so it rotted in silence. It joins
+the gate run with two rules:
 
-So the C# suite joins the gate run, with the two lessons from that afternoon built in:
-
-  * a STALE native library is refused, not used: a fresh binary is the only thing whose verdict means anything
-    (csharp/tools/run_tests.py got the same check the same day);
-  * "cannot be run" is said out loud. `dotnet` missing, no built library, or a library older than the sources all
-    print what is missing and the exact command that fixes it. With `--require` each of those becomes exit 2, for
-    callers (CI) that must not accept a silent skip.
+  * a STALE native library is refused, not used -- a fresh binary is the only thing whose verdict means
+    anything (`csharp/tools/run_tests.py` carries the same check);
+  * "cannot be run" is said out loud. `dotnet` missing, no built library, or a library older than the
+    headers: print what is missing and the exact command that fixes it. With `--require` each of those
+    becomes an error, for callers (CI) that must not accept a silent skip.
 
 Exit codes: 0 pass (or SKIP), 1 the suite failed, 2 required-but-unanswerable or usage.
 """

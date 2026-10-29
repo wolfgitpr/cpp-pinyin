@@ -1,40 +1,28 @@
 #!/usr/bin/env python3
 """Do the cross-references this repository writes actually land?
 
-WHY THIS EXISTS. Three kinds of reference rot were measured on 2026-10-20 (audit round 2, findings
-G15/G16/G17/G18), each of which a reader meets and none of which any existing gate could see:
+Three kinds of reference rot a reader meets and no other gate sees:
 
-  * **section references that point nowhere.** `include/cpp-pinyin2/core/Types.h` cited
-    `docs/CONTRACT.md` "section 修订层 B"; CONTRACT has no such section and does not contain the word
-    修订层 at all. `ManTone.h` cited a §9.2 of a ledger that had been archived days
-    earlier. `ReadingCodec.h` cited `docs/PERFORMANCE.md` section 4.15.5, which now lives in
-    `docs/HISTORY.md`.
-  * **decision numbers nothing defines.** `include/` + `src/` carry ~70 citations of tokens like
-    `(S7)`, `(S9c)`, `(D4)`, `(R14)`; the ledgers that defined them were retired in the 2026-10-09
-    documentation cut, and `S9a`/`S9c`/`S11a`/`S18` are defined nowhere in the tracked tree. A
-    consumer reading a public header meets `(S7)` and has no way to resolve it.
-  * **paths to directories that no longer exist.** `docs/testdata/` was renamed on 2026-09-29 and sixteen
-    documents went on citing the old path; an archive index explained the rename, but only
-    `audit_doc_anchors.py` looked for references and it did not cover this shape. That rule retired on
-    2026-10-23 with the archive index and the dated records -- no tracked file names `docs/testdata/` now.
+  * **section references that point nowhere** -- a header cites `docs/CONTRACT.md` "section 修订层 B"
+    and CONTRACT has no such section, or cites a section of a document that has since moved;
+  * **decision numbers nothing defines** -- `(S7)`, `(S9c)`, `(D4)`, `(R14)` scattered through `include/`
+    and `src/`, where the ledger that defined them is not in the tracked tree and a consumer reading a
+    public header has no way to resolve it;
+  * **paths to directories that no longer exist** (rule retired once the last one was gone).
 
 WHAT IT CHECKS (three rules, each with a control in `--self-test`):
 
-  1. `docs/<file>.md` **section <n>** must resolve: the target file must have a heading whose number
-     starts with <n> (or, for a non-numeric token such as `修订层 B`, a heading that contains it).
-  2. Every `(TOKEN)` decision number in code (`.h .c .cpp .cs .py .yml .txt .md` under `include/`,
-     `src/`, `tests/`, `tools/`, `csharp/`, `python/`) must be registered in `docs/DECISIONS.md`.
-     A token registered as `retired` may not appear under `include/`: a public header must point at a
-     document that ships with the package, not at a ledger that was deleted.
-  3. (retired 2026-10-23 with the archive index: `docs/testdata/` no longer appears in any tracked file) A line
-   citing `docs/testdata/` used to have to carry a pointer word, unless the file
-     declares `doc-anchors: historical` (the same opt-out `audit_doc_anchors.py` honours: a dated
-     record describes a tree that has moved, and rewriting it would falsify the record).
+  1. `docs/<file>.md` **section <n>** must resolve: the target file must have a heading whose number starts
+     with <n> (or, for a non-numeric token such as `修订层 B`, a heading that contains it);
+  2. Every `(TOKEN)` decision number in code must be registered in `docs/DECISIONS.md`, and a token
+     registered as `retired` may not appear under `include/`: a public header must point at a document that
+     ships with the package, not at a ledger that was deleted;
+  3. (retired) citing `docs/testdata/` used to require a pointer word.
 
-WHAT IT DOES NOT DO. It does not judge whether the cited section says what the sentence claims -- that
-is not mechanically checkable (see `audit_doc_anchors.py`, which learned the same lesson on line
-numbers). It does not check bare `section 6.8.4` references that name no file: with the file missing,
-guessing the target would produce false findings, so those are out of scope on purpose.
+WHAT IT DOES NOT DO. It does not judge whether the cited section says what the sentence claims -- that is
+not mechanically checkable (see `audit_doc_anchors.py`, which learned the same lesson on line numbers). It
+does not check bare `section 6.8.4` references that name no file: guessing the target would produce false
+findings.
 
 USAGE
     python tools/check_doc_refs.py                  # exit 1 on any finding
@@ -80,11 +68,22 @@ TOKEN_EXEMPT_FILES = {"tools/check_doc_refs.py"}
 #: `docs/X.md` section 4.5  /  `docs/X.md` section 修订层 B  /  docs/X.md section 6-9
 SECTION_RX = re.compile(
     r"docs/([A-Za-z0-9_.\- ]+\.md)`?\s*(?:section|§)\s*([0-9]+(?:\.[0-9]+)*|[^\s,;:)\]]{1,24})")
+#: THE SAME REFERENCE WITHOUT THE `docs/` PREFIX. Added 2026-10-27, after a script justified itself with
+#: `PLUGIN_INTERFACE_AND_BINDINGS.md section 6.7.11` -- a document that has never existed in this
+#: repository -- and this gate, written for exactly that failure mode, said nothing at all: SECTION_RX
+#: above only looks inside `docs/`.
+#:
+#: A bare name is resolved against `docs/` first and then the repository root (`CHANGELOG.md` lives
+#: there), and only a name that resolves to a real file is judged. A name that resolves to nothing is
+#: ignored on purpose: prose is allowed to mention files outside this tree, and turning every such
+#: mention into a finding would teach people to switch the gate off.
+BARE_SECTION_RX = re.compile(
+    r"(?<![\w/.-])([A-Za-z0-9_.\-]+\.md)`?\s*(?:section|§)\s*([0-9]+(?:\.[0-9]+)*|[^\s,;:)\]]{1,24})")
 #: A decision number: one to three letters, an optional dash, one or two digits, an optional letter
 #: (`S7`, `D4`, `N4b`, `S11a`, `C-13`, `T-01`). The prefix set is deliberately finite: it is the one
 #: the registry covers, and encodings such as `(UTF-8)` must not be mistaken for a decision number.
 #:
-#: `F`/`E`/`I`/`L`/`M`/`Q` are ABSENT on purpose (2026-10-20, audit round 3 H20): they are per-round
+#: `F`/`E`/`I`/`L`/`M`/`Q` are ABSENT on purpose (2026-10-20): they are per-round
 #: audit labels that mean nothing outside the ledger that minted them, so requiring every one of them to
 #: be registered would turn each round's working notes into registry debt. The decision and the escape
 #: hatch (a label that must be cited across documents gets a registered prefix instead) are written in
@@ -100,6 +99,10 @@ TOKEN_RX = re.compile(
 )
 NOT_A_TOKEN = {"UTF-8", "UTF-16", "UTF-32"}
 HEADING_RX = re.compile(r"^#{1,6}\s+(.*)$", re.M)
+#: `**2. 发布前的构建与验收**` -- a numbered section written as a bold paragraph instead of a heading.
+#: The release checklist numbers everything this way, so a heading-only reader sees a document with no
+#: sections at all.
+BOLD_SECTION_RX = re.compile(r"^\*\*([0-9]+(?:\.[0-9]+)*\.?\s+[^*]{1,80})\*\*", re.M)
 REGISTRY_RX = re.compile(r"^\|\s*`([A-Z][A-Za-z]*-?[0-9]{1,2}[a-z]?)`\s*\|\s*(live|retired)\s*\|", re.M)
 
 
@@ -117,11 +120,20 @@ def tracked_text_files(root: Path) -> List[str]:
 
 
 def headings_of(path: Path) -> List[str]:
+    """Every section identifier the document carries.
+
+    Markdown headings, plus the bold-paragraph numbering style that `docs/RELEASE_CHECKLIST.md` uses
+    throughout (`**2. 发布前的构建与验收**`). Without the second shape, every legitimate reference into
+    that document reads as dead -- measured 2026-10-27, when the bare-reference rule below was added and
+    immediately reported the runbook's `RELEASE_CHECKLIST.md section 2` as missing.
+    """
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return []
-    return [m.group(1).strip() for m in HEADING_RX.finditer(text)]
+    found = [m.group(1).strip() for m in HEADING_RX.finditer(text)]
+    found.extend(m.group(1).strip() for m in BOLD_SECTION_RX.finditer(text))
+    return found
 
 
 def section_is_present(headings: List[str], cited: str) -> bool:
@@ -175,6 +187,20 @@ def check(root: Path, files: List[str]) -> Tuple[List[str], List[str], int]:
                 if not section_is_present(heading_cache[target], cited):
                     findings.append(f"{rel}: cites `docs/{target}` section {cited}, which that file has no "
                                     f"heading for (headings: {len(heading_cache[target])})")
+
+            for match in BARE_SECTION_RX.finditer(text):
+                name, cited = match.group(1), match.group(2)
+                resolved = next((p for p in (root / "docs" / name, root / name) if p.is_file()), None)
+                if resolved is None:
+                    continue        # names nothing in this tree: prose about somebody else's file
+                checked["sections"] += 1
+                key = str(resolved)
+                if key not in heading_cache:
+                    heading_cache[key] = headings_of(resolved)
+                if not section_is_present(heading_cache[key], cited):
+                    findings.append(
+                        f"{rel}: cites `{name}` section {cited}, which has no such heading "
+                        f"(resolved to {resolved.relative_to(root).as_posix()})")
 
         if rel.startswith(CODE_DIRS) and rel not in TOKEN_EXEMPT_FILES:
             for match in TOKEN_RX.finditer(text):
@@ -237,6 +263,25 @@ def self_test() -> int:
         if not findings:
             failures.append("a retired token in include/ must fail")
 
+        # Rule 1's other half (2026-10-27): the same reference written WITHOUT the `docs/` prefix.
+        bare_ok = root / "src" / "bare_ok.cpp"
+        bare_ok.write_text("// see CONTRACT.md section 2\n", encoding="utf-8")
+        findings, _, _ = check(root, ["src/bare_ok.cpp"])
+        if findings:
+            failures.append(f"a bare reference that resolves must pass, got {findings}")
+
+        bare_bad = root / "src" / "bare_bad.cpp"
+        bare_bad.write_text("// see CONTRACT.md section 9\n", encoding="utf-8")
+        findings, _, _ = check(root, ["src/bare_bad.cpp"])
+        if not findings:
+            failures.append("a bare reference to a section that does not exist must fail")
+
+        bare_unknown = root / "src" / "bare_unknown.cpp"
+        bare_unknown.write_text("// see SOMEBODY_ELSES.md section 3\n", encoding="utf-8")
+        findings, _, _ = check(root, ["src/bare_unknown.cpp"])
+        if findings:
+            failures.append(f"a bare reference to a file outside this tree must be ignored, got {findings}")
+
         # The spec's other half: the clean file must stay green after the offenders existed.
         findings, _, _ = check(root, ["src/good.cpp"])
         if findings:
@@ -246,7 +291,7 @@ def self_test() -> int:
         for line in failures:
             print(f"check_doc_refs --self-test FAIL: {line}")
         return 1
-    print("check_doc_refs --self-test: PASS (7 controls: 3 green, 4 red)")
+    print("check_doc_refs --self-test: PASS (10 controls: 5 green, 5 red)")
     return 0
 
 

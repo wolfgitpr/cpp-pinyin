@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """Run the Python shell's own test suite, and say SKIP when it cannot be run.
 
-Why this gate exists: the suite existed and passed, but NOTHING ran it -- and it rotted in silence. On
-2026-10-18, `python -m pytest python/tests` failed because `python/tests/test_contract.py` still matched
-`cppp_` (the 1.x C ABI prefix) against a 2.x header, so its "the shell declares exactly the C ABI surface"
-assertion compared the empty set with the baseline. It failed only because the OTHER side of that
-comparison was non-empty; a pattern that parses nothing must never read as agreement, which is why that
-test now asserts it parsed something. A suite nobody runs cannot tell anyone that.
+The suite existed and passed but NOTHING ran it, so it rotted in silence: one test still matched the 1.x
+`cppp_` prefix against a 2.x header, so its "the shell declares exactly the C ABI" assertion compared the
+empty set with the baseline and read as agreement. A pattern that parses nothing must never pass; the test
+now asserts it parsed something, and this gate is what runs it.
 
 What "cannot be run" means, and why it is a SKIP rather than a failure:
-  * `pytest` is not installed  -> SKIP (print how to install it);
-  * the native payload is not staged under `python/cpp_pinyin2/_native/`  -> SKIP (print the exact
-    `python/tools/build_native.py` command). The payload is gitignored by design: it is a build artifact,
+  * `pytest` is not installed -> SKIP (print how to install it);
+  * the native payload is not staged under `python/cpp_pinyin2/_native/` -> SKIP (print the exact
+    `python/tools/build_native.py` command). The payload is gitignored by design: it is a build product,
     and shipping one from a previous commit is how a test starts vouching for code nobody built.
 
 Exit codes: 0 passed (or SKIP), 1 the suite failed, 2 usage.

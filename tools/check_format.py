@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 """Format gate: every FIRST-PARTY C/C++ file matches `.clang-format`.
 
-Why this file exists. `.clang-format` has sat in this repository since the beginning and **nothing ran
-it** (measured 2026-10-18: no caller in `tools/`, `tests/`, `CMakeLists.txt`, the hooks or any script) --
-so the tree drifted away from its own config: 40 lines over the configured 120 columns (the longest 773
-characters, in `ext/c_api.h`), and a `clang-format --dry-run` on the unformatted tree wanted to touch 69
-of 79 files. A config nobody runs is a claim, not a policy; this gate is what turns it into one.
+`.clang-format` had been in this repository since the beginning with nothing running it, so the tree
+drifted from its own config. A config nobody runs is a claim, not a policy; this gate is what turns it
+into one.
 
 Scope. `git ls-files` for `.c`/`.cc`/`.cpp`/`.h`/`.hpp`, minus anything under `vendor/`: third-party code
-is stored verbatim, and reformatting it would turn every future update of that file into a merge conflict
-with our changes hidden inside it. `vendor/.clang-format` says `DisableFormat: true`, so editors and this
-gate agree about that boundary instead of each having its own opinion.
+is stored verbatim, and reformatting it would turn every future update into a merge with our changes hidden
+inside it. `vendor/.clang-format` says `DisableFormat: true`, so editors and this gate agree about that
+boundary.
 
 Modes.
     (default)     verify; exit 1 listing the files that need formatting
     --fix         run `clang-format -i` on exactly the same set
-    --self-test   prove the checker sees a bad file and accepts a clean one (writes only under .tmp/)
+    --self-test   prove the checker sees a bad file and accepts a clean one (writes only under .tmp)
 
 Exit codes: 0 clean (or clang-format absent -- reported as SKIP, not as a pass), 1 drift found, 2 usage.
 """
@@ -91,7 +89,7 @@ def offender(executable: str, names: list[str], style: str) -> list[str]:
 def self_test(require: bool = False) -> int:
     executable = clang_format()
     if executable is None:
-        # --require must reach the self-test too (2026-10-20, audit round 2 §12.6 C3). The full gate runner
+        # --require must reach the self-test too (2026-10-20). The full gate runner
         # passes `--require`, and its self-test traversal used to drop it -- but even with the flag passed
         # the self-test ignored it and returned 0, so "no clang-format" still printed SKIP and looked like
         # a pass. With --require the absence is a failure here exactly as it is on the main path: a gate
@@ -115,6 +113,9 @@ def self_test(require: bool = False) -> int:
     clean_text = subprocess.run(
         [executable, f"--style={style}"], input=seed, capture_output=True, text=True, check=True
     ).stdout
+    # `.tmp/` is gitignored (`.gitignore:54`), so a clean checkout does not have it and
+    # TemporaryDirectory(dir=...) raises FileNotFoundError before the self-test can prove anything. Create it.
+    (ROOT / ".tmp").mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=ROOT / ".tmp") as scratch:
         space = Path(scratch)
         bad = space / "bad.cpp"

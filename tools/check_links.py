@@ -1,26 +1,19 @@
 #!/usr/bin/env python3
 """Every relative markdown link must land on a file that exists.
 
-WHY THIS EXISTS. The documentation review produced five gates, and between them they left one form of
-cross-reference unchecked: the anchor audit reads backticked ``path:NN`` citations, so a plain
-`[text](relative/path)` link was invisible to every instrument. Measured 2026-10-10 on the tracked tree:
-**28 relative links in 53 markdown files**, of which two were dead -- `docs/API_en.md` and `docs/API_zh.md`
-linked to `./docs/Custom%20Chinese%20Dialect.md`, a path that resolves to `docs/docs/...` because those files
-live in `docs/` while the link was written as if they sat at the root. A human found those two by reading a
-table; nothing would have found the next one.
+SCOPE. The doc gates divide by reference form: the anchor audit reads backticked ``path:NN`` citations,
+`check_doc_paths` reads bare backticked paths, and a plain `[text](relative/path)` link is neither.
 
 WHAT IT CHECKS: every markdown link with a relative target, resolved against the linking file's own
-directory, must name an existing path. Schemes (`https:`), absolute (`/...`) and in-page (`#...`) targets are
-out of scope -- they are not this repository's to verify.
+directory, must name an existing path. Schemes (`https:`), absolute (`/...`) and in-page (`#...`) are out
+of scope -- they are not this repository's to verify.
 
-TWO MEASURED DETAILS IT HAS TO GET RIGHT, both found by running it against the tree before trusting it:
-  * percent-encoding -- this repository writes `Custom%20Chinese%20Dialect.md`; without decoding, five links
-    reported as missing and the gate would have been noise from its first run.
-  * `doc-anchors: historical` -- the same declaration the anchor audit honours. A dated record may describe a
-    path as it was; that is a record, not a link to today. A document that declares itself historical is
-    skipped, and so is a line carrying a trailing `<!-- anchor-history: reason -->` comment. The marker has
-    to be a trailing comment on the link's own line: an exemption that a standalone comment line could grant
-    would be granted by accident, which is exactly what happened twice to the anchor audit.
+TWO DETAILS IT HAS TO GET RIGHT:
+  * percent-encoding -- this repository writes `Custom%20Chinese%20Dialect.md`; without decoding it is
+    reported as missing and the gate is noise from its first run.
+  * `doc-anchors: historical` -- the same declaration the anchor audit honours, plus a line carrying a
+    trailing `<!-- anchor-history: reason -->` comment. It must be a TRAILING comment on the link's own
+    line: an exemption a standalone comment line could reach would be granted by accident.
 
 USAGE
     python tools/check_links.py              # exit 1 if any relative link is dead
@@ -163,7 +156,7 @@ def self_test() -> int:
                                  f"{listed.stderr.strip()}")
             staged = {line for line in listed.stdout.splitlines() if line}
             present = {path.relative_to(root).as_posix()
-                       for path in root.rglob("*.md") if ".git" not in path.parts}
+                       for path in root.rglob("*.md") if ".git" not in path.relative_to(root).parts}
             missing = sorted(present - staged)
             if missing:
                 raise SystemExit(f"check_links self-test: the fixture has {missing} on disk but not in the "

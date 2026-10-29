@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Turn `data/dialects/**` into a C++ translation unit the library can link (CPP_PINYIN2_EMBED_DICTS).
+"""Turn `data/dialects/**` into a C++ translation unit the library can link (CPP_PINYIN2_EMBED_DIALECTS).
 
-Why this exists: a single-file deployment (one Windows .exe, an AppImage, a Unity/UE plugin, a mobile app
+Why this exists: a single-file deployment (one Windows .exe, an AppImage, a Unity/UE plugin, a language
 bundle) cannot carry a `share/cpp-pinyin2/dict` tree next to the binary, and a static build has no module
-anchor to resolve one against. Embedding the tables removes the resource directory from the picture entirely
+anchor to resolve one against. Embedding the tables removes the resource directory from the equation
 (D3 of docs/DECISIONS.md section 4.1).
 
 WHAT THIS WRITES. One file with
-  * one string literal per table (chunked, because MSVC refuses a string literal over ~16 KB: each chunk is
-    emitted as its own adjacent literal and C++ concatenates them), every byte escaped as `\\xNN` -- escaping
-    EVERY byte is what makes the result binary-safe, and it also keeps a literal from swallowing the following
-    character as a hex digit;
+  * one string literal per table (chunked, because MSVC refuses a literal over ~16 KB; each chunk is
+    emitted as its own adjacent literal and C++ concatenates them), every byte escaped as `\\xNN` -- that is
+    what makes the result binary-safe, and it also keeps a literal from swallowing the next character as a
+    hex digit;
   * one row per table (`<dialect>/<name>` + bytes + size);
-  * `cpp_pinyin::v2::detail::findEmbeddedTable()`, matched by the last two path components of the request.
+  * `cpp_pinyin::v2::detail::findEmbeddedTable()`, matched by the last two path components.
 
 Determinism: dialects and files are sorted, so two runs over the same tree produce byte-identical output.
 

@@ -1,30 +1,25 @@
 #!/usr/bin/env python3
 """No unqualified `cpp_pinyin::X` anywhere, and no `using namespace` in a header.
 
-WHY THIS EXISTS. The generation policy (`docs/STABILITY.md` section 4.5, R10/R11) says the product
-namespace holds version namespaces only and that the repository -- including its documents -- always
-spells the qualified name. For compiled code the COMPILER enforces that: after the rename, a root-style
-reference simply does not resolve. Nothing enforces it for the files no compiler reads:
-
-  * `docs/**` and the root `README.md`, where a stale `cpp_pinyin::Engine` is a lie a reader copies;
-  * `python/**` and `csharp/**`, whose comments and docstrings quote the C++ spelling;
-  * `tools/**`, whose messages talk about the library.
+The generation policy (docs/STABILITY.md section 4.5, R10/R11) says the root namespace holds version
+namespaces only and that the repository -- including its documents -- spells the qualified name. For
+compiled code the COMPILER enforces that: after a rename the old reference does not resolve. Nothing
+enforces it for the files no compiler reads: `docs/**` and `README.md` (a stale `cpp_pinyin::Engine` is a
+lie a reader trusts), `python/**` and `csharp/**` (comments quoting the C++ spelling), and `tools/**`.
 
 WHAT IT CHECKS
-  * a root-style reference (`cpp_pinyin::X` where X is not `v<digits>::…` and not `detail::…`) in code or
-    in prose is a finding;
+  * a root-style reference (`cpp_pinyin::X` where X is not `v<digits>::…` and not `detail::…`) in prose;
   * the spellings the `::` rule cannot see -- `namespace cpp_pinyin {`, `namespace cp = cpp_pinyin;`,
-    `using namespace cpp_pinyin;` -- are findings of their own: the first one is the abolished form
-    itself, and none of them contain a `::`;
-  * `using namespace cpp_pinyin::vN;` is a finding ONLY in a header (R14: in a header it re-exports a
-    generation into every translation unit that includes it); in a `.cpp` it is an advisory note.
+    `using namespace cpp_pinyin;` -- are findings of their own, since none of them contains a `::`;
+  * `using namespace cpp_pinyin::vN;` is a finding ONLY in a header (R14: it re-exports a generation into
+    every translation unit that includes it); in a `.cpp` it is an advisory.
 
 WHAT IT DOES NOT DO. It does not judge WHICH generation is current (`check_version_tokens` owns that) and
 it does not freeze names (`check_public_names` owns that). It also does not scan build directories or
 `.tmp`: those are copies, and judging a copy is how a gate reports its own shadow.
 
-EXEMPTIONS. `tests/versioning/**` exists to put two generations side by side, so it is allowed to spell
-either one; everything else names the current generation.
+EXEMPTIONS. `tests/versioning/**` exists to put two generations side by side, so it is allowed either one;
+everything else names the current generation.
 
 歧义形态：**源码面** ✗ —— 全树不得出现不限定的根名写法（编译器看不到的那一半由本门禁负责）。
 """
@@ -274,7 +269,7 @@ def walk(root: Path) -> list[Path]:
             continue
         for path in sorted(base.rglob("*")):
             if path.is_file() and path.suffix.lower() in CODE_SUFFIXES | PROSE_SUFFIXES \
-                    and not (set(path.parts) & SKIP_PARTS):
+                    and not (set(path.relative_to(root).parts) & SKIP_PARTS):
                 files.append(path)
     for name in ROOT_FILES:
         path = root / name

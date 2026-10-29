@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """AC-3 as a machine gate: lower layers must not include upper layers.
 
-Rule from docs/DECISIONS.md's acceptance criteria (AC-3). Until 2026-10-03 it was only ever checked by hand
-with grep, and every report had to carry that caveat. The inventory is the LAYERS table below -- files per
-layer plus the markers that layer must not include; the prose does not restate it, because two copies of one
-list disagree eventually. When the table misses a file, the uncovered-file check reports it instead of
-silently shrinking the scan (the table has to cover every file under src/ -- a hard-coded count here was wrong within one batch: it said 28 while the table held 32).
+AC-3 (docs/DECISIONS.md) is a rule, and a rule enforced by grepping by hand carries its own caveat every
+time. The inventory is the LAYERS table below: each layer plus the markers it must not include. The prose
+does not restate that table, because two lists disagree eventually. When the table misses a file the
+uncovered-file check reports it, instead of the scan silently shrinking.
 
-Two hard-won facts the scan encodes:
+Two facts the scan encodes:
 
-  * src/infra/ is a SET of two translation units, not a directory -- earlier versions printed "src/infra/
-    does not exist, its rule did not run" and then "AC-3 OK", which read as if the criterion had passed.
-  * Deliberately NOT upper layers: the public core headers (cpp-pinyin2/core/*, e.g. U16Str.h) and each
-    layer's own peers; a dict that could not use utf8strToU16str would be unimplementable.
+  * src/infra/ is a SET of two translation units, not a directory -- listing it as a directory made the
+    tool print "does not exist, its rule did not run" and then "AC-3 OK", which reads as if the criterion
+    had passed;
+  * the public core headers are deliberately NOT upper layers: a dict that could not use
+    `utf8strToU16str` would be unimplementable.
 
 Usage:
     python tools/check_layers.py               # check the tree, exit 1 on a violation
-    python tools/check_layers.py --self-test   # prove the checker can fail: a clean fixture passes, and
-                                               # fixtures with planted violations must be rejected (21 cases)
+    python tools/check_layers.py --self-test   # prove the checker can fail: a clean fixture passes and
+                                               # fixtures with planted violations must be rejected
 """
 
 import re
@@ -43,7 +43,7 @@ LAYERS = {
              ("dict/", "Engine.h", "EngineImpl", "dialects/")),
     "core": (("src/ToneConverter.cpp", "src/ToneSandhi.cpp", "src/Result.cpp", "src/Outcome.cpp",
               "src/Capabilities.h"),
-             # `ext/` is here as of 2026-10-20 (audit round 3, H09): `src/Capabilities.h` DOES include
+             # `ext/` is here as of 2026-10-20: `src/Capabilities.h` DOES include
              # the public `ext/Dialect.h`, and until this marker existed neither this scan nor the
              # public-header tier scan could see that edge -- the file sat in the core row, whose
              # forbidden list had no `ext/`, while the tier scan only reads `include/`. The edge is
@@ -60,7 +60,7 @@ LAYERS = {
 }
 
 #: The upward edges that ARE there, registered so the gate reports them instead of being blind to them
-#: (2026-10-20, audit round 2 §12.7). This is not a whitelist to make the tree green: each entry says which
+#: (2026-10-20). This is not a whitelist to make the tree green: each entry says which
 #: file, which layer, which edge, and WHY the edge is legitimate, and the run prints every one of them. The
 #: point is that a second, illegitimate edge cannot hide in the same blind spot -- `ReadingCodec.cpp` calling
 #: `ManTone::toneToInitials` is a real coupling that `check_layers` did not see at all before this table
@@ -75,7 +75,7 @@ LAYER_EXEMPT = {
         "the capability mask IS a property of the Dialect (`supportsVToU`/`supportsNeutralTone5`), so `core` "
         "cannot own it without that header; `docs/CONTRACT.md` keeps `Dialect` in `ext/`, and Capabilities.h "
         "cannot move up into `ext/` (it would add a public name to the frozen surface) -- registered 2026-10-20 "
-        "(audit round 3, H09) so the edge is printed instead of invisible"),
+        "so the edge is printed instead of invisible"),
 }
 
 
@@ -171,12 +171,12 @@ def check_public_surface_leaks(root):
 
     Measured 2026-10-10 on this tree: 14 public headers declare 17 types, src/ defines 13 types of its own.
     `Engine.h` forward-declares `Registry` at namespace level, and `Registry` IS a public type of its own
-    (`include/cpp-pinyin2/ext/Registry.h:44`) -- so pointing a public header at a type `src/` defines does not
-    happen today. Four internal names are MENTIONED in public headers, all in explanatory prose (`EngineImpl`
-    as "what sits underneath and is not part of the ABI", `PhraseGate` in a comment about an export leak,
-    `PhraseLayers` naming the file a rule lives in, `cppp2_engine` as the deliberate opaque handle whose
-    incomplete type the C API is built on) -- naming an internal in a comment is documentation, not a leak,
-    so mentions are not findings.
+    (`class Registry` in `include/cpp-pinyin2/ext/Registry.h`) -- so pointing a public header at a type `src/`
+    defines does not happen today. Four internal names are MENTIONED in public headers, all in explanatory
+    prose (`EngineImpl` as "what sits underneath and is not part of the ABI", `PhraseGate` in a comment about
+    an export leak, `PhraseLayers` naming the file a rule lives in, `cppp2_engine` as the deliberate opaque
+    handle whose incomplete type the C API is built on) -- naming an internal in a comment is documentation,
+    not a leak, so mentions are not findings.
 
     The finding is therefore narrow on purpose: a namespace-level forward declaration of a type that `src/`
     defines, or any include of a `src/` header. Those are the shapes a leak takes, and each one breaks the
@@ -389,7 +389,7 @@ def main():
             bad = [f for f in findings if f.startswith("VIOLATION (missing)")]
             cases.append(("renamed layer file caught", len(bad) == 1, f"{bad}"))
 
-        # 8b/8c. the src-side `core -> ext/` rule (added 2026-10-20, audit round 3 H09). Until it existed,
+        # 8b/8c. the src-side `core -> ext/` rule (added 2026-10-20). Until it existed,
         #    `src/Capabilities.h` could include the public `ext/Dialect.h` with BOTH scans blind: the core
         #    row's forbidden list had no `ext/`, and the public-header tier scan only reads `include/`.
         #    8b plants the real, legitimate edge and demands it stay allowed; 8c plants the same include in

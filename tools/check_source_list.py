@@ -1,11 +1,13 @@
-"""源文件清单与树一致（2026-10-20，审计 round 2 G31）。
+"""源文件清单与树一致。
 
-`CMakeLists.txt` 曾经用 `file(GLOB_RECURSE ...)` 决定编译哪些文件。glob 的问题不是风格：
-一个新文件会**自动**加入库（没人审阅它的接入），一个被删的头文件会**继续**用陈旧副本构建到下一次
-reconfigure 为止；而对一个以"公共面冻结"为核心的库来说，文件集合本身就是契约的一部分。
+`CMakeLists.txt` used to let `file(GLOB_RECURSE ...)` decide what gets compiled. The problem is not
+style: a new file joins the library **without review**, and a deleted header **keeps** building from a
+stale copy until the next reconfigure -- and for a library whose contract is a frozen public surface, the
+file set is part of the contract.
 
-现在清单写在 `CMakeLists.txt` 的 `CPP_PINYIN2_SOURCES` / `CPP_PINYIN2_HEADERS` 里，本脚本负责让
-"清单 == 树"这件事在门禁里成立：新增文件忘记登记、或者清单里留着一个已删除的文件，都会红。
+The list now lives in `CMakeLists.txt` as `CPP_PINYIN2_SOURCES` / `CPP_PINYIN2_HEADERS`, and this script
+makes "list == tree" true inside the gate: a new file left unregistered, or an entry for a deleted file,
+goes red.
 
 USAGE
     python tools/check_source_list.py              # 退出 1 表示清单与树不一致

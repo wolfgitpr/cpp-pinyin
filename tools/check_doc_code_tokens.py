@@ -1,29 +1,21 @@
 """G9 `check_doc_code_tokens`: the names taught to users in code blocks.
 
-Round 34 measured a hole with no gate behind it: the runbook's mechanical retag does not touch `docs/**` or
-`README.md`, so after a generation change the documentation keeps teaching `CPP_PINYIN2_DICT_DIR` -- a name
-no generation has -- and G1 never looks there (its token areas are code and build files).
+The runbook's mechanical retag does not touch `docs/` or `README.md`, and the other token gates look at
+code and build files only -- so a generation change can leave the documentation teaching a name no
+generation has.
 
 Scope, chosen to avoid flooding:
   * only FENCED code blocks (``` ... ```) inside `*.md` are judged. Those are what a reader copies.
-  * prose is never judged: a sentence may legitimately quote a historical name (this repository's rule is
-    that history is not rewritten).
-  * inside a block, a `CPP_PINYIN_*` name WITHOUT a generation digit is a finding -- the same criterion the
-    build-face attacker proposed for build names ("only `CPP_PINYIN_` and no number means a missed rename").
+  * prose is never judged: a sentence may legitimately quote a historical name.
+  * inside a block, a `CPP_PINYIN_*` name WITHOUT a generation digit is a finding.
 
-The dependency this exposes: the current documentation DOES teach the bare name, so this gate cannot land
-before the rename it argues for. That is measured here rather than assumed.
-
-Two exemption forms, both named rather than loose (this repository's rule: an exemption is named with a
-reason, and the pattern is never loosened, because loosening removes protection from real files too):
+Two exemption forms, both named rather than loose:
   * a line marker, for a line that quotes history in prose;
-  * a block marker (round 241), for an excerpt that is historical as a WHOLE -- a line marker cannot be used
-    inside a fence without printing an HTML comment in a sample a reader copies, and the reason for each such
-    exemption is written in a note beside the block.
+  * a block marker, for an excerpt that is historical as a WHOLE -- a line marker cannot be placed inside
+    a fence without printing an HTML comment in a sample a reader copies.
 
-歧义形态：**源码面** ✗（文档面）—— 读者照抄的围栏代码块里必须写带令牌的名字，否则照抄即错。
+
 """
-
 from __future__ import annotations
 
 import argparse
@@ -62,9 +54,15 @@ def scan_docs(root: Path) -> tuple[list[str], int, int]:
     files = 0
     blocks = 0
     for path in sorted(root.rglob("*.md")):
-        if any(part in {"build", ".git", ".tmp", "obj", "bin", "node_modules"} for part in path.parts):
+        # The skip list is about directories INSIDE the scanned tree, so compare the path relative to
+        # `root`: an absolute prefix such as `<repo>/.tmp/win-temp/...` must not make every fixture look
+        # like build output (that made this tool's own self-test report 12 red cases as green).
+        try:
+            parts = path.relative_to(root).parts
+        except ValueError:
+            parts = path.parts
+        if any(part in {"build", ".git", ".tmp", "obj", "bin", "node_modules"} for part in parts):
             continue
-        files += 1
         inside = False
         pending_block_exempt = False
         exempt_block = False
@@ -142,7 +140,7 @@ def main() -> int:
     # repository. Measured on the firefly board (2026-10-21): the default root was /tmp, the gate scanned whatever
     # else happened to sit there and reported ANOTHER project's documents as this repository's findings -- while on
     # a parent directory that holds only this repo makes the wrong root look right. The same off-by-one was
-    # already fixed in check_generation_compat.py, whose comment records it (audit round 2, 2026-10-20).
+    # already fixed in check_generation_compat.py, whose comment records it.
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()

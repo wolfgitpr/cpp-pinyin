@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Refuse a document that sends the reader to a path this repository does not have.
 
-WHY THIS EXISTS. `check_links` follows markdown LINKS and `audit_doc_anchors` resolves `path:line` anchors. A
-bare `include/cpp-pinyin2/c_api.h` sitting in backticks inside a sentence is neither, so a document can name a
-file that was renamed two generations ago while every other gate stays green. Measured on 2026-10-22 before
-this tool existed: 663 path mentions across `docs/`, 28 distinct ones that resolve to nothing.
+SCOPE. `check_links` follows markdown LINKS and `audit_doc_anchors` resolves `path:line` anchors. A bare
+`include/cpp-pinyin2/c_api.h` in backticks inside a sentence is neither of those, so a document could
+point at a file renamed two generations ago while every other gate stays green.
 
 WHAT IT DOES NOT JUDGE. Whether the sentence around the path is TRUE -- a path can exist and still be cited for
 something it does not do (`check_doc_claims` and the anchor audit are for that). This is the cheapest possible
@@ -80,21 +79,33 @@ RETIRED_NAMES = {
     "tests/cpp/test_batch_accuracy.cpp": "deleted 2026-09-29, replaced by tests/cpp/test_accuracy_v2.cpp",
     "tests/Common.cpp": "deleted; the shared helpers live in the per-suite translation units",
     "tests/registry/linked_in.cpp": "deleted; the linked-in probe is no longer in the tree",
-    # Removed 2026-10-23 as process records whose work had landed. Dated documents still cite them, and a dated
-    # citation is a true sentence about the day it was written -- what the repository must not do is imply the
-    # file is still there, which is why the pointers were reworded where they were load-bearing.
-    "docs/audit-report.md": "deleted 2026-10-23; the four-domain audit's fixes are the commits, and its open "
+    # Two different histories, and the difference matters to a reader looking for the text. The seven `docs/`
+    # names below were working-tree documents: this repository never tracked them, so the commit history cannot
+    # return them and saying "deleted 2026-10-23" would promise something no reader can collect. The
+    # `tests/data/testdata/` files WERE tracked; the 2026-10-22 commit that removed them still holds them.
+    # Dated citations of either are true sentences about the day they were written -- what the repository must not
+    # do is imply the text is still reachable when it is not.
+    "docs/audit-report.md": "never tracked here -- a working-tree document that the 2026-10-22 commit says had "
+                            "already been removed. The four-domain audit's fixes are the commits, and its open "
                             "items moved to docs/DECISIONS.md",
-    "docs/REPRODUCE_CLAIMS.md": "deleted 2026-10-23; it was a snapshot whose rows named tools that never shipped",
-    "docs/REPO_LAYOUT.md": "deleted 2026-10-23; the restructure it planned landed, and the surviving record "
-                           "of what moved is git history",
-    "docs/HISTORY.md": "deleted 2026-10-23 with the other process records; the facts a live document still "
-                       "needs are stated in that document, and the narration is in git history",
-    "docs/BACKLOG.md": "deleted 2026-10-23; open items moved to docs/DECISIONS.md sections 3 and 8",
-    "docs/PLUGIN_INTERFACE_AND_BINDINGS.md": "deleted 2026-10-23; its rulings migrated to docs/DECISIONS.md "
-                                             "section 2.1 and its fixture registry to conformance/README.md",
-    "docs/TESTDATA_ARCHIVE.md": "deleted 2026-10-23 with the dated review records it indexed; the frozen accuracy table lives in docs/REQUIREMENTS.md",
-    "tests/data/testdata/": "the dated review records were removed 2026-10-23; the results they carried are the accuracy table in docs/REQUIREMENTS.md",
+    "docs/REPRODUCE_CLAIMS.md": "never tracked here -- a working-tree snapshot whose rows named tools that never "
+                                "shipped, removed before the 2026-10-22 cleanup",
+    "docs/REPO_LAYOUT.md": "never tracked here -- it only ever existed in the working tree, and the 2026-10-22 "
+                           "commit that removed the process records says it had already gone. The restructure it "
+                           "planned landed, but nothing in this repository can return its text",
+    "docs/HISTORY.md": "never tracked here -- a working-tree document that the 2026-10-22 commit says had already "
+                       "been removed. The facts a live document still needs are stated in that document, and the "
+                       "history cannot return the rest",
+    "docs/BACKLOG.md": "never tracked here -- a working-tree document that the 2026-10-22 commit says had already "
+                       "been removed. Open items moved to docs/DECISIONS.md sections 3 and 8",
+    "docs/PLUGIN_INTERFACE_AND_BINDINGS.md": "never tracked here -- a working-tree document removed before the "
+                                             "2026-10-22 cleanup. Its rulings migrated to docs/DECISIONS.md section "
+                                             "2.1 and its fixture registry to conformance/README.md",
+    "docs/TESTDATA_ARCHIVE.md": "never tracked here -- a working-tree index removed before the 2026-10-22 cleanup. "
+                                "The frozen accuracy table lives in docs/REQUIREMENTS.md",
+    "tests/data/testdata/": "these 31 files WERE tracked and were removed in the 2026-10-22 commit; the delete "
+                            "commit still holds them, and the results they carried are the accuracy table in "
+                            "docs/REQUIREMENTS.md",
 }
 
 #: Paths owned by third parties that documents legitimately cite as reference material.

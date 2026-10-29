@@ -25,6 +25,18 @@ ROOT = Path(__file__).resolve().parent.parent
 BUILD_HINT = ("configure with: cmake -S . -B .tmp/mk-default -G Ninja "
               "-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON "
               "-DCPP_PINYIN2_BUILD_TESTS=ON -DCPP_PINYIN2_INSTALL=ON -DCPP_PINYIN2_BUILD_EXAMPLES=OFF")
+#: Two of the build-dependent gates do not read the build tree, they read THIS file, which nothing else in
+#: the hint produces. Measured 2026-10-27 by moving it away: `--with-build` then failed on `check_gate_inventory`
+#: ("inventory not found") and on `check_doc_claims`, both naming a file the hint had never told anyone to
+#: create. A hint that gets you 20 of 22 gates and does not say so is the same defect as a gate that skips
+#: in silence.
+INVENTORY_HINT = ("then the CTest inventory two gates read:\n"
+                  "    ctest --test-dir .tmp/mk-default --show-only=json-v1 > "
+                  ".tmp/mk-default-inventory.json\n"
+                  "  (PowerShell's `>` writes UTF-16 and the tools refuse it: use\n"
+                  "    ctest --test-dir .tmp/mk-default --show-only=json-v1 | Out-File -Encoding utf8 "
+                  ".tmp/mk-default-inventory.json\n"
+                  "  or pass the build DIRECTORY to the two gates instead.)")
 
 # (name, argv, needs_a_build_tree, what a failure means)
 GATES = [
@@ -101,6 +113,24 @@ GATES = [
     # rather than used -- that is the whole lesson of the run that found the six.
     ("check_csharp_shell", ["tools/check_csharp_shell.py"], True,
      "the C# shell's own test suite failed -- run python csharp/tools/run_tests.py --native-dir <built bin>"),
+    # 2026-10-27: this tool guards two things no other gate can -- a root-style
+    # `cpp_pinyin::X` reference must FAIL to compile, and the pre-rename C symbol must FAIL to link -- and
+    # NOTHING called it, so both had been verified once by hand and never again: a gate nobody invokes is a
+    # claim. It configures and builds its own directory, which is what the build-tree flag says; measured at
+    # ~30 s cold and ~2 s once warm. The g3/v3 sections stay manual on purpose -- they take a tree that this
+    # repository deliberately does not generate (docs/UPGRADING_A_GENERATION.md).
+    ("verify_build_dependent", ["tools/verify_build_dependent.py", "--authorised"], True,
+     "a generation guard stopped guarding: a root-style reference compiled, or a pre-rename C symbol "
+     "linked, so either the rename is not in force or the tool's read-the-tree expectation is stale"),
+    # 2026-10-27: five workflows and two shell scripts decide whether anything gets built, packaged or
+    # published, and NOTHING parsed them -- check_bindings reads the workflows as text and splits jobs by
+    # indentation, which answers its wiring questions and says nothing about whether the file is valid
+    # YAML. An unparsable workflow is a green repository and a red dispatch, and a dispatch is a decision,
+    # not a test. `--require` because both tools exist on every machine this project is developed on; the
+    # skip path stays for the machines that have neither.
+    ("check_parsable", ["tools/check_parsable.py", "--require"], False,
+     "a tracked shell script fails `bash -n` or a workflow fails `yaml.safe_load`, so the failure would "
+     "otherwise surface at dispatch or on a runner instead of here"),
 ]
 
 
@@ -117,7 +147,7 @@ def self_tests_pass() -> tuple[bool, str]:
     problems = []
     environment = {key: value for key, value in os.environ.items() if key not in ("TEMP", "TMP")}
     for name, argv, _needs_build, _why in GATES:
-        # THE REGISTRY'S ARGUMENTS MUST SURVIVE (2026-10-20, audit round 2 §12.6 C3). This used to build
+        # THE REGISTRY'S ARGUMENTS MUST SURVIVE (2026-10-20). This used to build
         # `argv[:1] + ["--self-test"]`, which dropped every flag the entry declares -- most importantly
         # `check_format`'s `--require`, so on a machine without clang-format the format gate's self-test
         # printed SKIP, exited 0, and this loop reported "all passed". The flags go before `--self-test`
@@ -145,6 +175,7 @@ def main() -> int:
 
     failures = []
     skipped = []
+    self_skips = []
     for name, argv, needs_build, why in GATES:
         if needs_build and not args.with_build:
             skipped.append(name)
@@ -169,6 +200,18 @@ def main() -> int:
 
         verdict = verdict_of(output)[:96]
         status = "ok  " if completed.returncode == 0 else "FAIL"
+        # EXIT 0 IS NOT THE SAME AS "CHECKED". Two gates are registered without `--require` on purpose --
+        # `check_python_shell` and `check_csharp_shell` cannot be answered on a machine with no pytest or no
+        # .NET SDK, so there the honest verdict is SKIP and exit 0. The consequence, measured 2026-10-27:
+        # `check_csharp_shell` had been refusing a stale staged library on every run of the day, printing
+        # "SKIP -- ... older than src/c_api.h", and this runner showed it as `ok` -- so "all 22 gates pass"
+        # in the summary was 21 passes and one gate that did nothing. `check_generation_compat`'s "NOT
+        # MEASURED" is the same shape.
+        self_skipped = completed.returncode == 0 and any(
+            marker in verdict for marker in ("SKIP", "NOT MEASURED"))
+        if self_skipped:
+            status = "skip"
+            self_skips.append(name)
         print(f"  {status}  {name:<22} {verdict}")
         if completed.returncode != 0:
             failures.append((name, why))
@@ -183,6 +226,13 @@ def main() -> int:
     if skipped:
         print(f"skipped: {', '.join(skipped)}")
         print(f"  {BUILD_HINT}")
+        print(f"  {INVENTORY_HINT}")
+    if self_skips:
+        # Above the RESULT line on purpose: the RESULT still says every gate passed, which stays TRUE --
+        # they all exited 0 and their self-tests pass -- and this is the line that says how many answered
+        # "cannot tell" instead of "yes".
+        print(f"note: {len(self_skips)} gate(s) reported SKIP / NOT MEASURED rather than a verdict: "
+              f"{', '.join(self_skips)}")
     if failures:
         for name, why in failures:
             print(f"RESULT: FAIL -- {name}: {why}")

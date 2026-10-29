@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 """The frozen list of public names must agree with the headers, in both directions.
 
-WHY THIS EXISTS. `tests/abi/expected_public_headers.txt` freezes the header FILES and
-`expected_c_api_symbols.txt` freezes the C symbols, but nothing froze the C++ NAMES. A name added to an
-existing header is therefore a public-surface change that no gate sees -- and the generation policy
-(`docs/STABILITY.md` section 4.5) makes each name a promise: the next major version must either keep it
-or say, in the migration guide, that it is gone.
+`tests/abi/expected_public_headers.txt` freezes the header FILES and `expected_c_api_symbols.txt` freezes
+the C symbols, but nothing froze the C++ NAMES: a name appearing in an existing header is a public-surface
+change no gate sees, and the generation policy (docs/STABILITY.md section 4.5) makes each name a promise the
+next major version must keep or document as gone.
 
 WHAT IT CHECKS
-  * every namespace-scope name a public header declares has a row in the list, and every row names a
-    name that really is declared -- the list cannot drift in either direction;
-  * the scan reports how many headers and how many declarations it read, and zero is RED ("found
-    nothing" must not look like "found no problem");
+  * every namespace-scope name a public header declares has a row in the list, and every row names
+    something really declared -- the list cannot drift in either direction;
+  * the scan reports how many headers and declarations it read, and zero is RED ("found nothing" must not
+    look like "found no problem");
   * only namespace scope counts: a member function, a nested alias or a private nested class is not a
-    public name of the generation (`ToneConverter::ConvertFunc`, `Engine::Impl` and friends);
-  * **the list and the header tree are paired BY GENERATION**: `include/cpp-pinyinN/` is checked against
-    `tests/abi/expected_public_names.vN.txt`. The first revision globbed every `cpp-pinyin*` directory
-    into one name set, which meant a name that v3 DROPPED could never turn the check red -- v2's header
-    still declared it, so the union still contained it. That is the exact question the file exists to
-    answer, so it now cannot be answered wrongly by accident. A tokenless
-    `expected_public_names.txt` is RED with a rename hint.
+    public name of the generation (`ToneConverter::ConvertFunc`, `Engine::Impl`);
+  * **the list and the header tree are paired BY GENERATION**: `include/cpp-pinyinN/` checks against
+    `tests/abi/expected_public_names.vN.txt`. Globbing every generation into one name set would mean a name
+    that v3 DROPPED could never turn the check red -- an older generation still declares it, so the union
+    still contains it. A tokenless `expected_public_names.txt` is RED with a rename hint.
 
 USAGE
     python tools/check_public_names.py                 # exit 1 on any disagreement

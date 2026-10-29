@@ -1,23 +1,22 @@
 """G8 `check_generation_compat`: the compatibility promise, made checkable.
 
-R2/R3 promise that generation N ships the names of generation N-1 (a caller migrates by rewriting the token
-once). The plan's runbook step 4 ASSUMED a gate checked that ("v3 must contain v2's 36 names, removals must
-be recorded") -- no such gate existed. This is it.
+R2/R3 promise that generation N ships the names of generation N-1 (a caller migrates by changing one
+directory). Nothing checked it until this gate existed.
 
 How it judges
-  * it reads only the FROZEN LISTS (`tests/abi/expected_public_names.vN.txt`), which G2 already pins to each
-    generation's headers. That keeps G8 free of parsing, and it means "the promise" is measured against what
-    the repository declares, not against a second interpretation of the headers.
-  * for every pair of CONSECUTIVE generations present (2 and 3, 3 and 4, ...), every name of the older list
-    must appear in the newer one.
-  * a removal is allowed only if it is written down in `tests/abi/removed_names.vN.txt` (one name per line,
+  * it reads only the FROZEN LISTS (`tests/abi/expected_public_names.vN.txt`), which the public-name gate
+    already holds to that generation's headers. That keeps this free of parsing, and it means "the promise"
+    is measured against what the repository declares, not a second reading of the headers;
+  * for every pair of CONSECUTIVE generations present (2 and 3, 3 and 4, ...), every name of the older one
+    must appear in the newer one;
+  * a removal is allowed only if it is written in `tests/abi/removed_names.vN.txt` (one name per line, an
     optional `# reason`), where N is the generation that dropped it. That file is the machine-readable half
-    of the migration guide.
+    of the migration guide;
   * a removal entry for a name the newer generation still has is STALE and also fails: otherwise the file
-    would silently accumulate permission slips.
+    would accumulate permission slips nobody re-reads.
 
-Self-test fixtures cover the baseline, a dropped name, a recorded drop, a stale record, non-consecutive
-generations, and a missing list.
+Self-test fixtures cover the baseline, a dropped name, a recorded drop, a stale record, three generations,
+and a missing list.
 
 歧义形态：**源码面** ✗（承诺面）—— 逐对检查"这一代是否仍提供上一代的名字"，删名必须在 removed_names 里记录在案。
 """
@@ -61,9 +60,9 @@ def compare(root: Path, allow_single: bool = False) -> list[str]:
     findings: list[str] = []
     found = generations(root)
     if not found:
-        # ZERO lists is not the same state as ONE list (2026-10-20, audit round 2 §12.7). The old code
+        # ZERO lists is not the same state as ONE list (2026-10-20). The old code
         # printed "nothing to compare yet" for both and PASSed, so a wrong default root -- it used to be
-        # `parents[2]`, which resolves to D:\projects on Windows, i.e. NOT this repository -- looked
+        # `parents[2]`, which resolves to the parent directory on Windows, i.e. NOT this repository -- looked
         # exactly like a healthy single-generation repository.
         findings.append(f"no generation name list found under {root} -- the check measured NOTHING, which "
                         f"is not the same as 'the tree is consistent'. Pass --root <repository> if this is "
@@ -171,8 +170,8 @@ def self_test(tmp: Path) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="generation-to-generation name compatibility (R2/R3)")
     # parents[1], not [2]: this file lives in tools/, so [0] is tools/ and [1] is the repository root.
-    # [2] is the DIRECTORY HOLDING the repository (D:\projects here) -- measured 2026-10-20: the gate
-    # then scanned a directory with no generation lists and reported a bare PASS (audit round 2 §12.7).
+    # [2] is the DIRECTORY HOLDING the repository (the parent of this checkout) -- measured 2026-10-20: the gate
+    # then scanned a directory with no generation lists and reported a bare PASS.
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--allow-single-generation", action="store_true",

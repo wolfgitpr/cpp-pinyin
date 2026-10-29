@@ -1,43 +1,41 @@
 #!/usr/bin/env python3
 """Every generation token in the tree must carry the package's major version -- and nothing else.
 
-WHY THIS EXISTS. The 2.x line identifies itself on TEN axes at once, and this file is where nine of them are
-compared (the tenth, the soname, is a property of the built binary and lives in
-`tests/abi/check_soname.cmake`): the header directory, the macro prefix, the package/library/pkg-config name, the
-C++ version namespace, the version-namespace token inside every declaration, the CHANGELOG's newest heading, the
-DATA floor (`dialect.json`'s `min_library`) and the compile-time macros in
-`core/Version.h`. Different batches edit them, and nothing compared them against each other, so the failure
-mode is silent: a header that keeps `namespace cpp_pinyin::v2` while the package says 3 ships a generation
-with two names.
+The 2.x line identifies itself in several places at once, and this file is what compares them against each
+other: the header directory, the macro prefix, the package/library/pkg-config names, the C++ version
+namespace, the version-namespace token inside every declaration, the DATA floor (`dialect.json`'s
+`min_library`), the compile-time macros in `core/Version.h`, and the CHANGELOG's newest heading. Different
+batches edit them, so the failure mode is silent: a header keeping `namespace cpp_pinyin::v2` while the
+package says 3 ships one generation with two names.
 
-(The count is written as a word on purpose: the docstring used to say "five axes" for a year after the tool had
-grown to nine -- and then said nine after it had grown to ten, which is the same class of drift this tool exists
-to catch, in its own header text.)
+The axis numbers below are the code's own and carry a gap: axis 8 was the vcpkg port manifest's `version`,
+retired with the port. The soname is not one of these areas -- it is a property of the built binary and
+lives in `tests/abi/check_soname.cmake`.
 
 WHAT IT CHECKS
-  1. the major version and product name come from the root CMakeLists.txt `project(... VERSION ...)`,
-     and the product name must be `cpp-pinyin<major>`;
-  2. every header under `include/<product>/` carries exactly one `namespace cpp_pinyin::v<major>`,
-     except the files on EXEMPT (which declare no C++ names at all) -- both directions, so a new
-     header that forgets the namespace is red and a stale exemption is red too;
+  1. the major version and product name come from the root CMakeLists.txt `project(... VERSION ...)`; the
+     product name must be `cpp-pinyin<major>`;
+  2. every header under `include/<product>/` carries exactly one `namespace cpp_pinyin::v<major>`, except
+     the files on EXEMPT (which declare no C++ names) -- both directions, so a stale exemption is red too;
   3. the header set equals `tests/abi/expected_public_headers.txt` (the frozen surface);
-  4. `inline namespace` is forbidden (it re-exports a generation into the product namespace, i.e. it
-     invents an unqualified name that the policy says must not exist);
-  5. nothing is declared directly in `namespace cpp_pinyin`, and no header body writes a root-style
+  4. `inline namespace` is forbidden (it re-exports a generation into the product namespace);
+  5. nothing is declared directly in `namespace cpp_pinyin`, and no header body writes a root-qualified
      `cpp_pinyin::X` reference in code;
-  6. the include paths, macro prefixes, pkg-config / CMake-config file names and the install directory
-     all agree with the same major;
-  7. scanning zero headers is RED ("found nothing" must never look like "found no problem");
-  8. the DATA floor (`min_library` in every `data/dialects/*/dialect.json`) is not newer than the package;
-  10. the compile-time macros in `core/Version.h` match the package (a consumer writes `#if` against them);
-  11. the CHANGELOG's newest `## ...` heading names the package version -- the file a user reads FIRST, and
-      the one nothing compared before 2026-10-20 (audit round 2, G31).
+  6. the include paths, macro prefixes, pkg-config / CMake-config file names and the install directory all
+     agree with the same major;
+  * scanning zero headers is RED ("found nothing" must never look like "found no problem") -- a meta-rule,
+    which is why it carries no number;
+  7. the DATA floor (`min_library` in every `data/dialects/*/dialect.json`) is not newer than the package;
+  9. the compile-time macros in `core/Version.h` match the package (a consumer writes `#if` against them);
+  10. the CHANGELOG's newest `## ...` heading names the package version -- the file a user reads first;
+  11. once a tag exists, that heading must be in the released form `## [x.y.z] - YYYY-MM-DD`, so a release
+      day cannot forget to rename `[Unreleased]`.
 
 USAGE
     python tools/check_version_tokens.py              # exit 1 on any disagreement
-    python tools/check_version_tokens.py --self-test  # build fixtures, prove each check can fail
+    python tools/check_version_tokens.py --self-test  # build fixtures, prove each check can fire
 
-歧义形态（政策定义见 docs/STABILITY.md §4.5）：**源码面** ✗ 与 **链接面** ✗ —— 名字（头目录/库文件名/包/pc/词典目录/宏/命名空间/C 符号）必须带同名代令牌，写错代就报错，绝不允许静默串到另一代。
+歧义形态（政策定义见 docs/STABILITY.md §4.5）：**源码面** ✗ 与 **链接面** ✗ —— 名字（头目录/库文件名/包/pc/词典目录/宏/命名空间/C 符号）必须带当前世代数字
 """
 
 from __future__ import annotations
@@ -474,7 +472,7 @@ def check_tokens(root: Path, product: str, major: int, result: Result) -> None:
             if not path.is_file() or path.suffix.lower() not in \
                     (".h", ".hpp", ".cpp", ".cc", ".c", ".py", ".cs", ".cmake", ".in"):
                 continue
-            if any(part in {"build", ".tmp", "data", "__pycache__"} for part in path.parts):
+            if any(part in {"build", ".tmp", "data", "__pycache__"} for part in path.relative_to(root).parts):
                 continue
             rel = path.relative_to(root).as_posix()
             # The expected token depends on WHERE the file lives. Library code is the current generation,
@@ -483,7 +481,7 @@ def check_tokens(root: Path, product: str, major: int, result: Result) -> None:
             # rule demanded the current major everywhere, which would have turned this gate red on the
             # day v3 shipped, i.e. the gate would have blocked the very release it exists to protect.
             expected = major
-            for segment in path.parts:
+            for segment in path.relative_to(root).parts:
                 match = re.match(r"^cpp-pinyin(\d+)$", segment)
                 if match:
                     expected = int(match.group(1))
@@ -570,7 +568,7 @@ def check_version_axes(root: Path, version: tuple[int, int, int], result: Result
         result.fail(f"CHANGELOG.md's newest heading says {newest.group(1)} but the package is {expected} "
                     f"-- users read the changelog first, so a stale heading is the drift they meet")
 
-    # Axis 10, second half: once a tag exists the heading must be in the RELEASED form. The tag list is the only
+    # Axis 11: once a tag exists the heading must be in the RELEASED form. The tag list is the only
     # in-tree evidence that "release day" happened, so this is the one place the release-day edit can be
     # proven rather than assumed (2026-10-20 audit, H49).
     body = read(changelog)

@@ -287,7 +287,7 @@ def root_name_refusal(root: Path, build: Path, authorised: bool) -> int:
     good_code, good_out = compile_one(good)
     print(f"    bad  exit={bad_code} (want non-zero) {bad_out.splitlines()[0][:90] if bad_out else ''}")
     print(f"    good exit={good_code} (want 0)        {good_out.splitlines()[0][:90] if good_out else ''}")
-    ok = bad_code != 0 and good_code == 0
+    ok = both_halves_agree(bad_code, good_code)
     print(f"    => {'VERIFIED' if ok else 'NOT VERIFIED'}")
     return 0 if ok else 1
 
@@ -296,7 +296,7 @@ def link_probes(root: Path, build: Path, authorised: bool, generator: str) -> in
     generation = package_generation(root)
     header = root / "include" / f"cpp-pinyin{generation}" / "ext" / "c_api.h"
     text = header.read_text(encoding="utf-8", errors="replace") if header.is_file() else ""
-    tokenised = f"cppp{generation}_" in text
+    tokenised = symbol_is_tokenised(text, generation)
     new_symbol = f"cppp{generation}_open"
     probes = root / "tests" / "abi" / "probes"
     print("== pj: the C ABI symbol carries the generation token ==")
@@ -318,10 +318,22 @@ def link_probes(root: Path, build: Path, authorised: bool, generator: str) -> in
         print("    the library did not build -- a link verdict would mean nothing")
         return 1
 
-    library = next((p for p in sorted((build / "bin").glob(f"*cpp-pinyin{generation}*"))
-                    if p.suffix in (".dll", ".so", ".dylib")), None)
+    # BOTH OUTPUT DIRECTORIES, because CMake splits them by artifact kind: `CMAKE_LIBRARY_OUTPUT_DIRECTORY` is
+    # `build/lib` (that is where the .so/.dylib lands on Linux and macOS) while `CMAKE_RUNTIME_OUTPUT_DIRECTORY`
+    # is `build/bin` (that is where the .dll lands on Windows). Searching only `bin` made this section print
+    # "no library -- cannot link a probe" on every non-Windows run even though the library had just been built.
+    library = next(
+        (
+            path
+            for directory in (build / "lib", build / "bin")
+            for path in sorted(directory.glob(f"*cpp-pinyin{generation}*"))
+            if path.suffix in (".dll", ".so", ".dylib")
+        ),
+        None,
+    )
     if library is None:
-        print(f"    no cpp-pinyin{generation} library under {build / 'bin'} -- cannot link a probe")
+        print(f"    no cpp-pinyin{generation} library under {build / 'lib'} or {build / 'bin'} "
+              "-- cannot link a probe")
         return 1
     print(f"    library: {library if library.is_relative_to(root) else library.name}")
     scratch = build / "probes-link"
@@ -384,10 +396,56 @@ def v3_day_tree(root: Path, build: Path, v3_tree: Path | None, authorised: bool,
     return 0 if codes == [0, 0, 0] else 1
 
 
+#: The two decisions this tool makes, pulled out so a self-test can drive them directly. Both are the
+#: "read the tree / require both halves" rules the module docstring describes, and a self-test that cannot
+#: reach them would only prove that argparse works.
+
+def both_halves_agree(bad_code: int, good_code: int) -> bool:
+    """A guard that refuses the wrong spelling AND accepts the right one. Half of that is not a guard."""
+    return bad_code != 0 and good_code == 0
+
+
+def symbol_is_tokenised(header_text: str, generation: int) -> bool:
+    """Is the C ABI spelled with the generation token? Read from the header, never assumed."""
+    return f"cppp{generation}_" in header_text
+
+
+def self_test() -> int:
+    """Prove the verdicts can fail, without a compiler."""
+    failures: list[str] = []
+
+    def expect(label: str, ok: bool, detail: str = "") -> None:
+        print(f"{'PASS' if ok else 'FAIL'}  self-test: {label}" + ("" if ok else f"  -> {detail}"))
+        if not ok:
+            failures.append(label)
+
+    expect("both halves agree when the bad one fails and the good one compiles",
+           both_halves_agree(1, 0))
+    expect("a toolchain that compiles BOTH is not a verified guard",
+           not both_halves_agree(0, 0), "bad compiled cleanly, which the docstring calls the trap")
+    expect("a toolchain that fails BOTH is not a verified guard",
+           not both_halves_agree(1, 1), "the good spelling did not compile either")
+    expect("any non-zero failure counts, not just exit 1", both_halves_agree(2, 0))
+
+    expect("a tokenised symbol is read as tokenised",
+           symbol_is_tokenised("void cppp2_open(void);", 2))
+    expect("an untokenised symbol is not read as tokenised",
+           not symbol_is_tokenised("void cppp_open(void);", 2),
+           "the pre-rename spelling must flip the expectation")
+    expect("the generation in the token matters",
+           not symbol_is_tokenised("void cppp3_open(void);", 2))
+
+    print(f"self-test: {len(failures)} failure(s)"
+          + (": " + "; ".join(failures) if failures else ""))
+    return 1 if failures else 0
+
+
 def main() -> int:
     root = find_root()
     parser = argparse.ArgumentParser(description="the verifications that need a compiler")
     parser.add_argument("--only", choices=["v3", "pj", "g3", "root", "all"], default="all")
+    parser.add_argument("--self-test", action="store_true",
+                        help="prove the two verdict rules can fail, without a compiler")
     parser.add_argument("--authorised", action="store_true",
                         help="required: building is a permissioned action in this project")
     parser.add_argument("--build-dir", default=str(root / ".tmp" / "verify-build"),
@@ -398,6 +456,8 @@ def main() -> int:
                         help="the CMake generator to build with (the preset uses Ninja; MinGW Makefiles "
                              "is the alternative where Ninja's jobserver pipe is blocked)")
     args = parser.parse_args()
+    if args.self_test:
+        return self_test()
     build = Path(args.build_dir).resolve()
     v3_tree = Path(args.v3_tree).resolve() if args.v3_tree else None
     print(f"generator: {args.generator}   build dir: {build}")

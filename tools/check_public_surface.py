@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """The API pair's public-surface index must agree with the public headers, in both directions.
 
-WHY THIS EXISTS. The documentation review found that `docs/API_zh.md` / `docs/API_en.md` were using
-`Syllable` in ordinary prose while never defining it, and that five other public types had no entry either --
-`Error` / `ErrorException` (the payload of the only error channel), `ToneKind` / `ReadingSource`, `StyleDecl`
-(a field of the public `Dialect` aggregate) and `ToneConverter` (the base class a plugin author subclasses,
-which the C++ section of the same document called "not part of the public API"). Every one of those was found
-by a human reading a table. Nothing mechanical could have found them, because nothing knew what the documents
-were SUPPOSED to cover.
+`docs/API_zh.md` / `docs/API_en.md` can describe a type in ordinary prose while never defining it, or omit a
+public type entirely -- `Error` / `ErrorException` (the payload of the only error channel), `ToneKind` /
+`ReadingSource` (fields of the public `Dialect` aggregate) and `ToneConverter` (the base class a plugin
+subclasses, which one document called "not part of the public API"). Nothing mechanical could find that,
+because nothing knew what the documents were supposed to cover.
 
 WHAT IT CHECKS, both directions:
-  * every type a public header declares has a row in the index -- so a new public type cannot ship
-    undocumented, and
-  * every name in the index is really declared in a public header -- so a deleted or renamed type leaves a
+  * every type a public header declares has a row in the index -- a new public type cannot arrive
+    undocumented;
+  * every name in the index is really declared in a public header -- a deleted or renamed type leaves no
     dangling row.
 
-WHAT IT DOES NOT DO: it does not judge the `audience` column (`consumer` / `plugin` / `internal`) or the prose
-in the other columns. Those are the judgement calls the index exists to make visible, and the gate's job is to
-keep the LIST complete, not to have an opinion about it.
+WHAT IT DOES NOT DO: it does not judge the `audience` column (`consumer` / `plugin` / `internal`) or any
+prose. Those are the judgement calls the index exists to make visible; this gate keeps the LIST complete.
 
 The index lives in `docs/API_zh.md` and `docs/API_en.md` and is parsed identically from both, so the pair
 cannot drift apart without failing here.
@@ -102,7 +99,7 @@ MEMBER_FILE = "tests/abi/expected_public_members.txt"
 
 #: The types whose public member declarations are frozen, with the declaration each one starts at.
 #:
-#: WHY FIVE AND NOT ONE (2026-10-20, audit round 2, G03). V2 §7 item 11 promised the member-signature
+#: WHY FIVE AND NOT ONE (2026-10-20). V2 §7 item 11 promised the member-signature
 #: freeze for `Engine`/`Result`/`Syllable`/`ToneConverter`/`Outcome`; what landed scanned `Engine`
 #: only, and the file said so ("Requiring a parameter list also drops data members, which `Engine` has
 #: none of"). The gap was not theoretical: `Syllable::spelling` is cited in tests/ exactly zero times,
@@ -116,7 +113,7 @@ MEMBER_SURFACE = (
     ("ToneConverter", "core/ToneConverter.h", "class CPP_PINYIN2_EXPORT ToneConverter"),
     ("Outcome<T>", "core/Types.h", "class Outcome {"),
     ("Outcome<void>", "core/Types.h", "class Outcome<void> {"),
-    # Added 2026-10-20 (audit round 2 §12.6 C1): `Segment` is `Result`'s element type -- a consumer
+    # Added 2026-10-20: `Segment` is `Result`'s element type -- a consumer
     # writes `for (const Segment &row : result)` and reads `row.text/reading/candidates/failure_kind/
     # rendered` -- and `EngineConfig` is the source of the C option table's fields. Neither was scanned
     # by anything: the freeze covered five types, and these two are the ones a rename here would reach
@@ -182,8 +179,8 @@ def public_members(root: Path, header: str, needle: str) -> List[str]:
             # ONLY A BODY IS CUT. A brace can also belong to a DEFAULT ARGUMENT, and that is signature:
             # `query(std::string_view text, const EngineConfig &cfg = EngineConfig{})` used to be frozen
             # as `query(std::string_view text, const EngineConfig &cfg =;` -- the default expression, the
-            # one part a caller actually depends on, was destroyed by the cut (2026-10-20, audit round 3
-            # H01; visible as `=;` in tests/abi/expected_public_members.txt before this fix).
+            # one part a caller actually depends on, was destroyed by the cut (2026-10-20;
+            # visible as `=;` in tests/abi/expected_public_members.txt before this fix).
             if "{" in normalised:
                 head, _rest = normalised.split("{", 1)
                 # A brace is a DEFAULT ARGUMENT when the parameter list it sits in already contains an
@@ -237,7 +234,7 @@ def check_member_surface(root: Path) -> Tuple[List[str], List[str]]:
             problems.append(f"{MEMBER_FILE}: no section for `{label}` -- the type is in the freeze set but "
                             f"not in the file, so nothing about it is frozen")
             continue
-        # ORDER, not set membership (2026-10-20, audit round 2 §12.6 C1). The previous revision compared
+        # ORDER, not set membership (2026-10-20). The previous revision compared
         # `sorted(set(...))`, which made a REORDERED header look identical to the frozen one -- and a
         # reorder of public data members changes both the aggregate-initialisation order and the layout a
         # consumer compiles against. Measured before the fix: swapping `EngineConfig::vToU` and
@@ -453,7 +450,7 @@ def self_test() -> int:
             encoding="utf-8")
         run(True, "a type with no section in the frozen file fails")
 
-    # The parser rule itself (2026-10-20, audit round 3 H01): a DEFAULT ARGUMENT is signature and must
+    # The parser rule itself (2026-10-20): a DEFAULT ARGUMENT is signature and must
     # survive the body cut, while an inline BODY must still be cut. Both halves are asserted because the
     # first version of the fix got one and broke the other -- it kept `= EngineConfig{}` but froze
     # `normalise(...) const { return s; }` verbatim, turning a body into surface.
@@ -487,7 +484,7 @@ def freeze(root: Path) -> int:
              "# `2.0.0` is a PROVENANCE anchor (when this freeze was cut), NOT a copy of the current",
              "# PROJECT_VERSION: bumping the version must NOT bump it, or the sentence stops being true about",
              "# the release it describes. Deliberate, and the reason the version gate does not police this",
-             "# line (audit round 3, H26). The declarations below are what it is checked for.",
+             "# line. The declarations below are what it is checked for.",
              "#",
              "# Regenerate with `python tools/check_public_surface.py --freeze` and READ the diff: every",
              "# changed line here is a change to the surface a C++ consumer compiles against.",

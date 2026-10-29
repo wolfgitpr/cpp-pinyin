@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
-"""Check the CTest registry its self: is every gate this repository claims actually registered?
+"""Check the CTest registry itself: is every gate this repository claims actually registered?
 
-Why this exists. The objective's first item is "the three frozen surfaces each have a CTest entry that
-can be shown to fail on the real tree". That sentence is only meaningful if the entries are really in
-the registry -- and the registry is not one list anywhere, it is built by `foreach` loops, globs and
-conditionals across tests/CMakeLists.txt. Measured today: a build configured without
-`CPP_PINYIN2_BUILD_EXAMPLES=ON` silently has one entry fewer, which is how a registry count drifts away
-from the numbers written in the documents.
+The registry is not one list anywhere -- `foreach` loops, generator expressions and conditionals in
+tests/CMakeLists.txt build it, so a build configured without one option silently has an entry fewer, and a
+count quoted in a document drifts away from the numbers the build gives.
 
 What it checks, from `ctest --show-only=json-v1` (read the JSON, never scrape the human table):
 
-  1. every REQUIRED entry below exists -- these are the gates whose absence has been, or nearly been,
-     a real finding (the plugin surface was ungated for a week; the static C ABI surface was unguarded);
+  1. every REQUIRED entry below exists -- these are the gates whose absence has been, or nearly been, a
+     real finding (the plugin surface was ungated for a week; the static C ABI surface was too);
   2. every test either carries a label or is listed in LABEL_EXEMPT with a reason at the site;
   3. every test whose TIMEOUT is >= LONG_TIMEOUT_SECONDS carries LABELS slow. The main suite and the
-     dump/load gates are the expensive ones, and `ctest -LE slow` is the command this repository uses
-     for a quick pass -- a new long test without that label would silently join "quick" and change what
-     the quick command means;
-  4. names are unique and the totals are reported, so a document that quotes a count can be checked
-     against this output instead of against memory.
+     dump/load gates are the expensive ones, and `ctest -LE slow` is this repository's quick pass -- a new
+     long test without that label would silently join "quick";
+  4. names are unique and the totals are reported, so a document quoting a count can be checked against
+     this output instead of against memory.
 
 Usage:
-    ctest --test-dir <build> --show-only=json-v1 > /tmp/inv.json
-    python tools/check_gate_inventory.py /tmp/inv.json [--expect-total N] [--expect-slow N]
+    ctest --test-dir <build> --show-only=json-v1 > <inventory.json>
+    python tools/check_gate_inventory.py <inventory.json> [--expect-total N] [--expect-slow N]
 Exit codes: 0 = the registry satisfies every check; 1 = it does not; 2 = usage/parse failure.
 """
 
@@ -206,7 +202,7 @@ def self_test() -> int:
                       f"{len(slow)} slow, {len(unlabelled)} unlabelled)",
                       problems == [] and len(slow) == 4))
     else:
-        # ABSENT IS "NOT MEASURED", NOT "FAILED" (2026-10-20, audit round 2 §12.7). The self-test proves the
+        # ABSENT IS "NOT MEASURED", NOT "FAILED" (2026-10-20). The self-test proves the
         # gate's own rules; it needs a real inventory only for the one case that cross-checks those rules
         # against what CTest actually registered. On a clean clone there is no build directory, so that file
         # does not exist -- and the old code turned its absence into a FAILED case, which made

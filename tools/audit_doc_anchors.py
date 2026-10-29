@@ -1,32 +1,19 @@
 #!/usr/bin/env python3
 """Audit `path:NN` anchors in the docs: does the referenced file exist, and does that line exist?
 
-Why: this session hit two stale-anchor problems in one day.
-
-  * `docs/NEW_DIALECT_PLAYBOOK.md`'s drift record cited the (since deleted) layout plan at `:165`, `:46`, `:204`, and none of
-    those lines mentions `dialect_set` any more -- the file is 449 lines now and the numbers had drifted
-    away from the claim entirely;
-  * a count ("static 26/24") travelled from one ledger into another and outlived its truth.
-
 `path:NN` is partly checkable, and this tool checks exactly that part. What it deliberately does NOT do is
-judge whether the cited line means what the sentence claims -- after one attempt at mechanising that, the
-result was 465 "broken" anchors out of 784, almost all of them sentences that cite several files at once
-("`CMakeLists.txt:2`, `docs/PERFORMANCE.md`, `docs/DECISIONS.md`"). A rule that a line must mention every
-file its sentence names is simply wrong, and a 59%-broken report would have been ignored, which is worse
-than no report. So: existence only, and the wording says so.
+judge whether the cited line means what the sentence claims -- mechanising that produced 465 "broken"
+anchors out of 784, almost all of them sentences that cite several files at once. A rule that a line must
+mention every file its sentence names is wrong, and a 59%-broken report gets ignored, which is worse than
+no report. So: existence only, and the wording says so.
 
 References are classified rather than lumped together:
 
   * `missing-file` / `past-eof` -- inside this repository, and actually broken;
   * `historical-doc-anchors` -- the whole document is opted out, see MARKER_HISTORICAL below: its header
-    says its line numbers describe a tree that has moved (37 of this repository's 56 in-tracked broken
-    anchors were in the two documents that say exactly that, 2026-10-09);
+    says its line numbers describe a tree that has moved;
   * `external` -- the path belongs to another checkout (`pinyin-makedict/...`), or is a bare filename with
     no directory (`TOOLING.md`), which this repository may not contain and cannot adjudicate.
-
-The `self-doc` class is gone: it existed for `docs/plans/` and `docs/history/`, whose line numbers were
-snapshots by definition. Both directories were retired on 2026-10-22 in favour of `docs/DECISIONS.md`
-and `docs/HISTORY.md`, which are live records -- an anchor into them is checked like anyone else's.
 """
 
 import argparse
@@ -83,7 +70,7 @@ def tracked_by_basename(root):
 
 
 def default_sibling() -> str:
-    """Where the dictionary repository probably is, without naming anyone's absolute path.
+    r"""Where the dictionary repository probably is, without naming anyone's absolute path.
 
     Order: the environment variable (CI and the board set it), then the three layouts this project is actually
     checked out in around here (a plain sibling, one level up, or `<parent>/<parent>/python/<name>`). An empty
@@ -187,7 +174,7 @@ def declare_marker_line(body: str):
     return None
 
 
-#: The file kinds whose COMMENTS also carry `path:NN` anchors (2026-10-20, audit round 2 G34). Until now the
+#: The file kinds whose COMMENTS also carry `path:NN` anchors (2026-10-20). Until now the
 #: gate only read Markdown under `docs/`, so a `path:NN` in a C++ or Python comment was nobody's business --
 #: measured before wiring: 18 such anchors existed, 4 of them already wrong. These are the extensions the
 #: tree actually uses; a new source language has to be added here, which is the point of a written list.
@@ -299,7 +286,7 @@ def audit(root, sibling=None, docs_glob="docs/**/*.md", adjudicate_bare=False):
 
 
 #: Symbol anchors: `` `path::literal` `` -- the claim is "that file contains this literal". Added 2026-10-20
-#: (audit round 3, H19) after measuring that 16 of 17 line-number anchors in ONE table pointed at unrelated
+#:  after measuring that 16 of 17 line-number anchors in ONE table pointed at unrelated
 #: code while this gate reported every anchor resolving: existence is checkable, meaning is not, and a name
 #: survives the refactors that move lines. Kept as a SEPARATE rule (own records, own line in the summary)
 #: rather than folded into ANCHOR_RX, so the frozen resolve/broken counts this tool has been quoted by do not
