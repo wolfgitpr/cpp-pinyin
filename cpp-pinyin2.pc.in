@@ -23,4 +23,8 @@ Conflicts:
 
 Cflags: -I${includedir} -std=c++17@CPP_PINYIN2_PC_EXTRA_CFLAGS@
 Libs: -L${libdir} -lcpp-pinyin2
+# Read by `pkg-config --static` only. `dl` is part of libc from glibc 2.34, so a static consumer on an
+# older glibc is the case this line exists for; CMakeLists.txt computes it from ${CMAKE_DL_LIBS}, which is
+# empty on Windows and macOS, so the value is empty where there is nothing to add.
+Libs.private:@CPP_PINYIN2_PC_LIBS_PRIVATE@
 

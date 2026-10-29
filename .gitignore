@@ -54,9 +54,10 @@ test_output.txt
 .tmp/
 # Scratch that belongs to the user rather than to this project (round 35 decision): the board disk
 # cleanup scripts live in .tmp-firefly-disk/, and that scratch tree stays ignored. Its plan note used
-# to be ignored too (the board cleanup plan); the 2026-10-09 documentation cleanup put the ledger under
-# version control, and the later cut removed it again -- its content lives in git history and in
-# docs/OBSOLETE-LEDGER-INDEX.md.
+# to be ignored too (the board cleanup plan); a 2026-10-09 cleanup put that note under version control
+# and the 2026-10-22 cleanup removed it again. Nothing of it survives here: the document that was
+# supposed to index it (docs/OBSOLETE-LEDGER-INDEX.md) is not in this repository either. Read this
+# paragraph as the record of the decision, not as a pointer to one.
 .tmp-firefly-disk/
 
 # Python shell: generated or staged by python/tools/build_native.py, never tracked
@@ -70,6 +71,12 @@ python/dist/
 # python/dist/ above: a build artifact, and running the script on a development machine should not leave an
 # untracked directory behind.
 python/repaired/
+# `dist/` at the REPOSITORY ROOT, not under python/: `release_prep.yml` packs the nupkg there
+# (`dotnet pack ... -o dist/<rid>`) and downloads the pooled inputs into `dist/` as well, and the runbook's
+# local rehearsal does the same. Nothing else in this tree writes there, so ignoring the directory cannot
+# hide a source file -- and it keeps `git status` from offering a 1.1 MB wheel and a nupkg as things to
+# commit (measured 2026-10-27, rehearsing that job on a development machine).
+dist/
 *.egg-info/
 __pycache__/
 *.pyc
@@ -103,3 +110,8 @@ tools/board/
 # Staged by python/setup.py so `license_files` can name files inside the project root.
 python/LICENSE
 python/THIRD_PARTY_NOTICES.md
+
+# Release-readiness audit reports (AUDIT-*.md) are one machine's working notes: they carry that
+# machine's absolute paths and the readings of the day, and their conclusions are folded into docs/ and
+# the commit messages. They stay local.
+/AUDIT-*.md

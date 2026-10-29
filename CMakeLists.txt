@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 # 2.0.0 is the v2 development line -- this branch has never been released, so the number is the
 # contract for its first release, not a bump of the old 1.0.x line. This line is the single authority
 # for the version: every other document points here instead of repeating the number (D32/D34, and
-# docs/BACKLOG.md ISS-015 for what went wrong when three copies disagreed).
+# ISS-015 in an old backlog ledger that is not in this tree, which recorded what went wrong when three copies disagreed).
 project(cpp-pinyin2 VERSION 2.0.0 LANGUAGES CXX)
 
 # Expose dictionary source directory for FetchContent consumers
@@ -25,7 +25,8 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(CPP_PINYIN2_BUILD_TESTS "Build test cases (requires a Python 3 interpreter)" OFF)
 option(CPP_PINYIN2_BUILD_EXAMPLES "Build example programs" OFF)
 # Sanitizers are a CI concern, not a user-facing build mode, and they are OFF by default. The reason
-# this repository had no sanitizer option at all before 2026-10-02 is written in docs/BACKLOG.md: the
+# this repository had no sanitizer option at all before 2026-10-02 was recorded in an old backlog ledger
+# (not in this tree): the
 # development machine is MinGW, which has no libasan. That reason does not apply to the Linux runners,
 # which is where this option is meant to be turned on (ci.yml, job linux-sanitizers).
 option(CPP_PINYIN2_SANITIZE "Build the library, tools and tests with ASan and UBSan (GCC/Clang)" OFF)
@@ -55,7 +56,7 @@ if (NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 endif ()
 
 # ----------------------------------
-# Reproducible artefacts (2026-10-20 audit round 2, G13)
+# Reproducible artefacts (2026-10-20)
 #
 # MEASURED BEFORE THIS BLOCK EXISTED: two Release builds of the same commit in two directories
 # (.tmp/repro-a and .tmp/repro-b) produced `libcpp-pinyin2.a` with DIFFERENT SHA-256 -- while all 23
@@ -89,7 +90,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             # then `ranlib` -> different, `ranlib -D` -> identical again). Apple's ranlib has no `-D`, and on
             # Apple the archive is not the shipped artefact anyway (the .dylib is).
             #
-            # APPLE, WHY NOTHING IS ADDED (2026-10-20, audit round 2 P3): the two ways to spend effort here
+            # APPLE, WHY NOTHING IS ADDED (2026-10-20): the two ways to spend effort here
             # would both be wrong. Substituting `libtool -static` for the archive step changes the file
             # format a consumer links against, to fix a directory that is not shipped; and Apple's own
             # `.dylib` determinism comes from the linker's `-no_uuid`/`ZERO_AR_DATE`, not from the archive.
@@ -168,7 +169,7 @@ endif ()
 #   Cantonese: src/Cantonese.cpp src/toneUtil/CanTone.cpp
 # ----------------------------------
 
-# EXPLICIT, NOT GLOB_RECURSE (2026-10-20, audit round 2 G31). A glob decides the build's content from
+# EXPLICIT, NOT GLOB_RECURSE (2026-10-20). A glob decides the build's content from
 # whatever happens to be on disk: a stray file silently joins the library, and a deleted header keeps
 # building from a stale copy until someone reconfigures (`CONFIGURE_DEPENDS` only mitigates that on
 # generators that honour it). For a project whose point is a FROZEN public surface, the file set is part
@@ -297,7 +298,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE CPP_PINYIN2_LIBRARY)
 
 # The version the C ABI reports (cppp2_version). It is PROJECT_VERSION on purpose: that is the
 # number a consumer resolves with find_package(cpp-pinyin2 <ver>). The API docs used to carry a "2.0.0"
-# header of their own (docs/BACKLOG.md ISS-015); as of 2026-10-01 they point here instead, so this is
+# header of their own (an old backlog entry, ISS-015 -- that ledger is not in this tree); as of 2026-10-01 they point here instead, so this is
 # the only place in the repository that spells a version number out (plan: `docs/DECISIONS.md` §2.1).
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         CPP_PINYIN2_VERSION_STRING="${PROJECT_VERSION}")
@@ -374,7 +375,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:cpp-pinyin2_dev_
 # The strict set lives on an INTERFACE target so that everything we compile -- the library, the
 # tools, the tests and the benchmark -- is held to it, instead of only the library target.
 # (Measured 2026-09-23: it used to cover the library alone, so tools/tests were compiled at default
-# warning level under docs/BACKLOG.md)
+# warning level, as an old backlog entry recorded it)
 add_library(cpp-pinyin2_warnings INTERFACE)
 option(CPP_PINYIN2_WERROR
        "Promote warnings to errors for the targets this build compiles (never inherited by consumers)" OFF)
@@ -434,13 +435,27 @@ if (CPP_PINYIN2_SANITIZE)
     include(CheckCXXSourceCompiles)
     set(CMAKE_REQUIRED_FLAGS "-fsanitize=address,undefined")
     set(CMAKE_REQUIRED_LINK_OPTIONS "-fsanitize=address,undefined")
-    check_cxx_source_compiles("int main() { return 0; }" CPP_PINYIN_HAVE_SANITIZERS)
+    # THE PROBE HAS TO TOUCH THE STL, or it answers a question nobody asked (measured 2026-10-27).
+    # `int main() { return 0; }` compiles AND LINKS under these flags on Windows clang, so the check
+    # reported green -- and the build then died twenty minutes later on
+    # `lld-link: error: could not open 'stl_asan.lib'`, which is the sanitized STL that MSVC targets need
+    # and this distribution does not ship. A program that instantiates std::string fails exactly where
+    # the real targets fail, so the FATAL_ERROR below fires at configure time, where it was always meant
+    # to fire. Verified both ways on this machine: trivial = 1, std::string = not 1.
+    check_cxx_source_compiles("
+        #include <string>
+        int main() {
+            std::string spelling = \"x\";
+            return static_cast<int>(spelling.size()) - 1;
+        }" CPP_PINYIN_HAVE_SANITIZERS)
     unset(CMAKE_REQUIRED_FLAGS)
     unset(CMAKE_REQUIRED_LINK_OPTIONS)
     if (NOT CPP_PINYIN_HAVE_SANITIZERS)
         message(FATAL_ERROR
                 "CPP_PINYIN2_SANITIZE=ON, but this compiler cannot build with -fsanitize=address,undefined. "
-                "Build without the option, or use a toolchain that has the sanitizer runtimes.")
+                "Build without the option, or use a toolchain that has the sanitizer runtimes. (The probe "
+                "instantiates std::string on purpose: a trivial main can link while the sanitized STL "
+                "cannot, which is what Windows clang does -- it wants stl_asan.lib and does not ship it.)")
     endif ()
     target_compile_options(cpp-pinyin2_sanitizers INTERFACE
             -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -g)
@@ -648,6 +663,18 @@ if (CPP_PINYIN2_INSTALL)
     if (NOT BUILD_SHARED_LIBS)
         set(CPP_PINYIN2_PC_EXTRA_CFLAGS " -DCPP_PINYIN2_STATIC")
     endif ()
+
+    # Libs.private has to say what `target_link_libraries(... PRIVATE ${CMAKE_DL_LIBS})` says. The CMake
+    # export target carries that dependency as a LINK_ONLY interface item, and a .pc file has no such
+    # channel: `pkg-config --static` reads `Libs.private` and nothing else. Without this line a STATIC
+    # install links against a modern glibc (where dl is part of libc) and fails on glibc < 2.34 with
+    # "undefined reference to `dladdr'" -- the same failure the target_link_libraries comment above
+    # records for our own test executables. `${CMAKE_DL_LIBS}` is `dl` on Linux and EMPTY on Windows and
+    # macOS, so the line is empty there rather than wrong.
+    set(CPP_PINYIN2_PC_LIBS_PRIVATE "")
+    foreach (_cpp_pinyin2_dl_lib IN LISTS CMAKE_DL_LIBS)
+        string(APPEND CPP_PINYIN2_PC_LIBS_PRIVATE " -l${_cpp_pinyin2_dl_lib}")
+    endforeach ()
 
     # Configure the .pc file
     configure_file(

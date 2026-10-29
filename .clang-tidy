@@ -29,7 +29,7 @@ Checks: >
   bugprone-swapped-arguments,
   bugprone-unhandled-self-assignment,
   bugprone-use-after-move,
-  # The static analyser's own family (2026-10-20, audit round 2 G31): the file claimed to be "the smallest
+  # The static analyser's own family (2026-10-20): the file claimed to be "the smallest
   # file that makes 'no static analysis at all' untrue" while containing ZERO clang-analyzer checks. These
   # three are the analyser's core path/taint checks; they are cheap, and they are the reason clang-tidy
   # exists for C++ rather than being another linter.
