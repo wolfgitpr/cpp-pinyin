@@ -21,12 +21,12 @@ copies bytes and rewrites the zip's index -- no repacking of a library, no renam
 plugin guide forbids secondary surgery on the artifacts: "anyone who does it may not modify the product").
 
 USAGE
-    python csharp/tools/merge_nupkgs.py -o dist/CppPinyin.2.0.0.nupkg \
-        dist/win-x64/CppPinyin.2.0.0.nupkg dist/linux-x64/CppPinyin.2.0.0.nupkg ...
+    python csharp/tools/merge_nupkgs.py -o dist/CppPinyin.<version>.nupkg \
+        dist/win-x64/CppPinyin.<version>.nupkg dist/linux-x64/CppPinyin.<version>.nupkg ...
 
 Verify the result with the repository's own gate (omit --rid: a pooled package is exactly the case that
 must NOT be asked for a single rid):
-    python tools/check_bindings.py --nupkg dist/CppPinyin.2.0.0.nupkg
+    python tools/check_bindings.py --nupkg dist/CppPinyin.<version>.nupkg
 """
 
 from __future__ import annotations
@@ -82,12 +82,15 @@ class Package:
 
     def shared_fingerprints(self) -> Dict[str, str]:
         """member -> sha256 for the members every input must agree on."""
+        # `self.nuspec`, not a hard-coded file name: `__init__` already requires exactly one root .nuspec and
+        # records it. The literal it replaces meant a package whose id (and therefore nuspec name) changed would
+        # have its nuspec silently dropped from the comparison -- the one member that describes the whole package.
         return {
             name: sha256(blob)
             for name, blob in self.members.items()
             if name.startswith(SHARED_PREFIXES)
             or name == "README.md"
-            or name == "CppPinyin.nuspec"
+            or name == self.nuspec
         }
 
 
@@ -120,8 +123,15 @@ def compare_shared(packages: Sequence[Package]) -> List[str]:
     return problems
 
 
-def merge(packages: Sequence[Package], output: Path) -> Dict[str, object]:
-    """Write `output` as one package holding every input's runtimes/, and report what went in."""
+def merge(packages: Sequence[Package], output: Path,
+          expect_rids: Optional[Sequence[str]] = None) -> Dict[str, object]:
+    """Write `output` as one package holding every input's runtimes/, and report what went in.
+
+    `expect_rids`, when given, is the set the caller believes the inputs carry -- the release job's matrix.
+    A pool that silently merges FEWER rids than the matrix produced is not caught by anything downstream:
+    `check_bindings.py --nupkg` is run without `--rid` on purpose (a pooled package carries several), so a
+    two-rid pool passes every gate and ships. This is the only place that can refuse it (2026-10-27).
+    """
     total_rids: Set[str] = set()
     for package in packages:
         overlap = total_rids & package.rids
@@ -131,6 +141,19 @@ def merge(packages: Sequence[Package], output: Path) -> Dict[str, object]:
                 "carried: two copies of the same rid would be merged silently, and only one of them would win"
             )
         total_rids |= package.rids
+
+    if expect_rids is not None:
+        expected = set(expect_rids)
+        if expected != total_rids:
+            missing = sorted(expected - total_rids)
+            unexpected = sorted(total_rids - expected)
+            raise SystemExit(
+                "FATAL: the inputs do not carry the expected runtime identifiers"
+                + (f"; missing {missing}" if missing else "")
+                + (f"; unexpected {unexpected}" if unexpected else "")
+                + ". A pooled package that is short a rid still passes check_bindings (it is run without "
+                  "--rid on purpose), so this check is the only thing between a partial release and the feed."
+            )
 
     first = packages[0]
     # The output directory is created rather than demanded: a release job writes into a fresh dist/ path, and
@@ -143,6 +166,13 @@ def merge(packages: Sequence[Package], output: Path) -> Dict[str, object]:
     written = 0
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as out:
         for name, blob in first.members.items():
+            if RUNTIME_RE.match(name):
+                # The runtime trees are written by the per-input loop below, for EVERY input including
+                # this first one. Writing them here as well put the first input's native library into the
+                # package TWICE -- a duplicate zip member, measured on a real merged package on 2026-10-27
+                # (33 members, 1 duplicated name) -- and nothing caught it: check_bindings reads members
+                # into a dict, where the second copy silently wins.
+                continue
             out.writestr(name, blob)
             written += 1
         for package in packages:
@@ -184,7 +214,13 @@ def self_test() -> int:
         report = merge([Package(win), Package(linux)], merged)
         expect("two rids merge into one package", report["rids"] == ["linux-x64", "win-x64"], report)
         with zipfile.ZipFile(merged) as archive:
-            names = set(archive.namelist())
+            listing = archive.namelist()
+        names = set(listing)
+        # A SET hides exactly the failure this assertion is for: `zipfile` lets the same name in twice,
+        # the package still opens, `check_bindings` still passes (it reads into a dict), and only the
+        # size and some strict readers show it. Compare the list against its set.
+        expect("the pooled package has no duplicate member names",
+               len(listing) == len(names), sorted({n for n in listing if listing.count(n) > 1}))
         expect("the pooled package keeps both runtime trees",
                {"runtimes/win-x64/native/libcpp-pinyin2.dll",
                 "runtimes/linux-x64/native/libcpp-pinyin2.so"} <= names, sorted(names))
@@ -209,6 +245,30 @@ def self_test() -> int:
         else:
             expect("the same rid twice is refused", False, "merge accepted a duplicate rid")
 
+        # The expected-set check (2026-10-27). The release job knows which rids its matrix just built; this
+        # is the only place that can tell a TWO-rid pool from a three-rid one, because the gate that runs
+        # next is deliberately given no --rid.
+        expect("an expected set that matches merges",
+               merge([Package(win), Package(linux)], tmp / "ok.nupkg",
+                     ["linux-x64", "win-x64"])["rids"] == ["linux-x64", "win-x64"])
+        try:
+            merge([Package(win), Package(linux)], tmp / "short.nupkg",
+                  ["linux-x64", "osx-arm64", "win-x64"])
+        except SystemExit as error:
+            expect("a pool missing an expected rid is refused",
+                   "osx-arm64" in str(error) and "missing" in str(error), str(error))
+        else:
+            expect("a pool missing an expected rid is refused", False,
+                   "merge wrote a pool that is short one rid")
+        try:
+            merge([Package(win), Package(linux)], tmp / "extra.nupkg", ["win-x64"])
+        except SystemExit as error:
+            expect("a pool carrying an unexpected rid is refused",
+                   "linux-x64" in str(error) and "unexpected" in str(error), str(error))
+        else:
+            expect("a pool carrying an unexpected rid is refused", False,
+                   "merge accepted more rids than the matrix named")
+
     print(f"self-test: {len(failures)} failure(s)" + (": " + "; ".join(failures) if failures else ""))
     return 1 if failures else 0
 
@@ -218,6 +278,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("nupkgs", nargs="*", help="per-RID nupkgs to merge (at least one)")
     parser.add_argument("-o", "--output", help="the pooled nupkg to write")
     parser.add_argument("--force", action="store_true", help="overwrite the output if it exists")
+    parser.add_argument("--expect-rids",
+                        help="comma-separated rids the inputs must carry EXACTLY (the release matrix; a "
+                             "pool that is short one still passes the other gates, so this is the guard)")
     parser.add_argument("--self-test", action="store_true", help="prove the refusals fire, then exit")
     options = parser.parse_args(argv)
 
@@ -242,7 +305,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             + "\n  ".join(problems)
         )
 
-    report = merge(packages, output)
+    expect_rids = None
+    if options.expect_rids:
+        expect_rids = [rid.strip() for rid in options.expect_rids.split(",") if rid.strip()]
+        if not expect_rids:
+            parser.error("--expect-rids was given but names no rid")
+
+    report = merge(packages, output, expect_rids)
     size = output.stat().st_size
     print(f"\nwrote {output} ({size} bytes, {report['members']} members)")
     print("runtime identifiers: " + ", ".join(report["rids"]))

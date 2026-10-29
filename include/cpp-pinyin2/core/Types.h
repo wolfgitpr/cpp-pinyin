@@ -197,17 +197,13 @@ namespace cpp_pinyin::v2
 
     /// The result of an operation that either produced a `T` or failed: one of the two, never both.
     ///
-    /// Read it with `has_value()` / `operator bool` before `value()` / `error()`. Both are the
-    /// checked-by-the-caller accessors, and neither invents a `Code`: `value()` on a failure throws
-    /// `ErrorException` (the SAME type `value_or_throw()` throws, and never `std::bad_variant_access`,
-    /// which carried no `Code` -- 2026-10-19: `std::get` on the wrong alternative used to escape
-    /// there), while `error()` on a **success** throws `std::bad_variant_access` on purpose: "the
-    /// caller asked the wrong question" is a programming error, not a library failure, so there is
-    /// no `Code` for it -- and appending one would break the frozen 0..5 domain. `ErrorException` is
-    /// the only exception a fallible call throws out of a failure (docs/CONTRACT.md section 2,
-    /// "Exceptions"), which is why there is no `query_or_throw` next to `Engine::query`. Move-only
-    /// `T` (i.e. `Engine`) makes the `Outcome` move-only too: `value()` on an rvalue moves the value
-    /// out instead of copying it.
+    /// Read it with `has_value()` / `operator bool` before `value()` / `error()`. Neither accessor
+    /// invents a `Code`: `value()` on a failure throws `ErrorException` (the same type `value_or_throw()`
+    /// throws), while `error()` on a **success** throws `std::bad_variant_access` on purpose -- "the
+    /// caller asked the wrong question" is a programming error, and a `Code` for it would break the frozen
+    /// 0..5 domain. `ErrorException` is the only exception a fallible call throws out of a failure
+    /// (docs/CONTRACT.md section 2, "Exceptions"). Move-only `T` (i.e. `Engine`) makes the `Outcome`
+    /// move-only too: `value()` on an rvalue moves the value out instead of copying it.
     template <class T>
     class Outcome {
         // `Outcome<Error>` would collide with itself: `Outcome(T)` and `Outcome(Error)` become the
@@ -267,15 +263,15 @@ namespace cpp_pinyin::v2
 
     /// `Outcome<void>`: the operation either succeeded or failed, and carries no value.
     ///
-    /// An explicit SPECIALIZATION, not `Outcome<std::monostate>`: the call site reads `Outcome<void>`
-    /// (the same shape as `std::expected<void, E>`), and no public NAME is added, so the frozen
-    /// 38-name list does not move for a change that only refines a return type.
+    /// An explicit SPECIALIZATION, not `Outcome<std::monostate>`: the call site reads `Outcome<void>` (the
+    /// same shape as `std::expected<void, E>`), and no public NAME is added, so the frozen name list
+    /// (`tests/abi/expected_public_names.v2.txt`) does not move for a change that only refines a return
+    /// type.
     ///
-    /// There is deliberately NO `value()`: on the primary template `value()` is the plain accessor
-    /// that returns a `T`, and a `void value()` that threw on failure would give one spelling two
+    /// Deliberately NO `value()`: a `void value()` that threw on failure would give one spelling two
     /// behaviours. Success has nothing to read, so `value_or_throw()` (a no-op on success, an
-    /// `ErrorException` on failure) is the only way to consume it -- which makes
-    /// `if (!r) return r.error();` the natural spelling at a call site.
+    /// `ErrorException` on failure) is the only way to consume it -- which makes `if (!r) return
+    /// r.error();` the natural spelling at a call site.
     template <>
     class Outcome<void> {
     public:
@@ -304,11 +300,10 @@ namespace cpp_pinyin::v2
     };
 
     // Result row (S7: the 2.0 face's shape)
-    // One input span and what the engine read for it: the shape authority (docs/CONTRACT.md section 3, "Structured
-    // readings" -- this line said section 2 for a long while, but §2 is the error model and says nothing about row
-    // shape; `c_api.h` pointed at §3 all along). minus the C ABI's `struct_size`/`candidate_count`;
-    // `character`/`reading`/`failed` merely renamed. RULED (S8): `candidates` stays an array of STRINGS: seven readings
-    // have an (initial, fin) projection that is not invertible (`hm`, `ǹ`, `ḿ`, `yo`, `yō`, `ò`, `ō`;
+    // One input span and what the engine read for it: the shape authority (docs/CONTRACT.md §3) minus the
+    // C ABI's `struct_size`/`candidate_count`; `character`/`reading`/`failed` merely renamed.
+    // RULED (S8): `candidates` stays an array of STRINGS: seven readings have an (initial, fin)
+    // projection that is not invertible (`hm`, `ǹ`, `ḿ`, `yo`, `yō`, `ò`, `ō`;
     // tests/cpp/test_syllable_producer.cpp), so moving that column would move the frozen digest and
     // the C ABI bytes at once - that projection, NOT the frozen corpus, is why (measured 2026-10-09).
     struct CPP_PINYIN2_EXPORT Segment {

@@ -85,7 +85,7 @@ namespace cpp_pinyin::v2
         }
         // A file that opens but yields not a single entry is a malformed dictionary, not a valid
         // empty one: reporting success there produced an engine that was "ready" with no knowledge
-        // at all (audit S-02). Reported as a load failure, the file name shows up in lastError().
+        // at all. Reported as a load failure, the file name shows up in lastError().
         // Since C-05 the same reasoning covers partially-broken files: "some rows parsed" is not
         // "the file is fine" when other rows silently produced nothing.
         return parsed > 0 && skippedNonBlank == 0;

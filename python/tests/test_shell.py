@@ -1,7 +1,7 @@
 """Behavioural gates for the Python shell (`docs/DECISIONS.md` §2.1).
 
 Expectations come from the project's own gates rather than from memory: the install gate asserts
-中国人民 -> "zhong1 guo2 ren2 min2", and tests/catch2/test_engine_dialect.cpp asserts the
+中国人民 -> "zhong1 guo2 ren2 min2", and tests/cpp/test_engine_dialect.cpp asserts the
 Cantonese reading "nei5 hou2" for 你好.
 
 Run from python/:   python -m pytest tests -q
@@ -461,7 +461,7 @@ def test_user_dict_without_entries_is_refused(mandarin, tmp_path):
 
 
 def test_user_dict_of_skipped_lines_is_refused(mandarin, tmp_path):
-    # splitLine in src/DictUtil.cpp drops lines without a separator (there is no comment syntax),
+    # splitLine in src/dict/DictUtil.cpp drops lines without a separator (there is no comment syntax),
     # so a file of prose parses to zero entries -- and the library reports success for that.
     prose = tmp_path / "prose.txt"
     prose.write_text("just prose\n# this is skipped, not a comment\n", encoding="utf-8")

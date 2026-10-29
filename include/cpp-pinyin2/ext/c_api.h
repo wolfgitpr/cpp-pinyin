@@ -11,7 +11,7 @@
  * `cpp_pinyin::v2::Engine` (include/cpp-pinyin2/core/Engine.h) -- after `cppp2_open` any number of threads may call the
  * read functions on one handle, while `cppp2_load_user_dict` / `cppp2_load_traditional_dict` must NOT overlap a read.
  *
- * WHAT IS DELIBERATELY NOT HERE (2026-10-20, audit H03): the disambiguation callback.
+ * WHAT IS DELIBERATELY NOT HERE: the disambiguation callback.
  * `Engine::setDisambiguationCallback` takes a `std::function`, and a C caller cannot construct one -- a C-visible
  * version would be a function-pointer-plus- user-data pair with its own lifetime rules, i.e. a new contract rather than
  * a spelling of the existing one. The capability table in docs/CONTRACT.md lists callbacks as C++-only for that reason.
@@ -19,7 +19,7 @@
  * not a change to these symbols.
  */
 
-// Why a macro guard here and `#pragma once` in the other 14 public headers (2026-10-20, audit H17):
+// Why a macro guard here and `#pragma once` in the other 14 public headers:
 // this is the one public header compiled by C as well as C++. `#pragma once` is an unstandardised
 // extension, so a strict C compiler is entitled to ignore it -- the include-guard macro is the portable
 // spelling, and this file is the one a C translation unit includes. It is also why the surrounding block
@@ -218,7 +218,7 @@ typedef struct cppp2_query_opts {
      * (This note has been wrong twice, both times by quoting offsets that were not its own: it first
      * repeated `reserved_1`'s 36..39, then called 32..39 padding after `include_reading` had taken
      * 32..35. The layout asserts in `src/c_api_lifecycle.cpp` now pin the adjacency this note describes
-     * on both 32- and 64-bit layouts. -- audit round 3, H07.) */
+     * on both 32- and 64-bit layouts.) */
     int32_t reserved_0;
     /* 0/1 -- the structured reading, the same switch as `EngineConfig::includeReading` (S8). 0 (the DEFAULT,
      * and what a shorter older struct gets) means "do not build the structure": syllables come back NULL
@@ -236,7 +236,7 @@ typedef struct cppp2_query_opts {
 
 CPP_PINYIN2_EXPORT void cppp2_query_opts_init(cppp2_query_opts *opts);
 
-/* WHICH OPTIONS EACH ENTRY HONOURS (2026-10-20, audit round 2, G25).
+/* WHICH OPTIONS EACH ENTRY HONOURS.
  *
  * The question a binding author actually asks is "does `cppp2_readings` honour `style`, or do I have to do
  * something else?" -- and this header never answered it, so the only way to find out was to read the .cpp.
@@ -266,6 +266,23 @@ CPP_PINYIN2_EXPORT void cppp2_query_opts_init(cppp2_query_opts *opts);
  * there with CPPP2_ERR_INVALID_ARG (`Dialect::toneSandhi`, src/c_api_lifecycle.cpp), rather than silently
  * returning the input unchanged -- "this dialect has no pass" and "the pass changed nothing" must not look
  * the same to a caller. That refusal is why the entry takes an engine handle at all.
+ *
+ * WHAT IT WRITES: each affected span's `rendered`, and nothing else -- `cppp2_syllable::tone` and
+ * `spelling` keep the values the query produced. The C++ face does more: `applyMandarinToneSandhi`
+ * mirrors the new tone into `Syllable::reading.tone` as well, with the comment "so the two descriptions
+ * of one row cannot disagree" (src/ToneSandhi.cpp). The C entry has no such sync, so after a sandhi pass
+ * the two faces disagree about the structured tone while agreeing about the text. Stated rather than
+ * fixed: syncing it would move bytes, and whether the structure or the rendered string is the subject of
+ * the rewrite is a ruling this entry does not get to make on its own.
+ *
+ * WHAT IT ACCEPTS, said because the type does not say it: `result` must be a result THIS LIBRARY produced
+ * -- the pointer `cppp2_query` wrote through `out_result` -- and it must not have been passed to
+ * `cppp2_result_free` yet. The entry recovers the owning block from the pointer's address (one
+ * `reinterpret_cast`, pinned by a load-bearing `static_assert` in `src/c_api_internal.h`) in order to write
+ * the replacement into that block instead of freeing a string the caller may still hold. A `cppp2_result`
+ * the caller assembled itself therefore has no owner block behind it and is NOT a supported input; the
+ * refusals below cover the one malformed shape a careless caller produces by accident (`count != 0` with a
+ * null `segments`, which answers CPPP2_ERR_INVALID_ARG rather than dereferencing it), not every misuse.
  */
 
 /* ------------------------------------------------------- structured readings --- */
@@ -354,6 +371,10 @@ typedef struct cppp2_result {
     // `cppp2_apply_tone_sandhi`) has to be able to write that one pointer. The strings are still the
     // library's and `rendered` is still `const char *`, so nothing a caller holds becomes writable;
     // widening this member is source-compatible for readers and changes no layout.
+    //
+    // `count != 0` REQUIRES `segments != NULL`: the two describe one array, and an entry that reads the
+    // rows answers CPPP2_ERR_INVALID_ARG for the other shape instead of dereferencing. Both fields are
+    // the library's to fill -- a caller reads them and never builds a result by hand (2026-10-27).
     cppp2_segment *segments;
 } cppp2_result;
 
@@ -530,14 +551,24 @@ CPP_PINYIN2_EXPORT int32_t cppp2_load_user_dict(cppp2_engine *engine, const char
 CPP_PINYIN2_EXPORT int32_t cppp2_load_traditional_dict(cppp2_engine *engine, const char *path, int32_t clear_existing);
 
 /*
- * The same two loads, WITH the error channel (2026-10-20, audit H04). Appended, never substituted: the two names
+ * The same two loads, WITH the error channel. Appended, never substituted: the two names
  * above keep their signatures and their behaviour, and the only difference here is that `err` receives the pair
  * `{code, detail}` the C++ face already had in its `Outcome`.
  *
  * WHY THE DETAIL MATTERS EVEN THOUGH THE PATH IS THE CALLER'S: the path says WHICH file failed, not WHY.
- * "refusing to write an empty table", "wrote 3 row(s), below the 20-row sanity floor" and "the format marker is
- * missing" are three different repairs, and before this the C face got one `CPPP2_ERR_LOAD` for all of them. The
- * Python shell re-checks the file itself before loading; a C host has no way to ask this library anything.
+ * The detail strings this library can actually produce for these two calls are `dictDir is empty`,
+ * `failed to load: <file> (under <dir>)` (from the initial dictionary load) and `failed to load traditional
+ * dict: <path>`; before this entry a C host got the code alone and had no way to ask anything.
+ *
+ * WHAT THESE TWO ENTRIES DELIBERATELY DO NOT DO: they do not grade the file's CONTENT. The user-dictionary
+ * layer is tolerant by design -- an empty or comment-only `user_dict.txt` is legal, and the Cantonese built-in
+ * ships as a 0-byte file -- so `CPPP2_ERR_LOAD` here means "the file could not be opened", never "its rows
+ * were rejected". A caller that needs a content verdict must do what the Python shell does
+ * (`_check_dict_file` in python/cpp_pinyin2/__init__.py): read the file and count its `key:value` rows.
+ * (This comment used to justify the entry with three diagnoses -- "refusing to write an empty table",
+ * "below the 20-row sanity floor", "the format marker is missing" -- that no code in this tree produced;
+ * removed 2026-10-27. The format-marker one does exist, but for `open`'s dictionary directory, in
+ * src/dict/DictManifest.cpp, not for these two calls.)
  *
  * `detail` is a fresh allocation owned by the CALLER (free with `cppp2_string_free`), NULL on success and NULL
  * when the library can only classify the failure -- the contract `cppp2_error` states above.

@@ -175,7 +175,7 @@ namespace CppPinyin2
         /// <paramref name="vToU"/> reads backwards from its name, and the name is deliberate: ü is
         /// written <c>v</c> BY DEFAULT, and setting this to <see langword="true"/> is what keeps ü.
         /// That is the opposite direction from pypinyin's <c>v_to_u</c>, so the parameter is not named
-        /// after it -- the plugin guide records the three-place naming rule, and <c>core/Types.h</c>
+        /// after it -- the plugin guide records the three-place naming rule, and <c>include/cpp-pinyin2/core/Types.h</c>
         /// states the behaviour.
         /// </para>
         /// </summary>
@@ -295,7 +295,7 @@ namespace CppPinyin2
         /// Convert <paramref name="text"/> and then apply Mandarin tone sandhi to the result.
         /// <para>
         /// The rules are not implemented here: this is <see cref="Query"/> followed by the C entry point
-        /// <c>cppp2_apply_tone_sandhi</c>, the C face of <c>core/ToneSandhi.h</c> -- the one place the three
+        /// <c>cppp2_apply_tone_sandhi</c>, the C face of <c>include/cpp-pinyin2/core/ToneSandhi.h</c> -- the one place the three
         /// rules (third-tone runs, bu, yi) and their two deliberate differences from pypinyin's
         /// <c>contrib.tone_sandhi</c> are written down. The three switches default to ON, the library's own
         /// default, and are always sent explicitly: NULL would test the C default instead of the value the
@@ -406,7 +406,7 @@ namespace CppPinyin2
         /// <summary>
         /// Every reading of a single hanzi, in the library's order. A non-hanzi yields itself.
         /// <para>
-        /// The order is the library's (<c>core/Types.h</c> → <c>Segment::candidates</c>): the dialect's
+        /// The order is the library's (<c>include/cpp-pinyin2/core/Types.h</c> → <c>Segment::candidates</c>): the dialect's
         /// own dictionary order, de-duplicated by the CONVERTED string keeping the first occurrence, so
         /// <paramref name="style"/> and the two switches decide the count as well as the spellings.
         /// </para>
@@ -516,7 +516,11 @@ namespace CppPinyin2
             return value;
         }
 
-        /// <summary>Whether a single hanzi has more than one reading in this dialect.</summary>
+        /// <summary>
+        /// Whether the FIRST character of <paramref name="hanzi"/> starts a phrase in this dialect's corpus --
+        /// the predicate the C ABI documents as <c>cppp2_is_polyphonic</c>. It is NOT "the character has more
+        /// than one reading of its own": a single-reading character that opens a phrase answers <c>true</c>.
+        /// </summary>
         public bool IsPolyphonic(string hanzi)
         {
             RequireText(hanzi, nameof(hanzi));
@@ -534,8 +538,16 @@ namespace CppPinyin2
 
         /// <summary>
         /// Load a user dictionary. Not thread-safe: do not call this while other threads query.
-        /// A file that parses to zero entries is a <c>CPPP2_ERR_LOAD</c> failure, so a mistyped table is
-        /// not silently ignored.
+        /// <para>
+        /// A file that parses to ZERO ENTRIES IS NOT REFUSED HERE -- this used to claim it was a
+        /// <c>CPPP2_ERR_LOAD</c> failure, which the C ABI never delivers: the loader returns success once
+        /// the file opens (<c>src/dict/DictUtil.cpp</c>, the end of <c>loadAdditionalDict</c>), because the
+        /// shipped Cantonese <c>user_dict.txt</c> is a 0-byte file and an empty table has to stay legal.
+        /// The Python shell pre-checks the case and raises (<c>python/cpp_pinyin2/__init__.py</c>,
+        /// <c>_check_dict_file</c>, measured 2026-10-27); this shell does not, so a mistyped table loads
+        /// "successfully" and changes nothing. Stated here rather than left as a promise the code does not
+        /// keep.
+        /// </para>
         /// </summary>
         /// <param name="path">The user dictionary to load.</param>
         /// <param name="clearExisting">

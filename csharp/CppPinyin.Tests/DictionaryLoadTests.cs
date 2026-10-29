@@ -24,7 +24,7 @@ namespace CppPinyin2.Tests
         {
             // 2026-10-17 alignment: the C# shell used to declare `clearExisting = false`, so a second
             // load merged and the first file's entries survived. The C++ (include/cpp-pinyin2/core/Engine.h),
-            // the C ABI (ext/c_api.h) and the Python shell all defaulted to replacing, and this test is the
+            // the C ABI (include/cpp-pinyin2/ext/c_api.h) and the Python shell all defaulted to replacing, and this test is the
             // one that fails under the old default (the second assertion at the end would read the FIRST
             // file's "yi2 dan4" back instead of the built-in "yi1 dan4").
             using var engine = new Engine("mandarin", RepoLayout.DictDirectory);

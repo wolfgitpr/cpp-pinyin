@@ -1,13 +1,12 @@
 #include "PhraseLayers.h"
 
-// The phrase layer's load-time logic (P2 split #2, route A). Moved out of EngineImplLoad.cpp by a
-// .tmp/promote_r3a.py via line-range slicing, so the bodies below are byte-identical apart from four
-// substitutions: the dictionary directory, the error slot and the reading normalizer became
-// parameters, and the signatures became free functions.
+// The phrase layer's load-time logic. Moved out of EngineImplLoad.cpp by line-range slicing, so the
+// bodies below are byte-identical apart from four substitutions: the dictionary directory, the error slot,
+// the reading normalizer and toSimp became parameters, and the signatures became free functions.
 //
-// Nothing here reaches for the engine: toSimp, the normalizer, the error slot and the directory all
-// arrive as arguments. That is what lets this file be compiled and tested with only the dict layer
-// (AC-3/AC-4) -- tests/dict/selfcheck_main.cpp calls rebuildPhrases directly.
+// Nothing here reaches for the engine -- everything arrives as an argument. That is what lets this file be
+// compiled and tested with only the dict layer (AC-3/AC-4); tests/dict/selfcheck_main.cpp calls
+// rebuildPhrases directly.
 
 #include <algorithm>
 
@@ -32,8 +31,8 @@ namespace cpp_pinyin::v2
             // by THIS dialect's hook (Mandarin: tone3 -> tone-marked; Cantonese: identity) -- a
             // hardcoded Mandarin normalizer used to mangle Cantonese user dictionaries.
             const bool ok = loadAdditionalDict(path, phrases.user, normalizeReading, ':', " ", &phrases.userStart);
-            // The index rebuild is triggered by the engine-side shell (see PhraseLayers.h): the index     // self-check
-            // calls findPhrase(), which is the query hot path and must stay in the engine.
+            // The index rebuild is triggered by the engine-side shell (see PhraseLayers.h): the index
+            // self-check calls findPhrase(), which is the query hot path and must stay in the engine.
             if (!ok && (clear || error.empty()))
                 error = "failed to load user dict: " + path.string();
             return ok;

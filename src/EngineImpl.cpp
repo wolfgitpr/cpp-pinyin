@@ -32,6 +32,13 @@ namespace cpp_pinyin::v2
     EngineImpl::~EngineImpl() = default;
 
     bool EngineImpl::init() {
+        // UNREACHABLE THROUGH THE PUBLIC API, and that is why no test pins this wording (checked
+        // 2026-10-27 across every suite: the string appears nowhere). `Engine::Engine` resolves an
+        // empty subdirectory to the dialect's own id (`src/Engine.cpp:137`) before constructing the
+        // inner engine, so `dictDir / subdir` is non-empty even when the caller's root is; the three-
+        // place constructor was tried with both arguments empty and still opened "mandarin". The branch
+        // stays as insurance for an internal caller that hands over an empty path, where "dictDir is
+        // empty" is a far better answer than the four "cannot open <table>" lines that follow.
         if (m_dictDir.empty()) {
             m_lastError = "dictDir is empty";
             return false;

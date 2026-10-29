@@ -31,7 +31,14 @@ namespace cpp_pinyin::v2
                 if (len < 2 || len > 4)
                     continue;  // the window never probes these, so they must not reach the index
                 const uint16_t first = static_cast<uint16_t>(kv.first >> (16 * (len - 1)));
-                if (counts[first] == 0xFFFF) {
+                // THE COUNT FIELD IS 8 BITS. `desc` holds the bucket start in bits 16..31 and the count in
+                // bits 8..15 (written below as `counts[c] << 8`, read back as `(desc >> 8) & 0xFF`), so a
+                // bucket of 256 wraps the count AND shifts it into the start field, corrupting both numbers
+                // silently. This guard used to say 0xFFFF -- the width of the `counts` ELEMENT, not of the
+                // field it is about to be packed into -- so it only refused at 65535, long after the damage
+                // Refusing at 255 keeps the highest usable bucket at 255; the
+                // shipped tables peak at 128, a third-party dialect is what this protects.
+                if (counts[first] == 0xFF) {
                     ok = false;  // bucket would overflow the packed count
                     break;
                 }

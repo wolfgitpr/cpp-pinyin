@@ -52,7 +52,7 @@ void cppp2_result_free(cppp2_result *result) {
     if (result == nullptr)
         return;
     // ONE deletion releases the strings, the segment array and both nested arrays: they are members of the
-    // owner block the public pointer addresses (2026-10-20, audit H10). Nothing is freed one pointer at a
+    // owner block the public pointer addresses. Nothing is freed one pointer at a
     // time any more, so no `const_cast` is needed to express ownership -- `ResultOwner` says it in its shape.
     auto *owner = reinterpret_cast<cppp_detail::ResultOwner *>(result);
     delete owner;
@@ -108,8 +108,7 @@ int32_t cppp2_render_syllable(const cppp2_engine *engine, const cppp2_syllable *
         // query path masks them: a switch a dialect does not support is ignored, never reinterpreted,
         // and this entry must not be the one place that disagrees. The mask itself is
         // `detail::effectiveCaps` -- the ONE definition -- not a fifth hand-written copy of the same
-        // expression (2026-10-20, audit round 3 H50: the copy here is why `Capabilities.h`'s "written
-        // out four times" claim was false). The style goes through `resolveStyle` for the same reason:
+        // expression. The style goes through `resolveStyle` for the same reason:
         // this entry renders ONE syllable by hand instead of going through `Engine::query`, and it must
         // not be the place where an empty `cppp2_query_opts` starts meaning something else.
         const cpp_pinyin::v2::detail::EffectiveCaps caps = cpp_pinyin::v2::detail::effectiveCaps(dialect, cfg);
@@ -287,7 +286,7 @@ namespace
 {
     /// Which table a load entry names. Both loads are the same shape -- validate, load, classify -- and keeping
     /// ONE body means the two spellings of each (with and without the error channel) cannot drift apart about the
-    /// CODE, which is what a host branches on (2026-10-20, audit H04).
+    /// CODE, which is what a host branches on.
     enum class LoadedTable { user, traditional };
 
     int32_t loadThrough(cppp2_engine *engine, const char *path, int32_t clear_existing, LoadedTable which,

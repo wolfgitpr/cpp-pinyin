@@ -38,7 +38,7 @@ PLATFORM_TAG_ENV = "CPP_PINYIN_PLATFORM_TAG"
 
 
 def dynamic_version() -> str:
-    """The version written by ``tools/build_native.py``, which read it from the single source."""
+    """The version written by ``python/tools/build_native.py``, which read it from the single source."""
     if not VERSION_FILE.is_file():
         raise SystemExit(
             f"FATAL: {VERSION_FILE} is missing. Run `python python/tools/build_native.py` first: "
@@ -84,7 +84,7 @@ class BDistWheel(bdist_wheel):
 
     def get_tag(self) -> Tuple[str, str, str]:
         super().get_tag()  # keep wheel's own validation and plumbing in the loop
-        # An explicit --plat-name WINS over the build host's tag (2026-10-20, audit H47). Before this, the
+        # An explicit --plat-name WINS over the build host's tag (2026-10-20). Before this, the
         # option was accepted by the command line and then silently ignored here: a cross-build, or a
         # release that pins the manylinux level, got the host's sysconfig tag anyway -- with no error, and
         # the only trace was the wheel's FILE NAME, which nobody compares against their intent.

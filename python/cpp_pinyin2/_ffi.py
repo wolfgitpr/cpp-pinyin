@@ -261,7 +261,11 @@ class ToneSandhiOpts(ctypes.Structure):
 
 
 def declare(lib: ctypes.CDLL) -> None:
-    """Declare all 20 entry points of the ABI on ``lib``.
+    """Declare every exported entry point of the ABI on ``lib``.
+
+    "Every" is checked rather than counted here: the authority is
+    ``tests/abi/expected_c_api_symbols.txt``, and a hard-coded number in this docstring went stale
+    once already (it said 20 while the shell declared 23).
 
     ``cppp2_open``'s first argument is the nullable ``const cppp2_registry *``: the shell has no
     C++ host to hand it one, so it passes NULL and gets the library's own two built-ins -- which
@@ -378,8 +382,8 @@ def declare(lib: ctypes.CDLL) -> None:
     lib.cppp2_load_traditional_dict.restype = ctypes.c_int32
     lib.cppp2_load_traditional_dict.argtypes = [ctypes.c_void_p, _STR, ctypes.c_int32]
 
-    # The `_ex` spellings (2026-10-20, audit H04): the same two loads plus the error channel. Declared here
-    # because tests/test_contract.py::test_ffi_declares_exactly_the_c_api_surface compares this module's
+    # The `_ex` spellings (2026-10-20): the same two loads plus the error channel. Declared here
+    # because python/tests/test_contract.py::test_ffi_declares_exactly_the_c_api_surface compares this module's
     # `lib.cppp2_*` set against the frozen list as SETS -- a symbol the C face has and this module lacks is
     # exactly the gap that test exists to catch. The public Python methods keep calling the short names:
     # their failures already carry `path` from a pre-load check, and switching them is a separate decision.

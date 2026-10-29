@@ -7,7 +7,7 @@ WHAT THIS WRITES AND WHY IT IS GENERATED RATHER THAN WRITTEN BY HAND:
   puts into the nuspec. The version has exactly one source of truth, ``CMakeLists.txt``
   (``project(cpp-pinyin2 VERSION x.y.z)``), exactly as the Python shell's ``_version.py`` does
   (PLUGIN doc section 6.8.5, version chain places 3 and 5).
-* ``csharp/CppPinyin/BuildInfo.g.props`` -- ``NativeLibraryName`` and ``Commit``. The native file
+* ``csharp/CppPinyin/BuildInfo.g.cs`` -- ``NativeLibraryName`` and ``Commit``. The native file
   name differs by toolchain (MinGW produces ``libcpp-pinyin2``, MSVC ``cpp-pinyin2``), so decision
   D20=A says no shell may hardcode it: it is recorded here at build time from the library that was
   actually built. ``DllImport`` needs a compile-time constant, which is why this is a C# source

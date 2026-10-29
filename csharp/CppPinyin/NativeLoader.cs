@@ -16,20 +16,19 @@ namespace CppPinyin2
     /// looks in a short, named list of places and otherwise throws an exception naming them.
     /// </para>
     /// <para>
-    /// On netstandard2.0 there is no resolver hook, so the library must sit where the OS loader looks
-    /// (next to the assembly or on the search path), and failures surface as
-    /// <see cref="DllNotFoundException"/> wrapped by <see cref="NativeLoader.DescribeMissingLibrary"/>.
+    /// Both targets this package ships (net7.0, net10.0) have the resolver hook, so the registration below
+    /// is unconditional. It used to be wrapped in <c>#if !NETSTANDARD2_0</c> for the target that had no
+    /// hook; that target was dropped on 2026-10-27 (D36 revoked), and a host without the hook would now
+    /// need the library next to the assembly or on the OS search path, as
+    /// <see cref="NativeLoader.DescribeMissingLibrary"/> explains.
     /// </para>
     /// </summary>
     internal static class NativeLoader
     {
-#if !NETSTANDARD2_0
         private static bool _registered;
-#endif
 
         internal static void Register()
         {
-#if !NETSTANDARD2_0
             if (_registered)
             {
                 return;
@@ -37,7 +36,6 @@ namespace CppPinyin2
 
             _registered = true;
             NativeLibrary.SetDllImportResolver(typeof(NativeLoader).Assembly, Resolve);
-#endif
         }
 
         /// <summary>A message naming what was looked for and where, for a load failure.</summary>
@@ -95,7 +93,6 @@ namespace CppPinyin2
             return null;
         }
 
-#if !NETSTANDARD2_0
         private static IntPtr Resolve(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
             if (!string.Equals(libraryName, NativeMethods.Library, StringComparison.Ordinal))
@@ -138,6 +135,5 @@ namespace CppPinyin2
                 yield return baseName + ".so";
             }
         }
-#endif
     }
 }

@@ -229,9 +229,9 @@ namespace cpp_pinyin::v2
 
         std::vector<std::string> defaultReadings(char16_t ch, int style, bool v_to_u, bool neutralTone5) const;
         /// Converts every reading of `candidates` to `style` and drops duplicates, keeping the first
-        /// occurrence. The loop existed verbatim in `defaultReadings` and in `queryRawInto` (2026-10-20, audit
-        /// round 2 §12.7): same table, same conversion, same de-duplication key, two copies to keep in step.
-        /// Returns an EMPTY vector when the bucket is empty -- callers decide what "no reading" means for them
+        /// occurrence. The loop existed verbatim in `defaultReadings` and in `queryRawInto`: same table, same
+        /// conversion, same de-duplication key, two copies to keep in step. Returns an EMPTY vector when the bucket is
+        /// empty -- callers decide what "no reading" means for them
         /// (`defaultReadings` falls back to the character, `queryRawInto` pushes the character and continues).
         [[nodiscard]] std::vector<std::string> convertCandidates(const std::vector<std::u16string> &candidates,
                                                                  int style, bool v_to_u, bool neutralTone5) const;
@@ -272,11 +272,10 @@ namespace cpp_pinyin::v2
         /// The number of (first, second) pair gates the phrase attempts share. The window only ever starts
         /// a phrase at cursor-3 .. cursor (Attempt::rel is -3..0; it can REACH cursor+1 but never starts
         /// there) and only ever tests four pairs, so four slots cover every
-        /// attempt -- the same invariant the 12-entry attempt table relies on (2026-10-20, audit H14).
+        /// attempt -- the same invariant the 12-entry attempt table relies on.
         static constexpr size_t kPhraseGateCount = 4;
         /// A `rel` start maps to its gate slot by this offset: slot = rel + kPhraseGateSlotOffset, which is
-        /// why the table's `rel` range is -3..0 (2026-10-20, audit H14: the literal 3 was the third copy of
-        /// that invariant).
+        /// why the table's `rel` range is -3..0.
         static constexpr size_t kPhraseGateSlotOffset = 3;
 
         /// The five rendering switches one query carries, so the query-path helpers below do not each

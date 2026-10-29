@@ -1,8 +1,7 @@
 using System.Runtime.CompilerServices;
 
-// The test project needs internals on purpose, and only two of them:
-//   * Utf8.FromPtrPortable -- compiled on every target so the netstandard2.0 decoder has a witness that
-//     actually executes (see Utf8.cs); without this the fallback would be shipped untested.
+// The test project needs internals on purpose, and only one of them now:
 //   * BuildInfo -- the generated native library name, so a test can assert the loader's assumption
 //     against the package layout.
+// Utf8.FromPtrPortable was the other one; it went with the netstandard2.0 target on 2026-10-27 (D41).
 [assembly: InternalsVisibleTo("CppPinyin.Tests")]

@@ -15,21 +15,23 @@ namespace cpp_pinyin::v2
     class Registry;
 
     /// Dialect-agnostic query facade: every dialect's operations, parameterized by a dialect description
-    /// instead of per-class (the `Mandarin` / `Cantonese` classes are no longer public): the entry point for
-    /// a dialect outside this repository, and the only supported way to run a custom `ToneConverter` (the
-    /// engine object underneath is not exported; built-ins hard-code their own converter).
-    /// The dictionary root is a constructor argument, with no setter (FR-4.5 of docs/REQUIREMENTS.md): two `Engine`
-    /// objects with different roots or dialects coexist in one process and do not interfere. THREADS: after
-    /// construction completes, concurrent READ-only calls (`query` / `readings` / `toSimplified` / `isPolyphonic`) are
-    /// safe on a shared instance; `loadUserDict` / `loadTraditionalDict` / `setDisambiguationCallback` MUTATE tables
-    /// readers touch and must not overlap a read from another thread -- a data race today, measured (concurrent loading
-    /// corrupts the heap). FAILURE: `open` answers with an `Outcome` that carries no value, `error().code` saying which
-    /// kind of failure it was; the description constructors CANNOT report a reason, so a failed construction is
-    /// reportable only through `open`'s `Outcome`, and the public face has no `isReady()` / `lastError()`
-    /// (those two belong to the internal implementation).
-    /// Every accessor stays safe on an engine that is not ready: `query`, `readings`, `toSimplified` and the
-    /// `load*` entries answer with `Code::NotReady` rather than dereferencing anything; only
-    /// `isPolyphonic` (false) and `dialect()` (an empty id) have an empty value to return.
+    /// Dialect-agnostic query facade: every dialect's operations, parameterized by a dialect description
+    /// instead of per-class (the `Mandarin` / `Cantonese` classes are no longer public). The dictionary
+    /// root is a constructor argument with no setter (FR-4.5 of docs/REQUIREMENTS.md), so objects with
+    /// different roots or dialects coexist in one process without interfering.
+    ///
+    /// THREADS: after construction completes, concurrent READ-only calls (`query` / `readings` /
+    /// `toSimplified` / `isPolyphonic`) are safe on a shared instance; `loadUserDict` /
+    /// `loadTraditionalDict` / `setDisambiguationCallback` write what readers touch and must not overlap a
+    /// read from another thread -- a data race that corrupts the heap.
+    ///
+    /// FAILURE: `open` answers with an `Outcome` carrying the kind of failure; the description
+    /// constructors cannot return anything, so a failed construction is reportable only through `open`, and
+    /// the public face has no `isReady()` / `lastError()` (those belong to the implementation).
+    ///
+    /// Every accessor stays safe on an engine that is not ready: `query`, `readings`, `toSimplified` and
+    /// the `load*` entries answer `Code::NotReady` rather than dereferencing anything; only `isPolyphonic`
+    /// (false) and `dialect()` (an empty id) have an empty value to return.
     class CPP_PINYIN2_EXPORT Engine {
     public:
         /// Resolves `dialectId` through `registry` -- the CALLER's registry; there is no global one -- and
@@ -60,21 +62,16 @@ namespace cpp_pinyin::v2
         [[nodiscard]] const Dialect &dialect() const;
 
         /// The rows for `text`, or an error instead of them when this engine cannot answer: an
-        /// engine that is not ready (an unresolvable description, a moved-from object) answers with
-        /// `Code::NotReady` -- never with an empty result, which reads like a successful query that
-        /// found nothing (docs/CONTRACT.md section 2). Every other failure of a running engine stays inside the rows
-        /// (`Segment::failure_kind`), so a value is the only outcome of a successful call.
+        /// The rows for `text`, or an error when this engine cannot answer: a not-ready engine (an
+        /// unresolvable description, a moved-from object) answers `Code::NotReady` -- never an empty
+        /// result, which reads like a successful query that found nothing (docs/CONTRACT.md section 2).
+        /// Every other failure of a running engine stays in the value (`Segment::failure_kind`).
         ///
-        /// TWO overloads, and the difference is the unit of input: a string is queried as text
-        /// (converted and segmented), a vector is queried as a list of characters that has ALREADY been
-        /// split, so every element must be exactly one character. Writing `query({"x"})` is therefore
-        /// ambiguous, and g++ says so ("call of overloaded 'query(<brace-enclosed initializer list>)' is
-        /// ambiguous" with both candidates listed, measured 2026-10-18). That is deliberate: the two
-        /// readings -- one string "x" vs one character "x" -- differ for any text that is not a single
-        /// character ("ni hao" is ONE string and TWO invalid characters), so letting a braced list silently
-        /// pick one would be the ambiguity this whole API avoids. Say which one you mean:
-        /// `query("x")` / `query(std::string_view{"x"})` for text, `query(std::vector<std::string>{"x"})`
-        /// for a character list.
+        /// TWO overloads, differing in the unit of input: a string is queried as text (converted and
+        /// segmented), a vector as a list of characters already split, so every element must be exactly one
+        /// character. `query({"x"})` is therefore ambiguous and g++ rejects it -- deliberately: "ni hao" is
+        /// ONE string but TWO invalid characters, so a braced list cannot pick a reading for you. Say which
+        /// you mean: `query("x")` for text, `query(std::vector<std::string>{"x"})` for a character list.
         [[nodiscard]] Outcome<Result> query(std::string_view text, const EngineConfig &cfg = {}) const;
         [[nodiscard]] Outcome<Result> query(const std::vector<std::string> &chars, const EngineConfig &cfg = {}) const;
         [[nodiscard]] Outcome<std::vector<std::string>> readings(std::string_view hanzi,
@@ -131,34 +128,28 @@ namespace cpp_pinyin::v2
         /// Why construction failed. Empty whenever `impl_` is set.
         std::string m_error;
         /// How to classify that failure when `open` turns it into an `Outcome`. `Load` unless the
-        /// dictionary's manifest asks for a newer library (docs/CONTRACT.md section 2): a caller can then tell "upgrade
-        /// the library" from "the data is broken", which is the whole point of the separate code.
+        /// How to classify that failure when `open` turns it into an `Outcome`. `Load` unless the
+        /// dictionary's manifest asks for a newer library (docs/CONTRACT.md section 2), which is the whole
+        /// point of the separate code: "upgrade the library" is actionable, "the data is broken" is not.
         ///
-        /// SCOPE, stated because it is an asymmetry a reader will notice (2026-10-20, audit H02): this code is
-        /// produced by BOTH construction paths but exposed by only one. `Engine::open` returns
-        /// `Outcome<Engine>`, so a failed open carries the classification; the description constructors
-        /// (`Engine(const Dialect &, path)` and its subdir form) cannot return anything, so a host that uses
-        /// them learns only `isReady() == false` and the text from `lastError()` -- the code stays here and is
-        /// never published. That is a property of the constructor shape, not a missing wire: adding
-        /// `failureCode()` would expose it, and it is deliberately NOT in the frozen surface (adding a public
-        /// member is an API change with its own review, `tests/abi/expected_public_members.txt`).
+        /// SCOPE: produced by BOTH construction paths, exposed by only one -- `open` returns
+        /// `Outcome<Engine>`, while the description constructors cannot return anything, so a host using
+        /// them learns only `usable() == false` plus `reason()`. That is a property of the constructor
+        /// shape, not a missing wire: a public `failureCode()` would expose it and is deliberately NOT in
+        /// the frozen surface (`tests/abi/expected_public_members.txt`).
         Code m_errorCode = Code::Load;
     };
 
     /// Where this build installed the dictionary tables -- the C++ face of `cppp2_dict_dir_candidate`,
-    /// and ONE implementation behind both spellings (a C++ host should never have to include the C header
-    /// to ask this; 2026-10-20, audit round 3 H05: the C face and both shells had it, the C++ face did
-    /// not, and the readers of that entry point are exactly the hosts WITHOUT a CMake package or .pc file).
+    /// Where this build installed the dictionary tables -- the C++ face of `cppp2_dict_dir_candidate`,
+    /// with ONE implementation behind both spellings (a C++ host should not have to include the C header).
     ///
-    /// The answer comes from the loaded module's own location plus the install-time relative path: it
-    /// never reads an environment variable (the shells own that) and never guesses the host executable's
-    /// directory -- both are decisions D1/D2 of docs/DECISIONS.md section 4.1
-    /// EMPTY when there is no usable anchor -- a static build has none, because "this module" would
-    /// resolve to the host executable, which D1 forbids. Cached after the first call: it cannot change for
-    /// the life of the process.
-    ///
-    /// Returns a COPY, so callers may keep it indefinitely. The C spelling hands out a pointer into the
-    /// same cache instead, because a `const char *` is all that ABI can carry.
+    /// Comes from the loaded module's own location plus the install-time relative path: never an
+    /// environment variable (the shells own that) and never a guess at the host executable's directory
+    /// (decisions D1/D2, docs/DECISIONS.md section 4.1). EMPTY when there is no usable anchor -- a static
+    /// build has none, because "this module" would resolve to the host executable, which D1 forbids.
+    /// Cached after the first call. Returns a COPY; the C spelling hands out a pointer into that cache
+    /// instead, because `const char *` is all that ABI can carry.
     [[nodiscard]] CPP_PINYIN2_EXPORT std::string dictDirCandidate();
 
 }  // namespace cpp_pinyin::v2

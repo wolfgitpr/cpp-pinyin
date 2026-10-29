@@ -32,8 +32,8 @@ namespace cpp_pinyin::v2
     // `plugin` are therefore never produced -- not "not yet observed", but not implemented.
     enum class ReadingSource { dictionary = 0, phrase = 1, user_dict = 2, plugin = 3 };
 
-    // Structured syllable
-    /// THE CONTRACT, verbatim from docs/CONTRACT.md section 3 (authoritative wording, do not reword;
+    /// THE CONTRACT, stated in full here and nowhere else (authoritative wording, do not reword;
+    /// `docs/CONTRACT.md` §3 indexes these four rules and names this block as the normative text;
     /// tests/cpp/test_syllable_contract.cpp fails if one of the four sentences goes away):
     /// 1. 「tone
     /// 的**唯一权威来源是词表原始注音**（粤语末位数字、普通话调号；无调号＝轻声）；**禁止**从转换后的输出字符串解析；**NORMAL
@@ -43,8 +43,9 @@ namespace cpp_pinyin::v2
     /// 3. 「普通话轻声的两种编码（`de` 无调号 / `de5`）＝**同一表层**，输出一律报实际编号：`markNeutralAs5 = false` 报
     /// `0`（或省略）、`= true` 报 `5`；**不得**让两条来源走不同路径。」
     /// 4. 「粤语**入声不新增相位**：1/3/6 调即含 `-p/-t/-k` 韵尾；方言表层编号**直用数据 1..6**，不得引入 7/8/9。」
-    /// `tone` is a dialect-internal tone-category number, NOT a cross-dialect comparable value (Mandarin 0..5,
-    /// Cantonese 1..6): never compare/order/average across dialects; authority = the dialect's own surface.
+    /// `tone` is a dialect-internal tone-category number, NOT a cross-dialect comparable value (Mandarin
+    /// 1..4, Cantonese 1..6): never compare, order or average it across dialects; the authority is the
+    /// dialect's own surface.
     struct CPP_PINYIN2_EXPORT Syllable {
         // The initial; "" for a zero-initial syllable ("阿", "衣", "知" follow the same rule as the beta
         // face).
@@ -52,15 +53,10 @@ namespace cpp_pinyin::v2
         // The canonical final: tone stripped, ü written as v. The tone number travels in `tone` and is
         // never read back out of this field.
         std::string fin;
-        // The row's ORIGINAL spelling in the dictionary (UTF-8, copied byte for byte, tone marks and
-        // trailing digits included) -- the IDENTITY of this struct. `initial`/`fin` are a PROJECTION of it,
-        // and the projection is not reversible: the seven Mandarin readings whose (initial, fin) projection
-        // loses information -- **the list itself lives in `core/Types.h`** (2026-10-20: it used to be spelled
-        // out here too, while this very sentence claimed the list was elsewhere; one enumeration, one home) --
-        // and any non-syllable string cannot be reconstructed. A
-        // consumer that has to render again must use this field rather than infer it from `initial`+`fin`
-        // -- when that inference fails the old interface could only report an argument error, which is the
-        // C2 defect. For an empty reading (an empty table entry) this field is "", like the others.
+        // The row's ORIGINAL spelling in the dictionary (UTF-8, byte for byte, tone marks and trailing
+        // digits included) -- the IDENTITY of this struct. `initial`/`fin` are a LOSSY PROJECTION of it
+        // (the seven readings whose projection collides are listed in `core/Types.h`), so a consumer that
+        // has to render again must use this field rather than infer it. Empty for an empty reading.
         std::string spelling;
         // The dialect-internal tone category. Its authority and its value range are contract clauses 1, 3
         // and 4 above.

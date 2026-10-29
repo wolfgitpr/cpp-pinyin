@@ -7,7 +7,8 @@ namespace CppPinyin2.Tests
     /// <summary>
     /// The shell default must mean "whatever the dialect defaults to", not one shell's idea of a
     /// neutral rendering. `Style.Default` is the sentinel the library resolves against the dialect's
-    /// default (`styles[].isDefault`, read by `defaultStyleOf` and resolved by `resolveStyle` in `core/Types.h`); `Readings` was the one entry point still hard-coding
+    /// default (`styles[].isDefault`, read by `defaultStyleOf` and resolved by `resolveStyle` in
+    /// `include/cpp-pinyin2/core/Types.h`); `Readings` was the one entry point still hard-coding
     /// `Style.Normal`, so a C# caller got `zhong` where every other entry point -- and the Python
     /// shell -- gives the dialect default `zhōng`.
     ///

@@ -1,20 +1,16 @@
 #pragma once
 
-// CPP_PINYIN2_VERSION_* -- the COMPILE-TIME half of the version, so a consumer can write `#if`
-// instead of calling a function at run time. The run-time half already exists (`cppp2_version()`);
-// this header is what fmt/spdlog/zstd/utf8proc all ship and this library did not (2026-10-19 audit,
-// finding F15: the only version string in the tree was a PRIVATE compile definition, so no consumer
-// could branch on it).
+// CPP_PINYIN2_VERSION_* -- the COMPILE-TIME half of the version, so a consumer can write `#if` instead of
+// calling a function at run time (the run-time half is `cppp2_version()`).
 //
-// WHY THESE ARE PLAIN #define AND NOT A GENERATED FILE: the public headers are installed by a
-// directory copy (`install(DIRECTORY include/cpp-pinyin2 ...)`) and every gate that freezes the
-// public face works on the paths under include/. A configure_file()-generated header would need an
-// extra install rule, a binary-directory include path and an exemption from each of those gates --
-// a second mechanism for one file. Instead the numbers are written here ONCE and checked against
-// `project(cpp-pinyin2 VERSION x.y.z)` by tools/check_version_tokens.py (axis 9), which refuses the
-// tree when they disagree. Drift is impossible; a hand edit without a bump is loud.
+// PLAIN #define, NOT A GENERATED FILE: the public headers are installed by a directory copy and every
+// gate that freezes the public face works on paths under include/, so a configure_file()-generated header
+// would need an extra install rule, a binary-directory include path and exemptions from those gates -- a
+// second mechanism for one file. Instead the numbers are written here ONCE and checked against
+// `project(cpp-pinyin2 VERSION x.y.z)` by tools/check_version_tokens.py (the compile-time-macro check),
+// which refuses the tree when they disagree.
 //
-// The numbers are the PACKAGE version, not an ABI version: 2.x is the same compatibility level
+// These are the PACKAGE version, not an ABI version: 2.x is the same compatibility level
 // (docs/CONTRACT.md section 1) and the same binary generation (docs/STABILITY.md R9).
 
 #define CPP_PINYIN2_VERSION_MAJOR 2

@@ -1,15 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- D36 = A (2026-10-01, user): netstandard2.0, not netstandard2.1.
-         netstandard2.1 cannot be consumed by .NET Framework, and D31 chose to keep .NET Framework
-         and 32-bit in scope (PLAN doc). 2.1's one real benefit here was Marshal.PtrToStringUTF8,
-         which Utf8.cs replaces in a few lines.
+    <!-- TARGETS, and the reversal recorded on 2026-10-27. D36 = A (2026-10-01, user) put netstandard2.0 in
+         the list to keep .NET Framework and 32-bit consumers in scope, with a hand-written UTF-8 decoder
+         standing in for Marshal.PtrToStringUTF8. The user revoked that on 2026-10-27 (new decision, see
+         docs/DECISIONS.md) because shipping the promise needed runtime assets this package never carried:
+         csharp/build/CppPinyin.props|.targets were a self-declared skeleton and were not packed, so a
+         .NET Framework consumer would compile and then fail to find the native library. Two targets are
+         shipped instead of three advertised; the decoder and the LPUTF8Str workaround went with it.
          D37 = B (2026-10-01, user): net10.0 joins the list. net7.0 and net10.0 are the targets whose
          runtime has NativeLibrary.SetDllImportResolver (D18's reason); net7.0 stays even though it is
          past end of life so existing net7 consumers keep that path, and net10.0 is the newest target
          this host can actually build and run against (10.0.11 reference pack in the local cache). -->
-    <TargetFrameworks>netstandard2.0;net7.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -48,8 +51,9 @@
          repository nor the tables. -->
     <PackageLicenseExpression>Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
-    <!-- Explicit rather than assumed: netstandard2.0 does not get the compiler's reference assembly by
-         default the way the modern targets do, and the ref/ entry below depends on it existing. -->
+    <!-- Explicit rather than assumed: the ref/ entry below depends on the compiler emitting a reference
+         assembly, and that is not a default worth relying on (measured: the hook errors out with
+         "no reference assembly at ..." when this is false). -->
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
 
@@ -66,7 +70,7 @@
       5. ordinary evaluation-time None items gated on TargetFramework: pack succeeds, ref/ still empty.
          Items evaluated only in the inner per-framework build never reach the package.
       6. the same hook as 2, with NU5131 allowed through as the warning it is: the package really does
-         contain ref/net7.0|net10.0|netstandard2.0/CppPinyin.dll. So the hook and PackagePath do work, and
+         contain ref/net7.0|net10.0/CppPinyin.dll. So the hook and PackagePath do work, and
          the warning is the false positive that NoWarn below deals with.
     What ships now: the hook delivers the reference assembly AND its documentation file, because a
     reference group expects both, and a real project.assets.json confirms the consumer resolves
@@ -80,7 +84,7 @@
 
       Measured, not assumed: pack with this warning allowed through (its own text calls it a warning, and
       TreatWarningsAsErrors is what turns it into an error) produces a package that really does contain
-      ref/net7.0/CppPinyin.dll, ref/net10.0/CppPinyin.dll and ref/netstandard2.0/CppPinyin.dll, and whose
+      ref/net7.0/CppPinyin.dll and ref/net10.0/CppPinyin.dll, and whose
       nuspec has no references element at all. Adding the documentation file that the warning asks for
       changes nothing: it still reports both files as missing from every reference group, which means the
       check is not looking at the files the package actually contains.
@@ -114,7 +118,7 @@
          obj/Release/net7.0/ref/CppPinyin.dll is 11776 bytes against the 18944 byte runtime assembly.
       2. TfmSpecificPackageFile, the item type that TargetsForTfmSpecificContentInPackage documents,
          with PackagePath=ref/<tfm>/: pack fails with NU5131, which names CppPinyin.dll as missing from
-         the reference group of net7.0, net10.0 and netstandard2.0.
+         the reference group of net7.0 and net10.0.
       3. a plain None item with Pack and PackagePath from inside that same hook: pack succeeds and ref/
          is empty. The hook itself does run (probed with a high-importance message: once per target
          framework, with the correct IntermediateOutputPath), so items added there are not collected.

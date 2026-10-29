@@ -6,8 +6,13 @@
 # python/tools/ci_manylinux_aarch64.sh is tracked: the machine that measured the commands and the CI job
 # that will run them then execute the same bytes. The Linux legs had a board to be measured on; this one
 # has no macOS machine in this project, so **this script is unverified until someone runs it on a Mac**,
-# and its first honest execution is the first evidence. That is stated here rather than implied, and the
-# release checklist (PLUGIN_INTERFACE_AND_BINDINGS.md section 6.7.11) says the same thing.
+# and its first honest execution is the first evidence. That is stated here rather than implied, and
+# docs/RELEASE_CHECKLIST.md section 6.7.11 says the same thing.
+#
+# WIRED (2026-10-27): it had no caller at all until then. The ci.yml macos job now builds a wheel and
+# hands it to this script, so "unverified" means "the step exists and has never produced a result", not
+# "nothing is going to run it". The header above predates that wiring and is kept on purpose: it is the
+# reason the script refuses to guess.
 #
 # WHAT IT CHECKS AND WHY EACH ONE IS HERE:
 #   1. the architecture the binary actually contains, read from `lipo -archs`, against the architecture
@@ -102,6 +107,14 @@ case "$(basename "$WHEEL")" in
     *arm64*)      tag_arch="arm64" ;;
     *x86_64*)     tag_arch="x86_64" ;;
 esac
+# THE CASE ABOVE HAS NO DEFAULT ARM, and that used to be a silent hole: a wheel whose platform tag named
+# no architecture this script knows left `tag_arch` empty, and the loop below then skipped its arch check
+# without printing anything -- "verified" and "never looked at" reading the same in the log. That is the
+# shape this repository keeps finding, so it is a failure now: a tag naming no architecture cannot be
+# verified, and the three tags macOS actually produces (`macosx_X_Y_{arm64,x86_64,universal2}`) all match
+# a pattern above (2026-10-27).
+check "the platform tag names an architecture this script can verify" \
+      "$([ -n "$tag_arch" ] && echo 1 || echo 0)" "$(basename "$WHEEL")"
 for lib in $libs; do
     archs="$(lipo -archs "$lib" 2>/dev/null | tr ' ' '\n' | sort | tr '\n' ' ')"
     echo "  $(basename "$lib"): $archs"

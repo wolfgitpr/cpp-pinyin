@@ -10,7 +10,7 @@ namespace CppPinyin2.Tests
     /// Binding-level behaviour that the fixture cannot cover: the version chain's C# link, the
     /// <see cref="SafeHandle"/> lifecycle, the failure messages, the ABI structures' layout, the entry
     /// points the fixture does not reach (the structured reading, the renderer, the code text), and the
-    /// portable UTF-8 decoder that the netstandard2.0 target depends on.
+    /// UTF-8 round trip through <see cref="Utf8String"/> that every string parameter depends on.
     /// </summary>
     public sealed class SmokeTests
     {
@@ -265,25 +265,11 @@ namespace CppPinyin2.Tests
             // that is the literal "unknown code" (src/Outcome.cpp is its single authority).
             Assert.Equal("unknown code", Engine.CodeText(99));
         }
-
-        [Fact]
-        public void The_portable_decoder_agrees_with_the_framework_decoder()
-        {
-            // The netstandard2.0 target decodes UTF-8 by hand (Marshal.PtrToStringUTF8 does not exist
-            // there). That code is compiled on every target so this test can run it rather than trusting
-            // that it compiles. Multi-byte, mixed and non-BMP text, because a decoder that only handles
-            // ASCII would pass a careless test.
-            foreach (string text in new[] { "你好世界", "asdf,123!", "略", "你好,世界🙂", "a" })
-            {
-                using (var native = new Utf8String(text))
-                {
-                    Assert.Equal(text, Utf8.FromPtrPortable(native.Pointer));
-                    Assert.Equal(text, Marshal.PtrToStringUTF8(native.Pointer));
-                }
-            }
-
-            Assert.Equal(string.Empty, Utf8.FromPtrPortable(IntPtr.Zero));
-        }
+        // The portable-UTF8-decoder test stood here until 2026-10-27: it compared Utf8.FromPtrPortable
+        // (the netstandard2.0 path) against Marshal.PtrToStringUTF8. With netstandard2.0 dropped there is
+        // one decoder left -- the framework's -- so there is nothing left to compare it against. The
+        // round-trip through Utf8String is still exercised by every test that passes a Chinese string
+        // through the engine, which is most of this file.
 
         [Fact]
         public void The_generated_native_library_name_is_a_plain_file_name()

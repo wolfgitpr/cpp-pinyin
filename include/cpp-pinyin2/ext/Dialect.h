@@ -15,22 +15,20 @@ namespace cpp_pinyin::v2
     /// A complete description of one dialect -- the plugin entry point.
     ///
     /// Adding a dialect does NOT require touching this library: provide dictionary files, a
-    /// `ToneConverter` subclass, and one `Dialect`, then hand either to `cpp_pinyin::v2::Engine` (directly,
-    /// or through a `Registry` so it can be addressed by id).
+    /// `ToneConverter` subclass and one `Dialect`, then hand either to `Engine` (directly, or through a
+    /// `Registry` so it can be addressed by id).
     ///
     /// Two properties are deliberate and load-bearing:
     ///
-    ///  * **`tone` is held by value, not by pointer.** `EngineImpl` copies the converter it is
-    ///    given, and a value copy slices to the `ToneConverter` base subobject -- which is harmless
-    ///    here because every dialect behaviour lives in that base's *function pointer* table
-    ///    (`m_converts`, `m_normalize`), never in a virtual. Do not "improve" this into a virtual.
+    ///  * **`tone` is held by value, not by pointer.** `EngineImpl` copies the converter it is given, and
+    ///    a value copy slices to the `ToneConverter` base subobject -- harmless here because every dialect
+    ///    behaviour lives in that base's *function pointer* table (`m_converts`, `m_normalize`), never in
+    ///    a virtual. Do not "improve" this into a virtual.
     ///
-    ///  * **A `Dialect` carries no dictionary path and no loaded state.** The dictionary root is a
-    ///    constructor argument of `Engine`, so two instances of the same dialect can read two
-    ///    different directories at the same time. Nothing here is a process-wide setting.
+    ///  * **A `Dialect` carries no dictionary path and no loaded state.** The root is a constructor
+    ///    argument of `Engine`, so two instances of one dialect can read two directories at the same time.
     ///
-    /// Thread safety: a `Dialect` is an inert value. Copying one is safe from any thread; the
-    /// resulting `Engine` objects are independent of each other.
+    /// Thread safety: a `Dialect` is an inert value; the `Engine` objects built from it are independent.
     struct CPP_PINYIN2_EXPORT Dialect {
         /// Identifier used by `Engine::open`/`Registry`, e.g. "mandarin", "cantonese".
         std::string id;
@@ -52,19 +50,15 @@ namespace cpp_pinyin::v2
         /// Same, for `markNeutralAs5`.
         bool supportsNeutralTone5 = false;
 
-        /// What this dialect can emit, and what each of those styles is called -- the single
-        /// authority for "does this dialect have a 'tone3', and which number is it". EMPTY means the
-        /// dialect declares nothing: every style number then passes the reading through unchanged (a
-        /// default-constructed `ToneConverter` has an empty slot for it) and there is no default to
-        /// fall back to. A plugin that wants callers to be able to name its styles fills this in;
-        /// `findStyle` (core/Types.h) is the lookup, and tests/cpp/test_style_table.cpp pins the two
-        /// built-ins' tables.
+        /// What this dialect can emit and what each style is called -- the single authority for "does
+        /// this dialect have a 'tone3', and which number is it". EMPTY means it declares nothing: every
+        /// style number passes the reading through unchanged and there is no default to fall back to.
+        /// `findStyle` (core/Types.h) is the lookup; tests/cpp/test_style_table.cpp pins the built-ins.
         ///
-        /// The dialect's DEFAULT is the entry whose `isDefault` is set (`defaultStyleOf` in
-        /// core/Types.h reads it, `cppp2_style_list` publishes the same flag). Marking none means "no
-        /// opinion -- ask explicitly" and resolves to style 0; marking more than one is a plugin bug
-        /// (the first wins). There is deliberately no second field saying it: that field existed until
-        /// 2026-10-18 and let a description declare a default its renderer did not use.
+        /// The DEFAULT is the entry whose `isDefault` is set (`defaultStyleOf` reads it,
+        /// `cppp2_style_list` publishes the same flag). None marked means "no opinion, ask explicitly" and
+        /// resolves to style 0; more than one is a plugin bug (the first wins). Deliberately no second
+        /// field saying it: that field let a description declare a default its renderer did not use.
         std::vector<StyleDecl> styles;
 
         /// Which tone-sandhi pass this dialect declares (`core/ToneSandhi.h` has the enumerator and the

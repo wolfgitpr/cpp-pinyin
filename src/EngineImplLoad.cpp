@@ -1,15 +1,11 @@
-// Translation-unit split of the engine's load path (P2 split #2, step R3).
+// Translation-unit split of the engine's load path.
 //
-// The functions below were moved here verbatim from EngineImpl.cpp by the round-3 split script (line range
-// slicing, so the text is byte-identical), because that file is over the AC-5 budget and the load
-// path never runs in the query hot path. Same class, same translation-unit rules, no interface
-// change.
+// The functions below were moved here verbatim from EngineImpl.cpp, because that file is over the AC-5
+// budget and the load path never runs in the query hot path. Same class, same rules, no interface change.
 //
-// Scope, stated plainly: this file STARTED as a TU split inside the engine layer, buying the line-count
-// win only. The promotion that followed it is real: the layer logic now lives in
-// src/dict/PhraseLayers.cpp and the functions here are forwarding shells that supply what belongs to
-// the engine -- its dialect reading normalizer and its error slot (2026-10-22: this paragraph still
-// said the promotion "has NOT been done here", which stopped being true when it landed).
+// Scope: this file STARTED as a TU split inside the engine layer, buying the line-count win only. The
+// promotion that followed is real -- the layer logic lives in src/dict/PhraseLayers.cpp, and the functions
+// here are forwarding shells that supply what belongs to the engine: its reading normalizer and error slot.
 
 #include "EngineImpl.h"
 
@@ -165,7 +161,7 @@ namespace cpp_pinyin::v2
         if (ok)  // a failed load changed nothing, so nothing derived needs re-deriving (lesson of Q2)
             rebuildPhrases();
         // Same reporting rule as loadUserDictLayer: a failing explicit load must be visible
-        // through lastError() instead of only through the bool (audit S-02).
+        // through lastError() instead of only through the bool.
         if (!ok && (clear || m_lastError.empty()))
             m_lastError = "failed to load traditional dict: " + path.string();
         return ok;

@@ -11,7 +11,7 @@ namespace CppPinyin2
     /// <para>
     /// <see cref="Default"/> (-1) is not a style: it is the sentinel "whatever this dialect defaults
     /// to", and it is what every entry point below asks for when the caller names no style. The library
-    /// resolves it (<c>core/Types.h</c> -&gt; <c>resolveStyle</c>), so an unspecified style means
+    /// resolves it (<c>include/cpp-pinyin2/core/Types.h</c> -&gt; <c>resolveStyle</c>), so an unspecified style means
     /// Mandarin <see cref="Tone"/> and Cantonese <see cref="Tone3"/> in ALL FOUR layers -- C#, Python,
     /// C++ and the C ABI alike. It used to be <see cref="Normal"/>, which made this binding one of the
     /// two layers that disagreed with the C++ facades about the same sentence (C4/N27 gave "unset" a

@@ -119,8 +119,8 @@ def configure_and_build(build_dir: Path, config: str) -> None:
         # generator (Ninja, Makefiles) that flag is a no-op, so without this line the tree carries no
         # CMAKE_BUILD_TYPE at all -- no optimisation, and the part that bites, no -DNDEBUG. assert()
         # then stays LIVE inside the library that ships in the wheel, and
-        # src/EngineImpl.cpp:512 documents its own assertion as compiled out under the release 口径
-        # ("where the equivalence gate is what protects it"). Measured 2026-10-06: with that flag
+        # `assert(a.rowMode != 1 || decided >= 1)` in `src/EngineImpl.cpp` documents itself as compiled out under
+        # the release 口径 ("where the equivalence gate is what protects it"). Measured 2026-10-06: with that flag
         # missing, the conformance case m-tone3-people ("中国人民") aborted the whole pytest process
         # (SIGABRT, "Assertion failed: decided >= 1, ... EngineImpl.cpp, line 512") before any test
         # could report -- reachable through the C ABI alone, so it was the package, not the shell,
@@ -150,7 +150,7 @@ def configure_and_build(build_dir: Path, config: str) -> None:
     run(["cmake", "--build", str(build_dir), "--config", config])
 
 
-def find_library(build_dir: Path) -> Path:
+def find_library(build_dir: Path, config: str) -> Path:
     candidates = sorted(
         (
             path
@@ -159,7 +159,17 @@ def find_library(build_dir: Path) -> Path:
             and path.suffix.lower() in SUFFIXES
             and "cpp-pinyin2" in path.name
         ),
-        key=lambda path: (path.parent.name != "bin", path.name),
+        # THE REQUESTED CONFIGURATION WINS. A multi-config generator keeps Debug/ and Release/ side by side and
+        # names the library identically in both, so ranking on `bin` alone left the choice to the filesystem's
+        # own order -- the same shape as the install-consumer defect (a Debug consumer against a Release DLL is
+        # the CRT split that hung the Windows runner, see the 2026-10-23 install-smoke commits). On a
+        # single-config generator every candidate has the same parent, so this term is a no-op there. `bin`
+        # stays second because that is where the DLL lands on Windows; the name keeps the pick deterministic.
+        key=lambda path: (
+            path.parent.name.lower() != config.lower(),
+            path.parent.name != "bin",
+            path.name,
+        ),
     )
     if not candidates:
         raise SystemExit(f"FATAL: no cpp-pinyin2 library built under {build_dir}")
@@ -231,7 +241,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     write_version(version, commit)
     configure_and_build(build_dir, options.config)
-    stage_library(find_library(build_dir))
+    stage_library(find_library(build_dir, options.config))
     stage_dict()
 
     print(f"\nready: version={version} commit={commit} build_dir={build_dir}")

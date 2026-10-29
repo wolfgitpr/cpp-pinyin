@@ -20,14 +20,13 @@ namespace cpp_pinyin::v2
 
     inline uint64_t encodePhrasesKey(const std::u16string &s) { return encodePhrasesKey(s.data(), s.size()); }
 
-    // Size of every `char16_t`-keyed direct-indexed table in this library: the loaders below, the
-    // engine's phrase gates, and the engine's character tables all index by the code unit itself, so
-    // the size is exactly the number of distinct `char16_t` values.
+    // Size of every `char16_t`-keyed direct-indexed table in this library: the loaders below, the engine's
+    // phrase gates and its character tables all index by the code unit itself, so the size is exactly the
+    // number of distinct `char16_t` values.
     //
-    // Two nearby 16-bit constants look the same and are not: `U16Str.cpp`'s 0x10000 is the first code
-    // point past the BMP (surrogate-pair arithmetic), and the 0xFFFF saturation in the phrase index is
-    // the largest value a uint16_t can hold (saturation). This one is a count, that one is a boundary,
-    // the other is a maximum -- merging them would be off by one at best.
+    // Two nearby 16-bit constants look alike and are not: `U16Str.cpp`'s 0x10000 is the first code point
+    // past the BMP (surrogate arithmetic), and the 0xFFFF saturation in the phrase index is the largest
+    // value a uint16_t holds. This one is a count, that one is a boundary, the other a maximum.
     inline constexpr size_t CHAR16_TABLE_SIZE = 65536;
 
     // --- Direct-indexed array loaders (for char16_t-keyed dicts) ---
@@ -50,15 +49,13 @@ namespace cpp_pinyin::v2
                   std::unordered_map<uint64_t, std::vector<std::u16string>> &resultMap, const char &sep1 = ':',
                   const std::string &sep2 = ",");
 
-    /// Loads a phrase dictionary. When `phraseStartOut` is given, every character that
-    /// begins a key is recorded in it. The caller uses that bitmap to decide whether the
-    /// sliding window must open at a character; deriving it here keeps the index and the
-    /// map contents from ever disagreeing.
+    /// Loads a phrase dictionary. When `phraseStartOut` is given, every character that begins a key is
+    /// recorded in it -- the caller uses that bitmap to decide whether the sliding window must open at a
+    /// character, and deriving it here keeps the index and the map contents from ever disagreeing.
     ///
-    /// ``normalizeReading`` is MANDATORY: it maps a reading as written in the file onto the form
-    /// this dialect stores internally (Mandarin: ``"zhi4"`` → ``"zhì"``; Cantonese: identity,
-    /// its tables are already jyutping tone digits). It used to default to the Mandarin function,
-    /// which silently rewrote Cantonese user dictionaries (`jyut6` → `jyu6t6`).
+    /// `normalizeReading` is MANDATORY: it maps a reading as written in the file onto the form this
+    /// dialect stores internally (Mandarin `"zhi4"` -> `"zhì"`; Cantonese identity). It used to default to
+    /// the Mandarin function, which silently rewrote Cantonese user dictionaries (`jyut6` -> `jyu6t6`).
     bool loadAdditionalDict(const std::filesystem::path &dict_dir,
                             std::unordered_map<uint64_t, std::vector<std::u16string>> &resultMap,
                             const std::function<std::u16string(const std::u16string &pinyin)> &normalizeReading,

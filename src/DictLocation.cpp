@@ -1,15 +1,15 @@
-// D2 (docs/DECISIONS.md section 4.1, "no executable-relative guessing"): a host that links this library directly -- no
-// CMake package, no .pc file -- still needs to know where the build put the dictionary tables. This answers
-// that from the ONE anchor a shared library really has: its own module. It never reads an environment
+// D2 (docs/DECISIONS.md section 4.1, "no executable-relative guessing"): a host that links this library
+// -- no CMake package, no .pc file -- still needs to know where the build put the dictionary tables. This
+// answers it from the one anchor a shared library really has: its own module. It never reads an environment
 // variable (the shells own that, D1) and never guesses the host executable's location.
 //
-// The answer is built once and cached: it cannot change for the life of the process. The FIRST call
-// allocates (a path, a filesystem query); every later call is a pointer copy, like cppp2_version.
+// Built once and cached: it cannot change for the life of the process, so every call after the first is a
+// pointer copy.
 //
-// WHY THE `try` AROUND THE CACHE: an exception escaping an `extern "C"` function is undefined
-// behaviour (in practice `std::terminate`), and both `std::filesystem` here and the `std::string`
-// allocations can throw `bad_alloc`. Every other C entry point in this library catches for the same
-// reason; this one was the only export that allocated without a fence (2026-10-20 audit, G02).
+// WHY THE `try` AROUND THE CACHE: an exception escaping an `extern "C"` function is undefined behaviour
+// (`std::terminate` in practice), and both `std::filesystem` and the `std::string` allocations can throw
+// `bad_alloc`. Every other C entry point catches for the same reason; this was the only export that
+// allocated without a fence.
 
 #include <cpp-pinyin2/core/Engine.h>
 #include <cpp-pinyin2/ext/c_api.h>

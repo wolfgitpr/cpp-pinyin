@@ -1,9 +1,10 @@
 <!--
   csharp/build/CppPinyin.targets: the copy step for .NET Framework consumers.
 
-  STATUS: SKELETON, 未验证（待 CI）. See the header of CppPinyin.props for what that means: this
-  host has no .NET Framework, so this file has never run. It is written down because the alternative
-  (discovering the missing copy step in CI with a redesigned package) is worse.
+  STATUS: OBSOLETE since 2026-10-27 (docs/DECISIONS.md D41). See the header of CppPinyin.props: the
+  netstandard2.0 target these files served was revoked, nothing imports them, and they are not packed
+  into the nupkg. Kept as the written-down shape of the copy step, which is the part a future .NET
+  Framework leg gets wrong; never executed on a machine with .NET Framework.
 
   The consumer imports it AFTER Microsoft.Common.targets:
 

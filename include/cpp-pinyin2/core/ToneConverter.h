@@ -28,13 +28,12 @@ namespace cpp_pinyin::v2
 
         /// Converts one internal-form reading into `style`.
         ///
-        /// FAILURE MODE (it has none, and that is the contract): an unset slot returns `str` UNCHANGED.
-        /// `m_converts` is a 0..`MAX_STYLE` table of function pointers that a dialect fills for the styles
-        /// it supports, and this returns the input as-is for any slot it did not fill -- so a caller that
-        /// asks for a style the dialect does not declare gets their own string back rather than an error,
-        /// an empty string or a throw. `CanTone` relies on this deliberately: it registers only styles 0
-        /// and 3, while `CantoneseStyle::TONE3` (8) exists as a value, so asking Cantonese for TONE3 is
-        /// "no conversion", not a failure. `style` outside `[0, MAX_STYLE]` is likewise returned unchanged.
+        /// FAILURE MODE (it has none, and that is the contract): `m_converts` is a 0..`MAX_STYLE` table of
+        /// function pointers a dialect fills for the styles it supports, and an unset slot returns `str`
+        /// UNCHANGED -- so a caller asking for a style the dialect does not declare gets their own string
+        /// back, not an empty string and not a throw. `CanTone` relies on this: it registers only styles 2
+        /// and 3 while `CantoneseStyle::TONE3` (8) exists as a value, so asking Cantonese for TONE3 is "no
+        /// conversion", not a failure. `style` outside `[0, MAX_STYLE]` is likewise returned unchanged.
         std::u16string convert(std::u16string str, int style, bool v_to_u = false,
                                bool neutral_tone_with_five = false) const;
 

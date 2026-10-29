@@ -140,10 +140,11 @@ namespace CppPinyin2
     /// </para>
     /// <para>
     /// Every string parameter is an <see cref="IntPtr"/> holding UTF-8 allocated by the caller with
-    /// <see cref="Utf8String"/>, not a <c>[MarshalAs(UnmanagedType.LPUTF8Str)] string</c>. Reason
-    /// (measured, not stylistic): <c>LPUTF8Str</c> is absent from netstandard2.0 and the compiler refuses
-    /// it for that target (CS0117); the nearest marshaller alternative, <c>LPStr</c>, means the platform's
-    /// ANSI code page, which mangles Chinese on a non-UTF-8 host without failing.
+    /// <see cref="Utf8String"/>, not a <c>[MarshalAs(UnmanagedType.LPUTF8Str)] string</c>. The original
+    /// reason was that <c>LPUTF8Str</c> is absent from netstandard2.0 (CS0117 there), and that target is
+    /// gone as of 2026-10-27 (D41) -- the spelling is kept because the alternative it replaced,
+    /// <c>LPStr</c>, is the platform ANSI code page and mangles Chinese on a non-UTF-8 host without
+    /// failing, and because one explicit encoding beats an attribute nobody has measured here.
     /// </para>
     /// </summary>
     internal static class NativeMethods
@@ -214,7 +215,7 @@ namespace CppPinyin2
         }
 
         /// <summary>Applies the ENGINE'S DIALECT'S tone-sandhi pass to a LIVE result, in place; the rules live
-        /// in the library (<c>core/ToneSandhi.h</c>), never here.
+        /// in the library (<c>include/cpp-pinyin2/core/ToneSandhi.h</c>), never here.
         /// <para>The engine handle comes first, and it is not decoration: tone sandhi is a dialect property, so
         /// the library asks the dialect whether it declares a pass. A dialect without one (Cantonese) answers
         /// <c>CPPP2_ERR_INVALID_ARG</c> and leaves the rows alone -- which is the whole reason this takes a
@@ -310,7 +311,7 @@ namespace CppPinyin2
             IntPtr path,
             int clearExisting);
 
-        // The `_ex` spellings (2026-10-20, audit H04): the same two loads WITH the error channel, so a managed
+        // The `_ex` spellings (2026-10-20): the same two loads WITH the error channel, so a managed
         // host can read WHY a table was refused instead of only that it was (`CPPP2_ERR_LOAD` used to be the
         // whole answer). Declared here because `BindingGates` fails when the frozen C list names a symbol no
         // binding declares -- that gap is exactly what this pair closed. The managed shell keeps calling the

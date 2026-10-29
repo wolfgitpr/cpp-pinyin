@@ -16,24 +16,21 @@ namespace cpp_pinyin::v2
     /// later registration and an `Engine` built from it never changes under the caller's feet.
     using DialectCreator = std::function<std::shared_ptr<const Dialect>()>;
 
-    /// A READ-ONLY table of dialect id -> creator, **held by the caller**.
+    /// A READ-ONLY table of dialect id -> creator, **held by the caller** (FR-4.5 of
+    /// docs/REQUIREMENTS.md): creators only -- no dictionary path, no `Engine`, no cached table. The root
+    /// is supplied at `Engine` construction, so there is no global default and two instances may use two
+    /// roots.
     ///
-    /// Read-only in the sense that matters (FR-4.5 of docs/REQUIREMENTS.md): it stores **creators only** -- never a
-    /// dictionary path, never an `Engine`, never a cached table. Resolving an id produces a description;
-    /// the root is still the caller's, supplied at `Engine` construction, so there is no global default
-    /// dictionary and two instances may use two roots.
-    ///
-    /// **There is no process-level registry, and no `builtins()` factory.** The constructor registers the
-    /// two built-ins (mandarin, cantonese) inside *that object*, so a declared registry is usable at once
-    /// and two registries stay independent: an id is reachable only through the exact registry the caller
-    /// handed to `Engine::open`.
+    /// **There is no process-level registry and no `builtins()` factory.** The constructor registers the
+    /// two built-ins (mandarin, cantonese) inside *that object*; two registries stay independent, and an
+    /// id is reachable only through the exact registry handed to `Engine::open`.
     ///
     ///     cpp_pinyin::v2::Registry registry;
     ///     auto engine = cpp_pinyin::v2::Engine::open(registry, dictRoot, "mandarin");
     ///
-    /// Thread safety: `add` takes a unique lock, `resolve`/`ids` a shared one, and only while an engine is
-    /// being constructed -- the query path takes no lock at all. A creator is invoked after the lock is
-    /// released, so it may call back into the registry.
+    /// Thread safety: `add` takes a unique lock, `resolve`/`ids` a shared one, and only while an engine
+    /// is being constructed -- the query path takes no lock. A creator runs after the lock is released, so
+    /// it may call back into the registry.
     class CPP_PINYIN2_EXPORT Registry {
     public:
         /// Registers the two built-in dialects. The registry is empty of anything else, and it owns

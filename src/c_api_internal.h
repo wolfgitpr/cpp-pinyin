@@ -1,13 +1,11 @@
 #pragma once
 
-// Shared internals of the C API, split out of c_api.cpp (the P2 split; its ledger was retired in the
-// 2026-10-09 documentation cut, see docs/HISTORY.md). The helpers were an anonymous namespace; a header
-// cannot keep one (each including TU would get its own copy, breaking the ODR for the handle), so it is now the named
-// namespace cppp_detail, and both halves of the C API pull the names in with `using namespace cppp_detail;` -- which is
-// why no call site in the moved functions changed.
+// Shared internals of the C API. The helpers used to live in an anonymous namespace, which a header
+// cannot keep (each including TU would get its own copy, breaking the ODR for the handle), so they are in
+// namespace cppp_detail and both halves of the C API pull the names in with `using namespace`.
 //
-// `struct cppp2_engine` stays OUTSIDE that namespace on purpose: include/cpp-pinyin2/ext/c_api.h only
-// typedefs the opaque name, so the definition has to be the same global tag.
+// `struct cppp2_engine` stays OUTSIDE that namespace on purpose: include/cpp-pinyin2/ext/c_api.h typedefs
+// the opaque name, so the definition has to be the same global tag.
 
 // C ABI implementation -- see include/cpp-pinyin2/ext/c_api.h for the contract and the reasons behind
 // each rule, and `docs/DECISIONS.md` §2.1 for the incidents those rules came
@@ -56,7 +54,7 @@ namespace cppp_detail
 
     // Every string that crosses the boundary is allocated here and released by our own free
     // functions, so a caller with a different CRT never frees our memory (rule 3).
-    // Overload for the alloc-free failure path (2026-10-20, audit round 2 §12.6 C6): the C-string form
+    // Overload for the alloc-free failure path: the C-string form
     // exists so `cppp2_open`'s `fail()` never has to build a `std::string` to report a literal. The
     // allocation below is `nothrow`, so a failed copy leaves NULL -- the documented "we do not own a
     // message" outcome -- instead of throwing out of a `catch` handler.
@@ -141,17 +139,16 @@ namespace cppp_detail
     // CPPP_HAS_FIELD stays defined on purpose: cppp2_query_opts_init() below gates its *writes* with
     // the same rule the read path uses. It is #undef'd right after that function.
 
-    // Deep copy of a C++ Result into the C layout (S9a-2: the element is `cppp2_segment`, the structure
-    // is `cppp2_syllable`). Returns nullptr (and frees what it built) when an allocation fails, so a
-    // partially built result never escapes.
+    // Deep copy of a C++ Result into the C layout (S9a-2: the element is `cppp2_segment`, the structure is
+    // `cppp2_syllable`). Returns nullptr (freeing what it built) when an allocation fails, so a partially
+    // built result never escapes.
     //
-    // `includeReading` is the CALLER's switch, not something inferred from the result: the C++ face
-    // leaves `Segment::reading` default-constructed when nobody asked for it, so a builder that guessed
-    // "the structure is empty, so the caller did not want it" could not tell that case from a row the
-    // engine genuinely could not describe (a callback-written reading). The switch is carried here, and
-    // the rule it implements is one line: a non-failed span gets exactly one syllable when the caller
-    // asked for the structure, a failed span never gets one.
-    // What a query result OWNS, in one object (2026-10-20, audit H10). The public struct stays exactly as the
+    // `includeReading` is the CALLER's switch, not inferred from the result: the C++ face leaves
+    // `Segment::reading` default-constructed when nobody asked for it, so a builder that guessed "the
+    // structure is empty, so the caller did not want it" could not tell that from a row the engine
+    // genuinely could not describe. The rule it implements: a non-failed span gets exactly one syllable
+    // when the caller asked for the structure; a failed span never gets one.
+    // What a query result OWNS, in one object. The public struct stays exactly as the
     // header declares it -- `const char *` fields a caller reads and never frees -- but those fields are now
     // views into `strings` / `segments` / `syllables` / `candidates` here, and ONE deletion releases all of it.
     // Before this, the releaser walked the result and freed every string through `const_cast<char *>`; the cast
@@ -172,7 +169,7 @@ namespace cppp_detail
     };
 
     /// The owner block a public result pointer addresses (its FIRST member). One function, so the invariant is
-    /// stated once: `cppp2_result_free` and the tone-sandhi entry both recover through here (audit H10).
+    /// stated once: `cppp2_result_free` and the tone-sandhi entry both recover through here.
     inline ResultOwner *ownerOf(cppp2_result *result) noexcept { return reinterpret_cast<ResultOwner *>(result); }
     static_assert(offsetof(ResultOwner, pub) == 0, "cppp2_result_free recovers the owner by address");
 

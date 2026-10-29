@@ -26,7 +26,7 @@ namespace
 // rather than promised: if either side is renumbered, this file stops compiling. Together with
 // cppp2_code_text() calling `codeText` instead of carrying a table, code and wording have exactly one
 // authority each (the 2.0 face's shape authority -- now docs/CONTRACT.md; the plan that decided it was
-// retired in the 2026-10-09 documentation cut, see docs/HISTORY.md).
+// retired in the 2026-10-09 documentation cut and is not in this tree).
 static_assert(CPPP2_OK == static_cast<int32_t>(cpp_pinyin::v2::Code::Ok), "CPPP2_OK must be Code::Ok");
 static_assert(CPPP2_ERR_INVALID_ARG == static_cast<int32_t>(cpp_pinyin::v2::Code::InvalidArgument),
               "CPPP2_ERR_INVALID_ARG must be Code::InvalidArgument");
@@ -58,7 +58,7 @@ static_assert(CPPP2_SOURCE_PLUGIN == static_cast<int32_t>(cpp_pinyin::v2::Readin
 
 // The query-opts layout the comment beside `reserved_0` (c_api.h) describes, pinned as ADJACENCY rather
 // than absolute byte numbers: those differ between a 32-bit build (size_t is 4) and LP64, which is how
-// that comment came to quote the wrong offsets twice (2026-10-20, audit round 3 H07). What must stay
+// that comment came to quote the wrong offsets twice. What must stay
 // true is the claim the field makes: `include_reading` sits exactly where the next append was supposed
 // to go, and `reserved_1` is the one field after it.
 static_assert(offsetof(cppp2_query_opts, include_reading) == offsetof(cppp2_query_opts, reserved_0) + sizeof(int32_t),
@@ -94,7 +94,7 @@ cppp2_engine *cppp2_open(const cppp2_registry *registry, const char *dialect_id,
     // occurrence's message and belongs to the caller (cppp2_string_free); a failed allocation leaves
     // it NULL rather than returning a message we do not own.
     //
-    // WHY `const char *` AND NOT `const std::string &` (2026-10-20, audit round 2 §12.6 C6). The literal
+    // WHY `const char *` AND NOT `const std::string &`. The literal
     // messages below are longer than any small-string buffer (the `dict_dir` one is 55 bytes), so
     // passing them by value would allocate a `std::string` BEFORE entering this lambda -- and two of the
     // calls happen inside `catch` handlers, where `std::bad_alloc` cannot propagate: it would call
@@ -186,8 +186,7 @@ int32_t cppp2_style_list(const cppp2_engine *engine, cppp2_style **out_styles, s
                 rows[i].name = dup(declared[i].name);
                 // A row whose name could not be copied is not a row this API may return (the field is
                 // "the dialect's own name for this style"), so the whole list is rolled back instead of
-                // handed over with a hole in it -- 2026-10-20, the residual of audit H43 after the
-                // result-construction sites turned out to be checked already.
+                // handed over with a hole in it.
                 if (rows[i].name == nullptr) {
                     cppp2_style_list_free(rows, declared.size());
                     return CPPP2_ERR_INTERNAL;
@@ -272,6 +271,15 @@ int32_t cppp2_apply_tone_sandhi(const cppp2_engine *engine, cppp2_result *result
         *out_changed = 0;
     if (result == nullptr)
         return CPPP2_ERR_INVALID_ARG;
+    // A result that CLAIMS rows but carries no array is not a result. This is the one malformed shape a
+    // careless caller produces BY ACCIDENT, and every read below (`reserve(result->count)`,
+    // `result->segments[i]`) would be a null dereference, so it answers with the same INVALID_ARG every
+    // other malformed argument gets. It is NOT a promise that hand-built results
+    // are supported: this entry recovers the owning block from the pointer's address (ownerOf below), so a
+    // struct the caller assembled itself has nothing behind it -- the provenance rule is stated in
+    // c_api.h's "WHAT IT ACCEPTS" paragraph, where a caller reads the contract.
+    if (result->count != 0 && result->segments == nullptr)
+        return CPPP2_ERR_INVALID_ARG;
     if (!usable(engine))
         return CPPP2_ERR_NOT_READY;
     // The pass is a DIALECT decision, asked here and nowhere else (`Dialect::toneSandhi`, core/ToneSandhi.h).
@@ -317,7 +325,7 @@ int32_t cppp2_apply_tone_sandhi(const cppp2_engine *engine, cppp2_result *result
             const char *was = result->segments[i].rendered;
             if (was != nullptr && now == was)
                 continue;
-            // The result OWNS its strings in one block (2026-10-20, audit H10), so a replacement is written into
+            // The result OWNS its strings in one block, so a replacement is written into
             // that block's per-segment override slot instead of being `new`ed and the old pointer `delete[]`d:
             // the old pointer is a `c_str()` VIEW into the owner, so deleting it was heap corruption waiting for
             // the first caller to run the sandhi pass (`CppPinyinTests` aborted with 0xc0000374 when it did).

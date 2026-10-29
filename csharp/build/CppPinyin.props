@@ -1,9 +1,13 @@
 <!--
   csharp/build/CppPinyin.props: .NET Framework support glue (PLUGIN doc sections 6.7.4 and 6.8.3).
 
-  STATUS: SKELETON, 未验证（待 CI）. Nothing in this file has been executed on a machine with
-  .NET Framework: this host has .NET 7/10 SDKs only. It is here so the shape is written down and a
-  CI leg can be added without redesigning it, not to claim it works.
+  STATUS: OBSOLETE since 2026-10-27 (docs/DECISIONS.md D41). The netstandard2.0 target these files
+  served was revoked, so no package ships a .NET Framework assembly that could import them, nothing in
+  this repository imports them, and they are not packed into the nupkg. They are kept because the copy
+  step below is the part people get wrong when they try to support .NET Framework again, so the shape is
+  written down here so that leg starts from a design and not from a bug report. Delete them the day
+  nobody wants that leg. Nothing here has ever run on a machine with .NET Framework (this host has
+  .NET 7/10 SDKs only), and the revocation means it never will while it sits in this state.
 
   WHY IT EXISTS AT ALL: runtimes/<rid>/native/ is a .NET 5+ convention. A non-SDK PackageReference
   project targeting .NET Framework (or an AnyCPU non-SDK project) does NOT copy RID assets into the

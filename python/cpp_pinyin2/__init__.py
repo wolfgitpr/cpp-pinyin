@@ -197,8 +197,8 @@ def to_text(segments: Iterable["Segment"]) -> str:
     """``query()``'s segments joined into one space-separated string -- the shape ``Result::join()`` has in C++.
 
     A projection of the result, not a second way to ask the engine: the frozen C++ face puts the string form on
-    the RESULT (``include/cpp-pinyin2/core/Types.h:368``), and this mirrors it. A failed span contributes its
-    original text (``rendered`` equals ``text`` there), so the input stays readable in the output.
+    the RESULT (``Result::join`` in ``include/cpp-pinyin2/core/Types.h``), and this mirrors it. A failed span
+    contributes its original text (``rendered`` equals ``text`` there), so the input stays readable in the output.
 
     >>> to_text(engine.query("中国"))
     'zhōng guó'
@@ -242,12 +242,13 @@ def _check_dict_file(path: Path) -> None:
     measured library behaviours motivate it:
 
     * the loader behind ``cppp2_load_user_dict`` returns success unconditionally
-      (``src/dict/DictUtil.cpp:186``), so a file that parses to zero entries loads "fine";
+      (``src/dict/DictUtil.cpp``, the end of ``loadUserDictLayer``), so a file that parses to zero
+      entries loads "fine";
     * a key longer than :data:`MAX_USER_DICT_KEY` is silently truncated by
       ``encodePhrasesKey``.
 
     Lines without ``:`` are skipped here as well, matching ``splitLine`` in
-    ``src/DictUtil.cpp``, which ignores them rather than failing: a stray line is not
+    ``src/dict/DictUtil.cpp``, which ignores them rather than failing: a stray line is not
     evidence of a malformed file.
     """
     entries = 0

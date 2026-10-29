@@ -26,7 +26,7 @@ public sealed class ConformanceTests
         /// are compared when the fixture is GENERATED, the same split the Python consumer makes with its
         /// <c>C_ABI_ONLY_OPS</c> (python/tests/test_conformance.py:46). Declared once and read by BOTH the guard and
         /// the per-case runner: on 2026-10-20 the guard learned about these three and the runner did not, which is
-        /// exactly how six tests went red without anybody seeing it (CI has never run).
+        /// exactly how six tests went red without anybody seeing it (CI had never run at that point; it has since -- the C# suite is part of the 2026-10-23 green run).
         /// </summary>
         internal static readonly HashSet<string> CAbiOnlyOps = new HashSet<string>(StringComparer.Ordinal)
         {
@@ -53,7 +53,7 @@ public sealed class ConformanceTests
         [Fact]
         public void Every_case_is_one_this_consumer_runs()
         {
-            // The three C-ABI-only ops (2026-10-20, audit round 2 B18) are in the fixture on purpose and this
+            // The three C-ABI-only ops (2026-10-20) are in the fixture on purpose and this
             // shell has no public method for any of them; they are compared against the C surface when the
             // fixture is GENERATED. Listing them here is what keeps "not run by this consumer" from becoming
             // "not noticed by this consumer" -- an unknown op still fails, per the assert below.

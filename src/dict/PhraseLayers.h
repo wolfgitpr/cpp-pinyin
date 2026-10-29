@@ -1,7 +1,6 @@
 #pragma once
 
-// The phrase layer of one dialect, regrouped out of EngineImpl (P2 split #2, see
-// the P2 split ledger, retired in the 2026-10-09 documentation cut, see docs/HISTORY.md).
+// The phrase layer of one dialect, regrouped out of EngineImpl.
 //
 // This is a pure regrouping: the members keep their meaning, their types and the memory layout they
 // had as EngineImpl members, and the behaviour is bit-for-bit unchanged. The point is that the
@@ -61,14 +60,13 @@ namespace cpp_pinyin::v2
 
         /// Rebuilds `phrases.merged` from the built-in file, then the user layer, then the aliases.
         ///
-        /// The engine owns two things this needs and must pass in rather than be reached for, which is
-        /// what keeps this header free of tone/engine dependencies (AC-3): the dictionary directory, and
-        /// `toSimp` -- the traditional-to-simplified mapping used to compute the alias keys. `toSimp`
-        /// comes from the engine because the same mapping is read by the query hot path, so it cannot be
-        /// owned here. Same pattern as loadAdditionalDict's reading normalizer.
+        /// Two things come from the engine rather than being reached for, which keeps this header free of
+        /// tone/engine dependencies (AC-3): the dictionary directory, and `toSimp` (the traditional-to-
+        /// simplified mapping used to compute the alias keys). `toSimp` cannot be owned here because the
+        /// query hot path reads the same mapping.
         ///
         /// Returns the result of loading the BUILT-IN file (the user layer and the aliases never fail the
-        /// whole rebuild). The caller re-derives the index afterwards; this function only fills the tables.
+        /// whole rebuild). The caller re-derives the index afterwards.
         bool rebuildPhrases(PhraseLayers &phrases, const std::filesystem::path &dictDir,
                             const std::function<char16_t(char16_t)> &toSimp);
 

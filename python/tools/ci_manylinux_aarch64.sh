@@ -112,9 +112,12 @@ check "the checker's self-test exits 0" "$([ "$self_rc" = 0 ] && echo 1 || echo 
 
 note "6 the wheel we just built, against the source tree"
 $PY tools/check_wheel.py "$wheel" > /tmp/check-wheel.txt 2>&1
-echo "exit: $?"
+check_rc=$?
+echo "exit: $check_rc"
 cat /tmp/check-wheel.txt
-check "the wheel is accepted" "$([ "$(fails /tmp/check-wheel.txt)" = 0 ] && echo 1 || echo 0)" "$(fails /tmp/check-wheel.txt) FAIL line(s)"
+# BOTH the exit code AND the absence of FAIL lines. Counting FAIL lines alone reported a crashed checker as a
+# pass: a traceback carries no "FAIL" line, so the count is 0 and this assertion said ASSERT OK (2026-10-27).
+check "the wheel is accepted" "$([ "$check_rc" = 0 ] && [ "$(fails /tmp/check-wheel.txt)" = 0 ] && echo 1 || echo 0)" "exit=$check_rc, $(fails /tmp/check-wheel.txt) FAIL line(s)"
 
 note "7 install it with no index and no compiler, then ask it questions"
 $PY -m venv /tmp/venv
@@ -162,9 +165,72 @@ if [ -n "$stamped" ]; then
   stamped_tag="$(basename "$stamped" | awk -F- '{print $NF}' | sed 's/\.whl$//' | sed 's/\..*//')"
   echo "checking the stamped wheel under its first tag: $stamped_tag"
   CPP_PINYIN_PLATFORM_TAG="$stamped_tag" $PY tools/check_wheel.py "$stamped" > /tmp/check-stamped.txt 2>&1
-  echo "exit: $?"
+  stamped_rc=$?
+  echo "exit: $stamped_rc"
   cat /tmp/check-stamped.txt
-  check "the stamped wheel is accepted" "$([ "$(fails /tmp/check-stamped.txt)" = 0 ] && echo 1 || echo 0)" "$(fails /tmp/check-stamped.txt) FAIL line(s)"
+  # Same rule as step 6: the exit code decides, the FAIL count only describes (2026-10-27).
+  check "the stamped wheel is accepted" "$([ "$stamped_rc" = 0 ] && [ "$(fails /tmp/check-stamped.txt)" = 0 ] && echo 1 || echo 0)" "exit=$stamped_rc, $(fails /tmp/check-stamped.txt) FAIL line(s)"
+fi
+
+note "10 a STATIC consumer through pkg-config (the only reader of Libs.private)"
+# WHY THIS STEP EXISTS (2026-10-27): the .pc carries `Libs.private: -ldl` on Linux, computed from
+# ${CMAKE_DL_LIBS}. That variable is EMPTY on Windows and macOS, so no developer machine can exercise the
+# non-empty branch, and nothing in tests/ reads the line. A static consumer on glibc < 2.34 needs it. This
+# step builds the library STATIC, installs it, and asks `pkg-config --static` -- the one command that reads
+# Libs.private -- so the flag is measured rather than asserted in a commit message.
+if command -v pkg-config >/dev/null 2>&1; then
+  STATIC_BUILD=/tmp/static-build
+  STATIC_PREFIX=/tmp/static-prefix
+  rm -rf "$STATIC_BUILD" "$STATIC_PREFIX"
+  cmake -S "$WORK" -B "$STATIC_BUILD" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+        -DCPP_PINYIN2_BUILD_TESTS=OFF -DCPP_PINYIN2_BUILD_EXAMPLES=OFF -DCPP_PINYIN2_INSTALL=ON \
+        > /tmp/static.txt 2>&1
+  static_configure_rc=$?
+  echo "configure exit: $static_configure_rc"
+  cmake --build "$STATIC_BUILD" >> /tmp/static.txt 2>&1
+  echo "build exit: $?"
+  cmake --install "$STATIC_BUILD" --prefix "$STATIC_PREFIX" >> /tmp/static.txt 2>&1
+  echo "install exit: $?"
+  pc_file="$(find "$STATIC_PREFIX" -name cpp-pinyin2.pc | head -n 1)"
+  echo "pc file: $pc_file"
+  pc_dir="$(dirname "$pc_file")"
+  static_libs="$(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --libs cpp-pinyin2 2>/dev/null)"
+  echo "pkg-config --static --libs: $static_libs"
+  # POSIX `case` rather than grep: -ldl may sit anywhere in the flag list, and the log shows the whole line.
+  case " $static_libs " in
+    *" -ldl "*) have_dl=1 ;;
+    *)          have_dl=0 ;;
+  esac
+  check "Libs.private contributes -ldl" "$have_dl" "$static_libs"
+  cat > /tmp/static-consumer.c <<'C_EOF'
+#include <cpp-pinyin2/ext/c_api.h>
+#include <stdio.h>
+int main(void) {
+    printf("%s\n", cppp2_version());
+    return 0;
+}
+C_EOF
+  # Word-splitting is the point here: the flags have to reach the compiler as separate arguments.
+  # shellcheck disable=SC2046
+  gcc /tmp/static-consumer.c -o /tmp/static-consumer \
+      $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --cflags --libs cpp-pinyin2) >> /tmp/static.txt 2>&1
+  static_link_rc=$?
+  echo "link exit: $static_link_rc"
+  check "a consumer links through pkg-config --static" \
+        "$([ "$static_link_rc" = 0 ] && echo 1 || echo 0)" "see /tmp/static.txt"
+  if [ "$static_link_rc" != 0 ]; then
+    tail -n 25 /tmp/static.txt
+  else
+    /tmp/static-consumer
+  fi
+else
+  # NOT A SILENT SKIP (the reasoning check_format's `--require` spells out): this step exists only to
+  # measure Libs.private, so an image without the tool means the -ldl claim stays unmeasured -- and a step
+  # that prints a reason and exits 0 has not run. The manylinux images ship pkgconfig; if one ever does
+  # not, this records the failure and the person reading it can either install it or drop the step
+  # deliberately, with the reason written down.
+  check "pkg-config is available for the Libs.private measurement" 0 \
+        "absent from this image: Libs.private stays unmeasured"
 fi
 
 note "RESULT"

@@ -92,7 +92,7 @@ namespace cpp_pinyin::v2
                         "dictionary format marker in " + dir.string() + " declares data format " + text +
                             ", newer than this library supports (" + std::to_string(supportedFormat) + ")"};
 
-            // EMPTY TABLES ARE A LOAD FAILURE, NOT AN EMPTY DICTIONARY (2026-10-20, audit round 2 B19a).
+            // EMPTY TABLES ARE A LOAD FAILURE, NOT AN EMPTY DICTIONARY.
             // The producer refuses to write such a table at all now; this is the consumer half, for data
             // that arrives from elsewhere (a packaging step, a copy, a wheel built from a bad checkout).
             // Only `word.txt` is required to be non-empty: it is the one table a usable dictionary cannot
@@ -116,7 +116,19 @@ namespace cpp_pinyin::v2
                     return {Code::Load,
                             "dialect.json's min_library in " + dir.string() + " is not a version: found '" +
                                 minLibrary + "'"};
-                if (parseVersion(libraryVersion, have) && need > have)
+                // THE LIBRARY'S OWN STRING IS HELD TO THE SAME RULE. It used to be
+                // `if (parseVersion(libraryVersion, have) && need > have)`: a version string that did not parse
+                // simply skipped the comparison, so a build that misdefined its own version could install data
+                // asking for a newer library and never hear about it -- while the data half of the same handshake
+                // (the line above) is a loud refusal. EMPTY still skips, which DictManifest.h documents as "a
+                // build that did not define it does not guess"; a string that IS defined and is not a version is
+                // a build fault and fails like one.
+                if (!parseVersion(libraryVersion, have))
+                    return {Code::Load,
+                            "this library's version string is not a version: found '" + std::string(libraryVersion) +
+                                "', and " + dir.string() + " asks for min_library " + minLibrary +
+                                " -- refusing to skip the comparison"};
+                if (need > have)
                     return {Code::DictIncompatible,
                             "dictionary in " + dir.string() + " requires library >= " + minLibrary +
                                 ", this library is " + std::string(libraryVersion)};
