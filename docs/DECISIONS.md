@@ -3,7 +3,8 @@
 > **本文件是决策号与现行裁定的唯一登记处。** 它取代 2026-10-22 退役的
 > `REFERENCE_IDS.md`（登记表本体）、`REFACTORING.md` §2 的 D1–D23 台账、
 > `DEBT_REDUCTION_PLAN.md` §1 的 D24–D34，以及 `TEST_RECORD.md` 的判分口径与
-> `STABILITY_policy_patch.md` 的政策成文规则。退役清单与去向已在 提交历史里（这些过程记录 2026-10-23 一并删除）。
+> `STABILITY_policy_patch.md` 的政策成文规则。退役清单与去向：这些过程记录随 2026-10-22 那次清理一并删除，
+> **从未入库**，所以除了 `git log --diff-filter=D -- tests/data/testdata/` 这个取回命令之外，没有别的去处。
 >
 > **规矩**：新代码引用记号前，先在本文件 §1 有一行；**新增决策从 D41 续号**，不再从 D1 起开新段。
 > 记号是历史坐标，**不重编号**（重编号等于伪造历史）。
@@ -13,7 +14,14 @@
 ## 1. 登记表（机器解析）
 
 `tools/check_doc_refs.py` 按本节的表格判定：代码里出现的每个记号必须在这里有一行；`include/` 里只允许
-`live` 且权威指向随包分发文档的记号。
+`live` 且权威指向随包分发文档的记号。**它认的是括号写法 `(S7)`**——见下面「范围的边界」一段。
+
+**范围的边界（2026-10-27 实测）**：门禁只匹配 `(记号)` 这种**带括号**的写法。不带括号的散文引用（`C4/N27`、
+`N17`、`R9`、`K7`…）它一律看不见，因此"代码里每个记号都有一行"这句话的**实际覆盖面**是括号写法。
+这些裸记号在本仓没有登记行，但它们各自有落点：`C4`/`N27`（EngineConfig 三种默认风格的分歧）见
+`docs/CONTRACT.md` §8 与 `docs/STABILITY.md` §4.4；`N17` 见 `docs/CONTRACT.md` §2；`R9` 在 `docs/STABILITY.md` 的
+R 系列表里；`K7` 见 `docs/REQUIREMENTS.md`。**这一条不是"以后补"，是把保证的边界写清楚**——放开门禁去匹配裸记号，
+会把 `A0`、`G2p`（`G2pglobal` 的一部分）这类误报成决策号，代价比收益大。
 
 | 记号 | 状态 | 它指的那条裁定 | 权威（唯一的） |
 |---|---|---|---|
@@ -22,6 +30,7 @@
 | `S8` | live | 结构化读数按需开启（`Syllable` / `includeReading`），默认 OFF | `docs/CONTRACT.md` 第 3 节 |
 | `S9c` | live | 版本化结构体的 padding 陷阱：尾部先由 `reserved_*` 认领，再谈 append | `docs/CONTRACT.md` 第 1 节 + `include/cpp-pinyin2/ext/c_api.h` 的 GROWTH RULE 段 |
 | `C-13` | live | `isPolyphonic` 的语义是"以该字**开头**的词组"，不是"该字有多个读音" | `docs/CONTRACT.md` 第 2 节 |
+| `D41` | live | **撤销 D36**：C# 目标框架 `net7.0;net10.0`，不再发布 `netstandard2.0`（代价：.NET Framework 与 32 位本版无托管包） | 本文件 §2.1 的 D41 行 |
 | `S5` | retired | 2.0 结构化音节的生产/渲染分家（`toneUtil/ReadingCodec` 是它的产物） | 本文件 §4 |
 | `S6` | retired | 每条读音的结构在**加载期**建好，查询期不再逐条 parse/反演 | 本文件 §4 |
 | `S11a` | retired | 查询的"没有结果"必须是 `Code::NotReady`，不能是空结果 | 本文件 §4 |
@@ -94,11 +103,12 @@
 | **D11** | 平台范围：四平台脚本齐备；Windows 与 Linux（开发板）端到端实测，macOS 只出脚本、未实测 | `docs/RELEASE_CHECKLIST.md` |
 | **D12** | 包身份以代令牌区分：Python 分发名 `cpp-pinyin2`、导入名 `cpp_pinyin2`；C# 包 id `CppPinyin` | `python/setup.py`、`csharp/CppPinyin/CppPinyin.csproj` |
 | **D35** | 夹具口径：`tests/cpp/test_c_api.cpp` 的手写断言作**独立 oracle**；夹具输入人工挑选、期望值由引擎生成 | `tests/cpp/test_c_api.cpp`、`conformance/README.md` |
-| **D36** | C# 目标框架 `netstandard2.0;net7.0;net10.0`（2.0 保住 .NET Framework 与 32 位消费方，UTF-8 手工兜底） | `csharp/CppPinyin/CppPinyin.csproj` |
+| **D36** | C# 目标框架 `netstandard2.0;net7.0;net10.0`（2.0 保住 .NET Framework 与 32 位消费方，UTF-8 手工兜底）——**2026-10-27 已撤销，见 D41** | `csharp/CppPinyin/CppPinyin.csproj` |
 | **D37** | `net7.0` 已 EOL：SDK 10 对它的目标报 `NETSDK1138`（告警，不影响构建），仍保留该 TFM | 同上 |
 | **D38** | `ci.yml` 用 `workflow_call`，不自带触发（避免一次推送把同一套作业跑两遍） | `.github/workflows/ci.yml` |
 | **D39** | 调度层 `test_runner.yml` 的聚合 job 必须覆盖 C++ 套件，否则"CI 绿"不覆盖库本体 | `.github/workflows/test_runner.yml` |
 | **D40** | 原生库随 nupkg 走 `runtimes/<rid>/native/`；RID 与源目录由 `CppPinyinRid` / `CppPinyinNativeDir` 注入 | `csharp/CppPinyin/CppPinyin.csproj` |
+| **D41** | **撤销 D36**（2026-10-27，用户裁决）：C# 目标框架改为 `net7.0;net10.0`，不再发布 `netstandard2.0`。理由是这个 TFM 广告了但没做到——在 .NET Framework 上加载原生库需要 `build/` 资产把库送到加载路径，而 `csharp/build/CppPinyin.props\|.targets` 自己标着 SKELETON、且没有打进包，于是消费者能编译、运行时却找不到库。随该目标一起删除的还有手工 UTF-8 解码器（`Utf8.FromPtrPortable`）与 `LPUTF8Str` 规避的历史注释；两个保留目标的编译与运行由 `check_csharp_shell` 覆盖。**代价说清楚**：.NET Framework 与 32 位消费方本版不再有托管包可装。 | `csharp/CppPinyin/CppPinyin.csproj`、`csharp/CppPinyin/Utf8.cs`、`csharp/CppPinyin/NativeLoader.cs` |
 
 
 ---
@@ -186,10 +196,24 @@ policy line 2.28`）——那个 wheel 的标签就是 `linux_x86_64`，它**没
 
 **为什么**：windows 腿上 `InstallConsumerSmoke` 运行外置消费端可执行文件时**不返回**——三次运行、空 stdin、测试自带的 300 秒预算都试过，同用例在 Linux/macOS 上约 1 秒通过。它的两个自检（证明门禁能红的那两条）仍在该腿运行，所以排除的是**一个用例**，不是一条规则。
 
+**2026-10-27 追记（"未解问题"已不再是未解）**：根因在 2026-10-23 定位——runner 上脚本选中的是
+`build/Debug/capi.exe`，而它动态链接的是 Release 的 `cpp-pinyin2.dll`（MSVC `/MDd` 对 `/MD`），CRT 分裂使
+消费者打印空 detail 之后不返回。同一次提交把三处候选列表改成**首个匹配胜出**（Release 优先，
+`tests/install/check_install_consumer.cmake` 的 "FIRST MATCH WINS" 注释），并给失败路径补了三段诊断
+（重试 cwd=prefix/bin、去掉 `cmake -E env` 包装、打印 install 树内容）。**这次提交的哈希不写在这里**：
+写完这一行它就不再是 tip 了（本仓的既有规矩），要定位就按上面两个符号找。
+**排除项本身仍在 `ci.yml` 里**：该修复还没有在任何 runner 上跑过一轮，所以按本裁定不能提前撤掉。
+⇒ 下一轮 CI 转绿就撤掉排除、并同步改本段与 `docs/STABILITY.md` §0.1；若仍不绿，把探针（`ci.yml` 的
+"Probe the consumer smoke" 步骤）的输出写进这一段，而不是再猜一次。
+
 **反面参考**：msys2 腿的 `ConformanceProvenanceGateSelfTest` 也是按这条裁定的方式排除的——它建临时 git 仓库断言"不可达提交必须被拒"，在 MSYS2 git 上 6 例里 4 例失败，而原生 `windows` 腿 6 例全绿；该腿同时跑了**两个**构建目录，排除必须同时落在两处，否则只是排除了半个 job。
 
 
-## 4. 退役记号里仍然重要的裁定（retired，但代码里还在引用）
+## 4. 退役记号里仍然重要的裁定（retired：编号不再新起，裁定本身仍生效）
+
+**"仍然重要"不等于"代码里还能 grep 到编号"**：`D5`、`D25`、`D26`、`D30` 四条在 `src/`、`include/`、`tests/` 里**已经没有任何引用**（2026-10-27 实测），
+它们的裁定要么已经长进代码的形状里（`D25` 的状态码编号就是 `Code::Ok`…`Code::Internal`），要么只在文档里被引用（`D5` 见 `NEW_DIALECT_PLAYBOOK`、
+`REQUIREMENTS`）。本节的用途是**查"这个编号当年是什么意思"**，不是"找出谁还在用它"。
 
 **这一段按"系列"分组，因为 `D<n>` 在不同系列里不同义**——代码里同时引用着**三个不同的 `D4`**（安装面 =
 `min_library`、API 收敛 = 不加 pypinyin 兼容层、测试集 = 候选来源随字形）。所以引用纪律再加一条：
@@ -262,6 +286,14 @@ policy line 2.28`）——那个 wheel 的标签就是 `linux_x86_64`，它**没
 | **AC-4** | 词典层可脱离 tone/engine **独立编译与测试**（`tests/CMakeLists.txt` 用原文引用本条） |
 | **AC-5** | 只约束**新模块**（无文件 >300 行，`Engine` ≤200 行）；既有文件不在此限 ⇒ `EngineImpl` / `ManTone` **不拆** |
 | **AC-9** | 速度验收：查询/加载吞吐不低于基线 min，**±5% 内视为持平**，超出即回滚该次改动（不做"以后再优化回来"） |
+
+**这张表只收在本仓有正文的编号。** 编号不是连续的，缺口是真实的，不是省略：
+
+- **AC-6 / AC-7 / AC-8**：全仓（`docs/`、`tools/`、`tests/`、`src/`、`include/`）**一次都没有出现过**，无从补写；
+- **AC-10（二进制词典）**：判据在 `docs/NEW_DIALECT_PLAYBOOK.md` §5，那里也写明"这一条以前没有任何文档写过"——本仓 loader 不支持
+  `cpd`/binary，所以它是"前提已成立、判据未落地"的状态，不是已被满足的验收线。
+
+`docs/REQUIREMENTS.md` 顶部原先写"验收线 AC-01..10 见本文件"，那是把 10 个编号当成 10 条有正文的判据；2026-10-27 改成按实际存在的编号指路。
 
 ## 7. 性能与测量的纪律
 

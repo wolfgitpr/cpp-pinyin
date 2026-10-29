@@ -3,10 +3,12 @@
 > **这是什么**：给"下一步要动这四个面的人"看的事实清单 —— 现在能不能验、靠什么装置验、改什么会破。
 > **这不是什么**：不是方案、不是待办列表、不是路线图。本文不提议任何改动。
 >
-> 本文只写**当前**的判断与装置；起草过程的记录已不在仓库里，正文从 §0 起。
+> 本文只写**当前**的判断与装置；起草过程的记录已不在仓库里，正文从 §0 起。下文提到**旧台账**时指的就是那批
+> 过程记录：它们住在 `tests/data/testdata/`（31 个文件，2026-10-22 删除），`git log --diff-filter=D --
+> tests/data/testdata/` 仍能从删除它们的那个提交里取回。
 >
-> **标记约定**：`[事实]` = 本轮亲自读到的原文/代码；`[推断]` = 由事实推出、本轮未实测；
-> `[未证实]` = 只有他人（文档/注释/CI 文件自述）记录，本轮无法验证。**未证实项一律不当既定事实用。**
+> **标记约定**：`[事实]` = 成文时亲自读到的原文/代码；`[推断]` = 由事实推出、成文时未实测；
+> `[未证实]` = 只有他人（文档/注释/CI 文件自述）记录，成文时无法验证。**未证实项一律不当既定事实用。**
 
 ---
 
@@ -24,14 +26,22 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 第一次在本机真跑出了观测**（§1.1），但它**还不是门禁**：板与 CI 两侧不覆盖、慢档/Debug 档与泄漏检测各有未拆的
 边界 ⇒ 别把这一条读成"sanitizer 已全量覆盖"。
 
-### 0.1 CI 与门禁的接线现状（三栏；A29）
+### 0.1 CI 与门禁的接线现状（四栏；A29，2026-10-27 补第四栏）
 
 **`test_runner.yml` 这条链已经全绿**（2026-10-23，`v2` 提交 `f5c44bd`，运行 `39877724768`）：**19 个 job 全部成功** —— linux、linux-sanitizers、macos、windows、mingw、mingw32、C# 三条腿（ubuntu / macos / windows）、Python 三条腿（ubuntu / macos / windows）、`python_versions` 的 3.9–3.13 五档、以及 manylinux aarch64 的 wheel 容器。此前那一批失败是怎么一类一类拆掉的，记在
 `docs/RELEASE_CHECKLIST.md` §6。
 
 **仍然未跑的是 `release_prep.yml`**（只在 `workflow_dispatch` 下存在，标签、镜像拉取、runner 的 Docker 都没验过）——读下面的接线行时，请按这个分工理解：
 
-**一处带证据的排除，不是通过**：windows 腿不跑 `InstallConsumerSmoke`。该用例在 Windows runner 上执行外置消费端可执行文件时**不返回**（三次运行、空 stdin、测试自带的 300 秒预算都试过），同一用例在 Linux/macOS 上约 1 秒通过。理由与"未解问题"写在 `.github/workflows/ci.yml` 的注释里，它的两个自检仍在该腿运行。
+**Windows 的 `InstallConsumerSmoke`：排除项已撤，修复仍无 runner 证据（2026-10-27 更新）。** 历史观测：该用例在
+Windows runner 上执行外置消费端可执行文件时**不返回**（三次运行、空 stdin、测试自带的 300 秒预算都试过），
+同一用例在 Linux/macOS 上约 1 秒通过。**根因已于 2026-10-23 定位并修**（runner 上跑的是 Debug 消费者、
+链接 Release DLL，CRT 分裂；修法是候选"首个匹配胜出"＋失败路径三段诊断）。
+
+**2026-10-27 用户裁决撤除排除**：`ci.yml` 里 Windows 腿的 `-E '^InstallConsumerSmoke$'` 与那个单独跑它的
+`continue-on-error` 探针**一起删除**（`c3a728c`），该用例回到 Windows 腿的正常 CTest 集合里，每测预算
+1200 → 600 秒。也就是说：**修复是否真的生效，下一次 Windows CI 运行就是第一份证据**——在此之前，
+"曾在 runner 上挂死"是历史，"现在还会不会挂死"是未知。判词与撤除前后的证据链记在 `docs/DECISIONS.md` 的 D45。
 
 | 接法 | 是谁 | 证据 |
 |---|---|---|
@@ -43,22 +53,23 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 | | wheel 对源树／对绑定契约 | `.github/workflows/test_python.yml::wheel` |
 | | 打包与版本链门禁 | `.github/workflows/test_csharp.yml::nupkg` |
 | | manylinux aarch64 那条 | `.github/workflows/test_python.yml::manylinux` |
-| **只在本机 checklist** | `check_gate_inventory.py` | 本机 checklist 的一步（夹具不入库，2026-10-23 起） |
-| | `check_doc_claims.py --ctest-inventory`（**真文档那一趟**） | 同上，本机 checklist 的一步 |
-| | `check_wheel.py --self-test` | 同上，本机 checklist 的一步 |
+| **CI 的 `linux` 腿，经 `run_all_gates --with-build`**（2026-10-22 起） | `check_gate_inventory.py`、`check_doc_claims.py --ctest-inventory`（**真文档那一趟**；它顺带跑 `check_wheel --self-test` 取数） | `.github/workflows/ci.yml::Full gate suite`：先 configure `.tmp/mk-default`（examples OFF）→ `ctest --show-only=json-v1` 出 inventory → `python3 tools/run_all_gates.py --with-build`；清单在 `tools/run_all_gates.py::GATES` |
+| **只在本机**（不入库，且**不是门禁**） | 板上复验夹具与人为读数 | 夹具随本机保留（2026-10-23 起），口径见 `docs/PERFORMANCE.md`；没有任何 workflow 会执行它 |
 
 两个值得单独点出的结论：
 
-1. **文档数字门禁在 CI 里跑不到**：CI 经 CTest 只跑到 `--self-test`（`tests/CMakeLists.txt:479`），
-   而「文档里的计数是否与树一致」那一趟只在本机 checklist 里（夹具不入库）；`.github/` 下对该脚本的
-   引用是 0 处（实测）。
+1. **文档数字门禁 2026-10-22 起在 CI 里跑到了（2026-10-27 更正）。** 此前这里写的是"跑不到"，依据是
+   "CI 经 CTest 只跑到 `--self-test`"＋"`.github/` 下对该脚本的引用是 0 处（实测）"。后半句只在
+   "文件里没写出脚本名"这一层成立——`ci.yml` 里对 `check_doc_claims` 的 4 处提及**都是注释**；而在
+   "有没有跑到"这一层是错的：同一个 job 的 "Full gate suite" 步骤跑 `run_all_gates.py --with-build`，
+   它的 `GATES` 表里就有这一条，inventory 由该步骤自己先生成。
 2. **这一类失效有过前科**：`tests/CMakeLists.txt:487` 自述，插件面清单原属 `check_bindings.py`，
    而「本仓没有任何东西调用它」。检查项存在、却没人调用，是这里反复出现的形状；
    `check_bindings.py` 现在自己校验这一点（文档串编号 + 每个 `check_*` 都有调用点）。
 
 ### 0.2 跨仓（词典仓）的门禁接线现状
 
-出厂词典由**另一个仓库**（`pinyin-makedict`）生成，所以它的一致性由那边的工具守。本轮只读实测，
+出厂词典由**另一个仓库**（`pinyin-makedict`）生成，所以它的一致性由那边的工具守。成文时只读实测，
 读数如下，同样只记接线、不记运行史：
 
 | 事项 | 实测 |
@@ -68,7 +79,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 | 词典仓 `tools/check_binary.py` | 有意做成**第二份实现**：从文本表按引擎规则重算，再与二进制实测内容比对（6 项/方言），与写入器不共享代码 —— 一个错误假设必须被犯两次才会漏掉 |
 | 两者的**运行方式** | **人手跑**：词典仓 `README.md:24`／`:29` 与 `TOOLING.md:21` 给的是命令；该仓**未见 `.github/workflows/`** ⇒ 未自动化（与 §0.1 第一栏同类风险） |
 
-本轮的读数（只读、`-SkipGenerate`）：`RESULT: generated output matches the repo exactly (0 drift)`，退出码 0，
+成文时的读数（只读、`-SkipGenerate`）：`RESULT: generated output matches the repo exactly (0 drift)`，退出码 0，
 2 方言 × 4 张文本表全部 `IDENTICAL (byte-exact)`、行数逐一相同。
 
 两个历史注记（都出自词典仓自己的文档，已复核）：`TOOLING.md:246` 记着这份门禁曾经**写死 2 方言 × 4 表**，
@@ -78,48 +89,51 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 ---
 
-## 0. 门禁自检的用例数（2026-10-10 实测，本节是单一权威）
+## 0.3 门禁自检的用例数（2026-10-10 实测，本节是单一权威）
 
 数字由 `tools/check_doc_claims.py` 的 `measure_selftests()` **实跑各工具的 `--self-test` 并读它们
 自己的输出**得到（不是从源码数的）。下面每行都写成 `tools/check_doc_claims.py` 能认领的措辞，
 写错会被它抓住；本机夹具的 README 只写指针，不复述数字。
 
-* `check_bindings`：有 `--self-test`，自检 **77 条**（2026-10-20 起 +4：随包 `format.txt` 的值与 `src/Engine.cpp` 的 `kSupportedDictFormat` 必须一致（三条控制项）；以及 Python 壳的 7 个 ctypes 镜像必须逐字段对齐 `c_api.h`（一条控制项：删掉镜像里的一个字段必须红）。同时 C# 与 Python 两侧的比对表都补上了 `cppp2_tone_sandhi_opts`。**2026-10-20 再 +2**：C# 包身份三元组（`PackageId`/`AssemblyName`/`RootNamespace`）的冻结值必须与 csproj 一致——R15 的"只有 `PackageId` 不带代令牌"从政策散文变成可执行断言（审计 round 3 的 H28）。**2026-10-21 再 +8**（发布面 objective）：装配名从 csproj 读而不是硬编码（+1 反例）、发布面四条仓库 URL 必须同名（+2）、TFM 只能是包声明的子集（+1）、两条 CI 的 RID 矩阵必须相同且每个 RID 有扩展名规则（+3）、vcpkg 许可证表达式必须覆盖各词典 `License.txt` 声明的版本（+1）；发布面链接的**分支路径**必须同为一个且该分支存在（+2）；两张发布页不得对同一条命令给出两种写法（+2）。
-* `check_layers`：有 `--self-test`，自检 21 条（2026-10-20 起 +2：`src/Capabilities.h` 的 `core -> ext/` 边登记为合法，另一条把同一 include plant 到别的核心文件必须被抓 —— 审计 round 3 的 H09）。
-* `check_wheel`：有 `--self-test`，自检 **19 条**（2026-10-21 +1：wheel 缺 `dist-info/LICENSE` 或 `THIRD_PARTY_NOTICES.md` 必须红；2026-10-22 +2：PEP 639 的 `dist-info/licenses/` 布局必须**绿**、而同一份字节在不声称 manylinux 的 wheel 里**不得**触发 glibc 政策线）。
-* `check_links`：有 `--self-test`，自检 9 条。
-* `check_public_surface`：有 `--self-test`，自检 **16 条**（2026-10-19 起；其中 9 条专测成员签名冻结面 —— 2026-10-20 起覆盖 `Engine`/`Result`/`Syllable`/`ToneConverter`/`Outcome`/`Segment`/`EngineConfig` 七个类型的冻结声明，含数据成员，且**按声明顺序**比对：换序与改名一样判红。第三轮 H01 新增 2 条：**默认实参**（`= EngineConfig{}`）必须保留在签名里，而**内联函数体**仍必须被裁掉——上一版解析把默认值裁成了 `=;`，等于把"调用方能省略什么"从冻结面里删了）。
-* `merge_nupkgs`：有 `--self-test`，自检 6 条。
-* `check_doc_claims`：有 `--self-test`，自检 5 条。
-* `audit_doc_anchors`：有 `--self-test`，自检 10 条（2026-10-20 起 +2：`path::literal` 符号锚点的"在位"与"字面量已消失"两侧 —— 审计 round 3 的 H19）。
-* `check_gate_inventory`：有 `--self-test`，自检 10 条。
-* `check_source_list`：有 `--self-test`，自检 5 条（`tools/check_source_list.py`；2026-10-20 起：`CMakeLists.txt` 用显式源文件清单代替 `file(GLOB_RECURSE)`，这道门禁让「清单 == 树」成立——两个方向各一条控制项，外加「清单块缺失时拒绝空对空比较」一条）。
-* `check_doc_refs`：有 `--self-test`，自检 7 条（`tools/check_doc_refs.py`；2026-10-20 更正：此前这里与工具自己打印的 `6 controls` 都是错的，实际是 3 条绿 + 4 条红 = 7 条控制项。两处同错却很久没人发现，原因就是**这一行的工具名写了两遍**，把「自检」推到了条数断言的匹配窗口之外——现在改成与其余12 行同一形状，数字才真的被测）。
-* `check_csharp_shell`：有 `--self-test`，自检 **5 条**（`tools/check_csharp_shell.py`；2026-10-21 第 21 轮新增：C# 壳的测试套件进**门禁**，与 `check_python_shell` 同理由——2026-10-20 起 6 条一致性测试红了**两天没人发现**，因为本仓没有任何东西在跑它。该门禁**拒绝陈旧的原生库**（实测过的那次手动排查就是用 5 天前的库，差点把不存在的缺陷写成真的），缺 `dotnet`/缺库/库比源码旧一律 SKIP 并打印怎么补；`--require` 时改为 exit 2）
-* `check_conformance_provenance`：有 `--self-test`，自检 **6 条**（2026-10-20 R11 起，G24；**2026-10-21 +2**：一个对象**存在但无任何 ref 可达**必须红（压缩历史留下的孤立提交正是这种），以及恢复可达夹具后必须重新转绿——板上的全新克隆抓到了这条：`generated_by_commit` 曾指向被压缩掉的 `728b069`（压缩前提交，克隆内不可达），本机因对象残留而"过"、CI 首跑必红。原 4 条：本仓提交可过、不可解析哈希报红、缺 `generated_by_commit` 字段报红、非本仓检出 SKIP（`--require` 时退 2）—— 夹具的 provenance 此前只由人手工 `git cat-file -t` 见证过）。
-* `check_doc_paths`：有 `--self-test`，自检 **5 条**（`tools/check_doc_paths.py`；2026-10-22 新增：`docs/` 里提到的**仓库路径**必须存在 —— `check_links` 只管 markdown 链接、`audit_doc_anchors` 只管 `path:line`，反引号里的裸路径此前**没有任何家门**，实测 663 处引用里 28 处指向不存在的文件）。
+* `check_bindings`（`tools/check_bindings.py`）：有 `--self-test`，自检 **77 条**。
+* `check_layers`（`tools/check_layers.py`）：有 `--self-test`，自检 **21 条**。
+* `check_wheel`（`python/tools/check_wheel.py`）：有 `--self-test`，自检 **19 条**。
+* `check_links`（`tools/check_links.py`）：有 `--self-test`，自检 **9 条**。
+* `check_public_surface`（`tools/check_public_surface.py`）：有 `--self-test`，自检 **16 条**。
+* `merge_nupkgs`（`csharp/tools/merge_nupkgs.py`）：有 `--self-test`，自检 **10 条**。
+* `check_doc_claims`（`tools/check_doc_claims.py`）：有 `--self-test`，自检 **5 条**。
+* `audit_doc_anchors`：有 `--self-test`，自检 **10 条**。
+* `check_gate_inventory`（`tools/check_gate_inventory.py`）：有 `--self-test`，自检 **10 条**。
+* `check_source_list`（`tools/check_source_list.py`）：有 `--self-test`，自检 **5 条**。
+* `check_doc_refs`（`tools/check_doc_refs.py`）：有 `--self-test`，自检 **10 条**。
+* `check_csharp_shell`（`tools/check_csharp_shell.py`）：有 `--self-test`，自检 **5 条**。
+* `check_conformance_provenance`（`tools/check_conformance_provenance.py`）：有 `--self-test`，自检 **6 条**。
+* `check_doc_paths`（`tools/check_doc_paths.py`）：有 `--self-test`，自检 **5 条**。
 * 其余工具按文件名登记在这里，便于查找：`audit_doc_anchors.py`（锚点复核）、`check_comment_language.py`
   （注释语言）、`check_format.py`（随包 `format.txt` 与引擎常量）、`check_links.py`（相对链接）、
   `check_public_surface.py`（头/符号/声明三冻结面）、`check_python_shell.py`（Python 壳）。
 * 规范档（`examples OFF`）的**注册用例数：49**，`slow` 标签 4 条 —— 这两项的单一权威是
   `docs/NEW_DIALECT_PLAYBOOK.md` 的配置指纹表（下面的条数说明也只写指针）。
-  *（2026-10-20 第三次重算：46 = 上一次的 44 + `ConformanceProvenanceGate` 与其自检两条（G24 的
-  provenance 门禁）；四套配置的新指纹与旧指纹复现见 PLAYBOOK 表。
-  2026-10-20 第二次重算：44 = 上一次的 42 + `DocRefsGate` 与其自检两条；
-  2026-10-20 首次重算：42 = 2026-10-18 的 41 + `SonameGate` 一条（V2 的 B1a，只在共享构建注册、
-  带 `slow`）；四套配置的数值与指纹见 PLAYBOOK 表。
-  2026-10-18 重算：41 = 2026-10-10 实测的 36 + 之后登记进 CTest 的 5 件 generation 门禁；
-  该轮同样先以旧指纹 `dae313b0dc8bbc86` 自证方法，再四套 `configure + ctest -N` 实测，
-  条数与指纹与推导值逐个相同。）*
 
 **本节列出的每个门禁都有自检，而且各门禁的条数全部由 `tools/check_doc_claims.py` 每次实跑比对**（2026-10-20 起）：写的数字与实跑读数不等即报 `MISMATCH … self-test`。**本节刻意不写"共几个门禁"** —— 那个数字属于 §5 的测量表；写在这里只会是又一份要手动同步的副本（2026-10-20 修：这句原先写"13 个门禁"，而当时实数是 **19**，恰好是一份没人校验的副本）。
 
 这句总述以前数错过两次（先写「9 个门禁工具」，后来只加条目、没改这句，又写成 12），所以现在不再写一个要与列表同步维护的全局工具数 —— **以本节这份列表为准**。
 
 2026-10-20 又补了三个洞：`check_source_list` / `check_doc_refs` / `check_doc_claims` 三个工具的条数此前根本不在测量表里（被判「not measured」后直接放行），其中 `check_doc_refs` 的「6 条」实际是 **7** 条、工具与文档同时错；另外那两行**把工具名写了两遍**，把「自检」推出了条数断言的匹配窗口，等于双重失守。修法三件事一起做：接进测量表、两行改成与其余行同一形状、断言允许 `**` 加粗。**验证方式是毒化**：改成 8 ⇒ `MISMATCH docs/STABILITY.md:96`，改回 ⇒ PASS。
-⚠️ 测量它们时**必须移除 `TEMP`/`TMP`**：部分门禁的自检夹具建在临时目录下，
-若 `TEMP` 指向本仓 `.tmp/`，夹具会落进工具自己的跳过列表、扫描到 0 条而拒绝运行 —— 那种失败是环境造成的，
-不是工具缺陷（`tools/run_all_gates.py` 与 `tools/check_doc_claims.py` 的测量都已按此处理）。
+⚠️ **`TEMP`/`TMP` 与环境的关系（2026-10-27 复测：原文那句已经不成立）**：
+
+本节这张表的数字是在**默认 `TEMP`** 下量的；历史上（2026-10-20）曾记录"把 `TEMP` 指向本仓 `.tmp/` 会让部分工具的自检夹具
+落进它自己的跳过列表、扫描到 0 条而拒绝运行"。**这条在当前的树上不复现**：2026-10-27 实测把 `TEMP`/`TMP` 指到 `.tmp` 根、
+在 staged 库是新鲜的前提下跑 `tools/run_all_gates.py --with-build`，**22 条门禁全绿**，唯一 skip 的 `check_generation_compat`
+在默认 `TEMP` 下也 skip（树上只有一代，规则无对象）。当年那个失败已被这两个工具自己在代码里处理掉，所以"必须移除 `TEMP`"
+不再是前置条件。
+
+**真正有前置条件的是 `ctest`，方向相反，别把两者混用**：
+
+| 你要跑什么 | `TEMP`/`TMP` | 设错的症状 |
+|---|---|---|
+| `ctest`（C++ 测试） | **必须**指到仓内可写目录 | 默认 `%TEMP%` ⇒ `CppPinyinTests` / `ThreadSafety` / `InstanceIsolation` 三条红（判据与复现见 §5 开头那条） |
+| `tools/run_all_gates.py` | 无所谓（2026-10-27 两种设置都 22/22） | —— |
 
 本节列表之外的 `tools/run_all_gates.py` **不接受** `--self-test`：它的价值是"一条命令看全部判词"，
 不是给 `ctest` 增加覆盖面。它不进这份列表的理由与列表本身相同：一条没有东西能量的"自检 N 条"，
@@ -133,7 +147,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 ### 1.1 ① 现在能不能验？—— 本机能（一条窄路，2026-10-06 实测）；板上不能
 
-**装置（代码事实，行号本轮重读）**：
+**装置（代码事实，行号成文时重读）**：
 
 - `[事实]` option 存在且默认 OFF：`option(CPP_PINYIN2_SANITIZE "Build the library, tools and tests with
   ASan and UBSan (GCC/Clang)" OFF)` —— `CMakeLists.txt:31`；其存在理由写在 `:27-30`（"开发机是 MinGW，
@@ -146,8 +160,8 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   （`CMakeLists.txt:214-215`）+ 链接 `-fsanitize=address,undefined`（`:216`）。
 - `[事实]` 插桩覆盖范围：`cpp-pinyin_dev_flags = cpp-pinyin_warnings + cpp-pinyin_sanitizers`
   （`CMakeLists.txt:231-232`），库 `:144`、两个工具 `tools/CMakeLists.txt:66-67`、
-  tests 三个目标 `tests/CMakeLists.txt:405-392`、examples `examples/CMakeLists.txt:10,32`。
-  **C 目标**（`CApiSmoke`）刻意只链 sanitizer 集、不链 C++ 警告集：`tests/CMakeLists.txt:193-178`。
+  tests 三个目标 `tests/CMakeLists.txt:485-488`（三条 `target_link_libraries(... cpp-pinyin2_dev_flags)`）、examples `examples/CMakeLists.txt:10,32`。
+  **C 目标**（`CApiSmoke`）刻意只链 sanitizer 集、不链 C++ 警告集：`tests/CMakeLists.txt:249`。
 
 **本机可用路径（2026-10-06 实测；这是全仓**唯一**的 ASan 复现配方，别处只写指针）**：
 
@@ -158,10 +172,10 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   `lld-link: error: could not open 'stl_asan.lib'`，见 `.tmp/p1s28-asan/build.log:31`）。
   配置期自检随即打印 `Performing Test CPP_PINYIN_HAVE_SANITIZERS - Success`、`configure exit 0`
   ⇒ `CMakeLists.txt:206` 那个守卫在这条工具链上是**放行**（它仍对 MinGW 响亮拒绝）。
-- `[事实]` **ASan 运行时 DLL 必须在 `PATH` 上**（本轮新测到的关键参数）：插桩出的 exe 依赖
+- `[事实]` **ASan 运行时 DLL 必须在 `PATH` 上**（成文时新测到的关键参数）：插桩出的 exe 依赖
   `<clang 根>\lib\clang\22\lib\windows\clang_rt.asan_dynamic-x86_64.dll`，而它**不会**被拷进 `bin/`
   ⇒ 不把该目录加进 `PATH` 时，插桩测试一律以 `Exit code 0xc0000135`（DLL not found）起不来。
-  **这是环境问题，不是缺陷信号**（本轮第一次 `-L slow` 就是这样 4/4 红的，加上 `PATH` 后同样 4 条 4/4 绿）。
+  **这是环境问题，不是缺陷信号**（成文时第一次 `-L slow` 就是这样 4/4 红的，加上 `PATH` 后同样 4 条 4/4 绿）。
 - `[事实]` **条数**：各配置的注册数**唯一权威是 `docs/NEW_DIALECT_PLAYBOOK.md` 的配置指纹表**
   （2026-10-10 重测：默认 **36**、`EXAMPLES=ON` **37**、静态 **35**、两者同时 **36**，各带条目集合指纹；
   `tools/check_doc_claims.py` 会读回该表并从构建目录重算），本文不复述。
@@ -179,28 +193,28 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   `ok` ⇒ `sum=10 n=4 oob=0`、exit 0；`oob` ⇒ `ERROR: AddressSanitizer: heap-buffer-overflow`、exit 1，
   且**栈顶是项目帧** `…/asan_probe.cpp:13` ⇒ 上面那个"0 条报告"不是空壳跑出来的。
 - `[事实]` 证据文件（只读留档，不做二次加工）：`.tmp/p1s28-asan-rwdi.log`（configure + build + `-LE slow`）、
-  `.tmp/p1s28-asan-rwdi-gates.log`（本轮 `-L slow` 与 `ExportGate|BindingGates` 复跑）、
+  `.tmp/p1s28-asan-rwdi-gates.log`（成文时 `-L slow` 与 `ExportGate|BindingGates` 复跑）、
   `.tmp/asan_probe.cpp`、`.tmp/p1s28-asan2/{build.log,ctest.log}`、`.tmp/p1s28-asan/build.log`。
 
 **仍存的边界（未验证就是未验证 —— 别把上面读成"sanitizer 已覆盖全部"）**：
 
-- `[事实]` **板上不能**：提交历史（原 `REPO_LAYOUT.md` 批次 ⑭）
+- `[事实]` **板上不能**：旧台账（原 `REPO_LAYOUT.md` 批次 ⑭）
   记全套 ASan 构建在这块板（3.8 GiB 内存）configure 通过后
   **>17 min 未完成 ⇒ 主动停止**（`free` 显示 `2810 used / 965 available`）；`:315` 记另一次窄验证里 ASan 自身报
   `CHECK failed: sanitizer_allocator_primary64.h:131`，并把"内核 4.4 拿不到影子内存"明确标为 `[推断]`/未证实。
   板侧 sanitizer 覆盖**按项目 skill 的硬约束不做**。
-- `[未核实]` **另两条路本轮没留日志**：MinGW g++（`CMakeLists.txt:190-191` 记"没有 libasan"）与 clang 的
+- `[未核实]` **另两条路成文时没留日志**：MinGW g++（`CMakeLists.txt:190-191` 记"没有 libasan"）与 clang 的
   `windows-gnu` 目标（此前观测缺 `libclang_rt.asan_dynamic.dll.a`，发行包只带 MSVC 目标的运行库）⇒
-  仍算**不可用**，但这是**转述而非本轮实测**，别当本轮结论引用。
+  仍算**不可用**，但这是**转述而非成文时实测**，别当成本文结论引用。
 - `[事实]` **不要用 Debug 档跑 ASan**：同 clang、同三宏、`CPP_PINYIN2_SANITIZE=ON`，只把档位换成 `Debug` ⇒
   **28 条里 10 红**。其中 **9 条**是 ASan 报告，且报告栈**全是系统 CRT**（`ucrtbased.dll` / `MSVCP140D.dll` /
   `ntdll.dll`），**一条项目帧都没有**；同 clang **Debug 关 sanitizer** 的对照档只 **1** 红。
-  ⇒ `[推断]` 归因"ASan × debug-CRT 不匹配"，**机制本轮未证实**（如实按推断写，勿升级成定论）。
+  ⇒ `[推断]` 归因"ASan × debug-CRT 不匹配"，**机制成文时未证实**（如实按推断写，勿升级成定论）。
 - `[未证实]` **Windows 上没有 LeakSanitizer**（泄漏检测目前只写在 Linux 腿的 `detect_leaks=1`，§1.2）
   ⇒ 本机路径**不给**泄漏检测这一维。
 - `[事实]` 板/CI 的覆盖状态**不变**：板不做、CI 腿是否跑过未证实（§1.2）。本机这条路**替代不了** CI 腿
   （环境不同、且本机禁 push）。
-- `[历史]` 提交历史（2026-10-02 的更正记录）当时写"**唯一残留**是'sanitizer 下的套件真绿'
+- `[历史]` 旧台账（2026-10-02 的更正记录）当时写"**唯一残留**是'sanitizer 下的套件真绿'
   仍标**未验证（待 CI）**（本机无 `libasan`…）" —— 该记录**按原样保留**；其中"本机"这半句在 2026-10-06
   被上文的窄路限定掉了（"真绿"现在**有一份本机观测**，仍**不等于** CI 腿已验）。
 
@@ -220,18 +234,38 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   > `# Consequence to keep in mind: until test_runner.yml is on the default branch and registered, nothing`
   > `# triggers this workflow. The jobs themselves are unchanged.`
   `[事实]` 该工作流**只**声明 `on: workflow_call:`（`ci.yml:13-14`）—— 自己没有任何触发器。
-- **第二处自述**：`.github/workflows/test_runner.yml:20-23`：
+- **第二处自述**：`.github/workflows/test_runner.yml:20-23`（**2026-10-27 注：源文件里这段已改写成"已跑过"，
+  下面的引用保留为审计当天的原文**）：
   > `# NOT WIRED YET, and deliberately stated rather than implied: this file's runner wiring is unverified`
   > `# until it runs on GitHub (see the header of test_csharp.yml for how the individual commands were`
   > `# verified locally), and no publishing lives here -- a PyPI or NuGet upload must be a separate,`
   > `# manually dispatched workflow.`
   `[事实]` `test_runner.yml` 确实持有 push/pull_request/tag 触发器（`:25-31`），并在 `:38-40` 用
-  `uses: ./.github/workflows/ci.yml` 调它 —— **代码上的接线在**，但"它在 GitHub 上真的跑起来过"**本轮无法验证**。
+  `uses: ./.github/workflows/ci.yml` 调它 —— **代码上的接线在**。审计当天"它在 GitHub 上真的跑起来过"无法验证；
+  **2026-10-23 已有一条全绿运行记录**（`f5c44bd`，run `39877724768`，见 §0.1），这一条因此已经闭合。
 - ⇒ `[未证实]` **`linux-sanitizers` 是否曾经真正执行过、是否真绿。** 本文不把它当已验门禁引用。
+  **〔2026-10-27 闭合〕** `[事实]` 它执行过且是绿的：2026-10-23 的那次全绿运行（`f5c44bd`，run `39877724768`）
+  的 19 个 job 里就有 `linux-sanitizers`（§0.1 的清单）。下面两句随之作废，保留原文以便对照。
   `[推断]` 在"禁止 push"的前提下，它**不可能**在本机侧被观察运行。
   **〔2026-10-21 分工说明〕** 别把下面这条读成"CI 跑过了"：本机侧**能跑的部分**已实测 —— MinGW g++ 与
-  MSVC 19.51 各自 configure/build/`ctest` **49/49**，20 项门禁全绿。但那是**本机三条腿**（MinGW g++ / MSVC / Clang，各 50/50）的证据，GitHub 上五个 job
+  MSVC 19.51 各自 configure/build/`ctest` **49/49**，20 项门禁全绿（当时是 20 条；**2026-10-27 起 22 条**，
+  见本段末——这一句原写"21 条"，是加入 `verify_build_dependent` 之后的数字，后来又加
+  `tools/check_parsable.py` 时没有同步，正好与它下面那段自相矛盾）。但那是**本机三条腿**（MinGW g++ / MSVC / Clang，各 50/50）的证据，GitHub 上五个 job
   的真实运行记录**仍然一条都没有**，sanitizer 腿依旧 `[未证实]`。
+  **〔2026-10-27 三条腿重测（第 42–43 轮）〕** 用例总数现在是 **49**（不是这句里的 50，那是 2026-10-21 的口径）；
+  门禁从 20 条变成 **22 条**：`verify_build_dependent`（它守的两条生成期规则此前**没有任何自动调用者**），`tools/check_parsable.py`（5 个 workflow、2 个 `.sh`、4 个 JSON 与 `CMakePresets.json` 此前**没有任何门禁解析过**）。
+  三条腿逐一重跑：`default`（MinGW g++）**49/49**、`msvc`（VS2026 / clang-cl 环境外的 cl 14.51）**49/49**、
+  `clang`（22.1.4）**49/49**——但 clang 这一条**是在修掉 `InstallConsumerSmoke` 的编译器传递缺陷之后**才绿的
+  （修前 48/49，见 `tests/install/check_install_consumer.cmake` 的注释）。也就是说：**这句话在
+  2026-10-21 到 2026-10-27 之间，只有在前两条腿上成立**。
+  **〔2026-10-27 另有两条配置〕** 除三条编译器腿之外，两种构建类型也实测过：
+  `CMAKE_BUILD_TYPE=Debug`（同一份源码，`assert()` 全部保持生效）**49/49**；`-DCPP_PINYIN2_WERROR=ON`
+  + `BUILD_EXAMPLES=ON`（**CI 的 linux 腿用的就是这组**）**50/50**，构建零警告。前一条是 D45 那类
+  "Debug 与 Release 不一致"的反向证据，后一条说明本地 GCC 与 CI 的严格告警集合没有分歧。
+  **四套配置组合至此全部实测**（第 65–66 轮），读数与 `docs/NEW_DIALECT_PLAYBOOK.md` §7 的指纹表一致：
+  默认 **49** / +examples **50** / 静态 **48** / 静态+examples **49**——最后这套是后补的，
+  它证明「静态少一条」与「examples 多一条」**互不抵消**（48+1=49，而默认 49 的成因不同，
+  指纹也不同：`a131c1e6c36e0485` ≠ `93b0e403a39ffa01`）。
 - `[事实]` CI 中也**没有**第二条 sanitizer 腿：`mingw`（`ci.yml:157`）、`mingw32`（`:215`）、
   `macos`（`:89`）、`windows`（`:125`）、`linux`（`:22`）五个 job 都不设 `CPP_PINYIN2_SANITIZE`。
 
@@ -279,13 +313,13 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   to WRITE shared state (a cache, a lazy index)."
 - `[事实]` **全仓没有任何 TSan 装置**：`git grep -n "thread_sanitize\|TSan\|tsan" -- src include tests CMakeLists.txt .github`
   只命中 1 处，即上面那句注释（`tests/cpp/test_bug_regression.cpp:340`）。
-- `[事实]` 提交历史 记录同一口径（"契约仍不加锁（按设计）… 仍未加锁：`load*` /
+- `[事实]` 旧台账记录同一口径（"契约仍不加锁（按设计）… 仍未加锁：`load*` /
   `setDisambiguationCallback` 与并发读重叠依然是未定义行为（契约已写在 `Mandarin.h:25-32`）"）。
-  —— **2026-10-10 复核**：这一句是从旧记录抄来的，两处都不成立 —— ① 它引的头（连同 `Mandarin` 类）**已从公开面删除**；② 当年它自己就注明了行号已漂到 `Mandarin.h:30-35`。契约现在是 `include/cpp-pinyin2/core/Engine.h` 的类注释 **Thread safety** 段（本轮实测 :35-40），本行按符号定位。
+  —— **2026-10-10 复核**：这一句是从旧记录抄来的，两处都不成立 —— ① 它引的头（连同 `Mandarin` 类）**已从公开面删除**；② 当年它自己就注明了行号已漂到 `Mandarin.h:30-35`。契约现在是 `include/cpp-pinyin2/core/Engine.h` 的类注释 **Thread safety** 段（成文时实测 :35-40），本行按符号定位。
 
 ### 2.2 ② 靠什么验？—— 点名装置
 
-- `[事实]` **执行装置**：主套件 `CppPinyinTests`（`tests/CMakeLists.txt:106`，
+- `[事实]` **执行装置**：主套件 `CppPinyinTests`（`tests/CMakeLists.txt:146`，
   `add_test(NAME CppPinyinTests COMMAND CppPinyinTests "~[corpus]~[thread]~[thread_safety]~[concurrent]~[isolation]")`），
   加上 **2026-10-04 新增的两条独立条目**（`:120-123`）：`ThreadSafety`（`"[thread],[thread_safety],[concurrent]"`，
   实测选中 5 个 case）与 `InstanceIsolation`（`"[isolation]"`，1 个 case），两条都带 `thread` 标签
@@ -311,7 +345,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
    "Thread safety" 段、`c_api.h` 的 "THREAD SAFETY" 段）会与实现不一致；而当前**没有任何门禁比对
    "契约文本 ↔ 实现"**。
 3. `[推断]` **改动 `Registry.h` 的加锁**：`add` 取 `unique_lock`、`resolve`/`ids` 取 `shared_lock`
-   （`src/Engine.cpp:64,75,86`），且 creator 在**锁外**调用（`:81-82` 注释 + `:82` 实现），
+   （`src/Engine.cpp` 的 `Registry::add` 取 `unique_lock`、`Registry::resolve` 取 `shared_lock`），且 creator 在**锁外**调用（`resolve` 里 "Called with the lock released" 那条注释 + 紧随其后的 `return creator();`；原文引的 `:64,75,86` 与 `:81-82` 四个行号在 2026-10-27 重读时已全部漂掉：`:64` 是空行、`:65` 才是 `Registry::add`），
    理由是"creator 允许回调注册"。把 creator 挪进锁内会引入死锁（推断：同一把 `shared_mutex` 上
    重入 `unique_lock`）。
 4. `[推断]` **删掉 `find_package(Threads)`**（`tests/CMakeLists.txt:14`）：在 glibc < 2.34 的 Linux 上
@@ -329,8 +363,8 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 > `Engine::open(registry, root, id)`，且它**只查调用方传进来的那张表**。因此本小节里凡出现
 > "进程级单例 / `instance()` / `CPP_PINYIN_REGISTER_DIALECT` / 自注册在链接里" 的段落（原 `:43-47`、
 > `:185-192`、`:199`、`:214-218`、`:225-247`、`:252`、`:259-261`）都是 **S3 之前的形态记录**，不再描述今天的树；
-> 新形态的把守装置是 CTest `HostOwnedRegistry` / `HostOwnedRegistryBare`（`tests/CMakeLists.txt:451-454`，
-> 一组调用方自持注册表的正/负对照，行号 2026-10-06 重读）＋ `test_engine_dialect.cpp` 的 `registry semantics`
+> 新形态的把守装置是 CTest `HostOwnedRegistry` / `HostOwnedRegistryBare`（`tests/CMakeLists.txt:499-507`，
+> 一组调用方自持注册表的正/负对照；行号 2026-10-27 重读——原文写的 451-454 已漂到 AC-4 那段注释上）＋ `test_engine_dialect.cpp` 的 `registry semantics`
 > （两个 Registry 互不可见、`ids()` 有序、空 id/空 creator 与重复 add 的失败路径；详见 §3.2）。
 > **另一处随之消失的事实**：原来"唯一的非 const 文件级对象是 `src/Engine.cpp:56` 的 `static
 > DialectRegistry registry;`"（见 `:199`）—— **今天一个也没有**；库侧 ID 查表用的那张不可变表是
@@ -342,8 +376,9 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   constructor argument and there is no setter for it -- deliberately (D12 / FR-4.5). Two `Engine`
   objects with two different roots, or two different dialects, coexist in one process and do not interfere."）。
 - `[事实]` **可执行用例 1（多实例 × 线程，含注册表并发查表）**：
-  `tests/cpp/test_engine_dialect.cpp:412` `TEST_CASE("no shared state between instances, across threads", "[engine][thread]")`。
-  4 线程（`:434`）× 40 轮（`:435`），每个线程自己构造 `mandarin`/`cantonese`/探针方言三个引擎（`:447-450`），
+  `tests/cpp/test_engine_dialect.cpp:465` `TEST_CASE("no shared state between instances, across threads", "[engine][thread]")`。
+  4 线程（`:487`）× 40 轮（`:488`），每个线程自己构造 `mandarin`/`cantonese`/探针方言三个引擎（`:502-505`；
+  这四个行号 2026-10-27 重读，原文的 412/434/435/447-450 已整体漂掉），
   与**单线程基线**逐字节比对（`:455-463`），并检查长活实例事后未损（`:476-479`）。
   文件头 `:16-18` 把意图写明："**Nothing is process-global.** Every case builds its own engines from its own roots"。
 - `[事实]` **可执行用例 2（用户词典不串味）**：`tests/cpp/test_engine_dialect.cpp:482`
@@ -359,7 +394,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   stores a dictionary path, never stores an `Engine`, and never caches loaded dictionaries."）；
   `:37` 的 `static DialectRegistry &instance();`；`src/Engine.cpp:55-58` 的函数局部 static 实现
   （线程安全初始化）；`src/Engine.cpp:45-50` 只注册 `"mandarin"` 与 `"cantonese"`。
-- `[事实]` **库不读环境变量**（本轮亲自数的）：`git grep -n "getenv\|setenv\|putenv" -- src include tools examples`
+- `[事实]` **库不读环境变量**（成文时亲自数的）：`git grep -n "getenv\|setenv\|putenv" -- src include tools examples`
   ⇒ **0 命中，exit 1**。全仓命中 4 处，全在第三方 vendored Catch2
   （`vendor/catch_amalgamated.cpp:4294,4297`、`vendor/catch_amalgamated.hpp:243,9551`）。
   `[事实]` 另有第三方写入点在测试侧（Catch2 的 `getenv` 包装）。
@@ -370,9 +405,9 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   只命中 `src/Engine.cpp:37` 一行）。
 - ⚠️ **两条文档口径需要更正**（照实记录，不删史实）：
   - `docs/DECISIONS.md` §2.1:131` 写 "`src/`+`include/` 内 `std::mutex`/`std::shared_mutex`/
-    `std::atomic` **0 处**"。**实测是 1 处**：`src/Engine.cpp:37` `mutable std::shared_mutex mutex;`。
+    `std::atomic` **0 处**"。**实测是 1 处**：`src/Engine.cpp:44` `mutable std::shared_mutex mutex;`。
     `[推断]` 该行是 P1 实施**之前**的快照，同文档 `:25-26` 自己已经承认后来加了这把锁。
-  - 同一行 `:131` 与 提交历史 提到 "`std::mutex`" 的旧口径 —— 以 `src/Engine.cpp:37` 为准。
+  - 同一行 `:131` 与旧台账提到 "`std::mutex`" 的旧口径 —— 以 `src/Engine.cpp:44` 为准。
 
 ### 3.2 ② 靠什么验？—— 点名装置 + **两条真约束的当前把守状态**
 
@@ -384,11 +419,11 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 | 装置 | 位置 | 覆盖什么 | 条件 |
 |---|---|---|---|
 | CTest `CppPinyinTests` | `tests/CMakeLists.txt:129` | §3.1 的用例 1–4（都在同一个二进制里）；把 `thread`/`thread_safety`/`concurrent`/`isolation` 四组标签排除，改由下面两条独立条目选中（避免同一批 case 跑两遍） | `CPP_PINYIN2_BUILD_TESTS=ON` |
-| CTest `ThreadSafety` | `tests/CMakeLists.txt:143-144` | 只读并发契约：`[thread]`/`[thread_safety]`/`[concurrent]` | 同上（标签 `thread`） |
-| CTest `InstanceIsolation` | `tests/CMakeLists.txt:145-146` | 多实例：`[isolation]` ⇒ 实例间不共享已装载的用户词典 | 同上（与 `ThreadSafety` 共用 `thread` 标签） |
-| CTest `HostOwnedRegistry` | `tests/CMakeLists.txt:451-452` | **正向**：调用方把探针 id `add` 进**自己声明的** `Registry` ⇒ 该 id 必须 resolve，且 `Engine::open` 必须给出可用引擎、`engine.dialect().id` 必须就是它 | 同上（标签 `registry`；程序 `tests/registry/host_owned_registry_main.cpp`） |
-| CTest `HostOwnedRegistryBare` | `tests/CMakeLists.txt:453-454` | **负对照**：**同一个二进制**、只差"调用方没 add" ⇒ 该 id 必须 resolve 不了，`Engine::open` 必须失败**且消息点名该 id** | 同上 |
-| CTest `DialectSetGate` | `tests/CMakeLists.txt:278-281` | `data/dialects/` 目录集 == 运行时注册的 id 集 == 冻结清单 | 同上（标签 `dialect`） |
+| CTest `ThreadSafety` | `tests/CMakeLists.txt:160` | 只读并发契约：`[thread]`/`[thread_safety]`/`[concurrent]` | 同上（标签 `thread`） |
+| CTest `InstanceIsolation` | `tests/CMakeLists.txt:162` | 多实例：`[isolation]` ⇒ 实例间不共享已装载的用户词典 | 同上（与 `ThreadSafety` 共用 `thread` 标签） |
+| CTest `HostOwnedRegistry` | `tests/CMakeLists.txt:508-509` | **正向**：调用方把探针 id `add` 进**自己声明的** `Registry` ⇒ 该 id 必须 resolve，且 `Engine::open` 必须给出可用引擎、`engine.dialect().id` 必须就是它 | 同上（标签 `registry`；程序 `tests/registry/host_owned_registry_main.cpp`） |
+| CTest `HostOwnedRegistryBare` | `tests/CMakeLists.txt:510-511` | **负对照**：**同一个二进制**、只差"调用方没 add" ⇒ 该 id 必须 resolve 不了，`Engine::open` 必须失败**且消息点名该 id** | 同上 |
+| CTest `DialectSetGate` | `tests/CMakeLists.txt:328-330` | `data/dialects/` 目录集 == 运行时注册的 id 集 == 冻结清单 | 同上（标签 `dialect`） |
 | CTest `CApiSmoke` | `tests/CMakeLists.txt:228` | C 侧 `cppp2_open(NULL, "no-such-dialect", …)` 必须失败、`code == CPPP2_ERR_NOT_READY`、detail 点名该 id（`tests/c_api_smoke.c:141-150`） | 同上（标签 `abi`） |
 | 静/动态链接 | `CMakeLists.txt:104-106` | `BUILD_SHARED_LIBS=OFF` 时定义 `CPP_PINYIN_STATIC` | — |
 
@@ -429,7 +464,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
    当场判红（§3.2），错误消息还必须点名 id。
 2. `[推断]` **把注册表从"只存 creator"扩成"也缓存词典/`Engine`"** ⇒ 回归 `Registry.h:19-25` 的
    "no 'default dictionary' to be read or written globally"。
-3. `[推断]` **给 `data/dialects/` 加第三种语言目录**：`DialectSetGate`（`tests/CMakeLists.txt:278-281`）
+3. `[推断]` **给 `data/dialects/` 加第三种语言目录**：`DialectSetGate`（`tests/CMakeLists.txt:328-330`）
    会红 —— 这是**有装置**的（检查器自述在
    `tests/data/dialect_set/check_dialect_set.cmake:3-8`，同文件 `:55-60` 起是它的自证段）。
    `[事实]` 该检查器**不读**环境变量，也不依赖 CWD（`:23-26` 用 `-D` 传参）。
@@ -461,7 +496,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 - `[事实]` 权威成文（唯一权威）：`docs/DECISIONS.md` §2.1:926`
   `#### 6.8.5.1 版本与兼容契约（**本节是这一段的唯一权威**，2026-10-03 成文）`。
   三条要点在 `:930-942`，将来要真承诺二进制兼容要"同时做三件"在 `:944-946`。
-- `[未证实]` 该节的"唯一权威"地位只有它自己与 提交历史
+- `[未证实]` 该节的"唯一权威"地位只有它自己与旧台账
   声明；`[推断]` 没有机器门禁在比对"哪些文档复述了版本策略"。`docs/DECISIONS.md` §2.1
   是**入库且 frozen 清单里没有它**，因此它自己可以被静默改动而不触发任何门禁 —— 这是本文的推断，不是缺陷排期。
 
@@ -474,18 +509,18 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   文件行数与行号随注释增删漂移，故此处**不复述**；三个冻结面的定量读数**只许一处登记**，那处是
   `docs/REQUIREMENTS.md` §5.3 的 ① 行，本文件下方的「冻结面口径」行由 `tools/check_doc_claims.py` 逐轮与真值源核对。
   `[注]` 本小节其余行号仍是 2026-10-04 快照；三条清单的**形状**在下面三条里重读过。
-- `[事实]` 执行者之一 `BindingGates`：`tests/CMakeLists.txt:473-457`
+- `[事实]` 执行者之一 `BindingGates`：`tests/CMakeLists.txt:573-574`
   （`tools/check_bindings.py`，无 flag = 仓内可验证子集），比对逻辑在 `tools/check_bindings.py` 的 `check_public_header_surface`。
-- `[事实]` 执行者之二 `HeaderSelfCheck`：`tests/CMakeLists.txt:361-345`，把**每个** `include/cpp-pinyin2/**/*.h`
+- `[事实]` 执行者之二 `HeaderSelfCheck`：`tests/CMakeLists.txt:441-442`，把**每个** `include/cpp-pinyin2/**/*.h`
   单独编译两次（`:308-341`，glob 在 `:323`，空 glob 会 `FATAL_ERROR`，`:324-329`）。
 - ⚠️ **两个装置的覆盖差**：`HeaderSelfCheck` 的 glob 只保证"存在于此的头都能自包含"，
-  **不比对清单**；`BindingGates` 才比对清单，但**它需要 Python3**（`tests/CMakeLists.txt:438-422`，
+  **不比对清单**；`BindingGates` 才比对清单，但**它需要 Python3**（`tests/CMakeLists.txt:573-574`，
   找不到 Python 时 `:468-470` 是 `FATAL_ERROR`，不是跳过）。
 
 **冻结面 2：C ABI 符号清单**
 
 - `[事实]` 清单：`tests/abi/expected_c_api_symbols.txt`（文件头自述 **"THE COUNT IS THESE LINES"**，2026-10-06
-  起**行数即答案、正文不写数字**；符号是注释块之后的一段连续行）—— **第 11 轮 N4b 已删 2 个**
+  起**行数即答案、正文不写数字**；符号是注释块之后的一段连续行）—— **已删 2 个**
   （`cppp_is_ready`/`cppp_last_error`），当前符号 **19**，与 `docs/REQUIREMENTS.md` §5.3 的登记值同批改
   **冻结面口径（本行由 tools/check_doc_claims.py 逐轮核对）**：**15 公开头 + 23 C ABI + 18 插件面声明**。
   （那是三个数的唯一登记处）；**历史注记（2026-10-06 当时）**："另有 N7A 的 `cppp2_apply_tone_sandhi`（+1）与
@@ -494,16 +529,20 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   现状读数以本条上方的**冻结面口径**行为准，此处**不写第二份数字**。
   ⚠️ **本条曾写"31 行 / `:14-31`"，板上取证实测为 30 行、符号块 `:15-30`**：行号随注释增删漂移，故不再复述行号，
   唯一定量读数就是符号行数本身。
-- `[事实]` 执行者 `ExportGate`：`tests/CMakeLists.txt:250-257`（2026-10-06 复核改准；原引 `:228-212` 这个区间是反的且不存在），检查器
+- `[事实]` 执行者 `ExportGate`：`tests/CMakeLists.txt:283-284`（2026-10-27 重读改准；此前引过 `:228-212` 与 `:250-257`，前者是反向区间且不存在，后者已漂到别的用例），检查器
   `tests/abi/check_exports.cmake`（双向比对 + 内部符号泄漏检测在 `:78-105`，工具选择在 `:202-216`）。
-- `[事实]` **只在共享构建注册**：`tests/CMakeLists.txt:227-217`；静态构建下 configure 期
+- `[事实]` **只在共享构建注册**：`tests/CMakeLists.txt:282-284`（`if (BUILD_SHARED_LIBS)` 把它整个包住）；静态构建下 configure 期
   `message(STATUS ...)` 明确说"不注册"（`:215-216`）—— **不是静默跳过**。
 - `[事实]` **静态构建下的把守改到了链接期**：`tests/c_api_smoke.c:406-411` 的注释逐字记录
   "Measured 2026-10-03: `cppp_load_traditional_dict` was the one frozen symbol no test referenced … its
   implementation could be removed with every entry still green. Referencing it here makes that a link error."
   实调用在 `:242-243`。
-- `[事实]` `ExportGateSelfTest`（`tests/CMakeLists.txt:237-224`）用四个合成 dump 证明检查器**会红**
+- `[事实]` `ExportGateSelfTest`（`tests/CMakeLists.txt:292-296`）用四个合成 dump 证明检查器**会红**
   （`tests/abi/check_exports.cmake:147-190`：缺一个符号 / 多一个符号 / 内部符号泄漏 / 正确）。
+- `[事实]` **静态构建下的全套测试，2026-10-27 第一次跑**：`-DBUILD_SHARED_LIBS=OFF -DCPP_PINYIN2_BUILD_TESTS=ON`
+  ⇒ `ctest` **48/48 通过**（49 减掉未注册的 `ExportGate`，原因见上条，不是少测了）。在此之前静态构建只被
+  manylinux 步骤 10 以 `-DCPP_PINYIN2_BUILD_TESTS=OFF` 构建过——**它的测试从来没在任何地方跑过**，而
+  `tests/c_api_smoke.c:406-411` 说明静态路径的符号把守就靠这条链接期用例。
 
 **冻结面 3：C++ 插件面声明清单**
 
@@ -514,27 +553,31 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   "Still 16 declarations, but not the same sixteen"）。⇒ 引用这个清单时必须说**哪一天**的那一版。
 - `[事实]` 执行者仍是 `BindingGates`：比对逻辑与"清单太短就拒绝通过"的守卫在
   `tools/check_bindings.py` 的 `check_plugin_surface`（"清单不足以描述面 ⇒ 失败"）。
-- `[事实]` 该面**曾经没有 CTest 用例**，理由写在 `tests/CMakeLists.txt:458-455`：
+- `[事实]` 该面**曾经没有 CTest 用例**，理由写在 `tests/CMakeLists.txt:539-544`：
   "The plugin surface and the header set were owned by `tools/check_bindings.py`, which nothing in this
   repository called except **two CI workflows whose trigger workflow has never run on GitHub**. A gate
   that only runs in CI is a gate that has never been observed to run, so it is wired here."
-  —— 这句话与 §1.2 的触发链自述**互相印证**，是本轮找到的第二处"CI 未接线"记录。
+  —— 这句话与 §1.2 的触发链自述**互相印证**，是当时找到的第二处"CI 未接线"记录。
+  **〔2026-10-27 补注〕**上面这段引文**已经过期**：那条触发链在 2026-10-23 跑绿（run `39877724768`），
+  `tests/CMakeLists.txt` 的同一段现在紧跟一句"that trigger chain has since run green … so 'never run' is
+  history"（该文件 `:553-555`）。这里保留原文是因为它是"为什么把门禁接进 CTest 而不是只靠 CI"的理由，
+  **不是因为那句话今天还成立**——门禁不该依赖"CI 被观测到跑过"这件事本身。
 
 **版本 / so-version 策略（现状 + 权威行）**
 
 | 项 | 现状（`[事实]`） | 权威在哪一行 |
 |---|---|---|
 | 版本号唯一源 | `project(cpp-pinyin2 VERSION 2.0.0 ...)` | `CMakeLists.txt:6`（同文件 `:2-5` 自述"the single authority"） |
-| C ABI 报的版本 | `CPP_PINYIN2_VERSION_STRING="${PROJECT_VERSION}"` → `cppp2_version()` | `CMakeLists.txt:168-169`；实现 `src/c_api_lifecycle.cpp:9`；兜底 `src/c_api_internal.h:32-33` |
+| C ABI 报的版本 | `CPP_PINYIN2_VERSION_STRING="${PROJECT_VERSION}"` → `cppp2_version()` | `CMakeLists.txt:303`；实现 `src/c_api_lifecycle.cpp:73`；兜底 `src/c_api_internal.h:49-50`（三处行号 2026-10-27 重读，原文写的 168-169 / 9 / 32-33 全部已漂） |
 | 包版本兼容等级 | `COMPATIBILITY SameMajorVersion`（**2026-10-06 由 `AnyNewerVersion` 改判**） | `CMakeLists.txt:417-421`（指令在 `:420`） |
 | 该等级的**语义边界** | 表达"同 major 的**包/API** 请求算满足" ≠ 承诺兼容（更非二进制兼容）；它同时**挡住跨 major**：1.x 请求不再被 2.0 满足 | `docs/DECISIONS.md` §2.1:963-973`；**可执行判据** `tests/install/check_install_consumer.cmake:163-182` |
 | so-version（`SOVERSION`） | **`SOVERSION 2`（2026-10-18 决定 D2，仅共享构建）** ⇒ 产物为 `libcpp-pinyin2.so.2` 加无版本符号链接；**仍不承诺二进制兼容**（`SameMajorVersion` 只管包/API 一级）；PE（Windows）产物**没有 soname**，这一格记 "n/a (PE)" | `CMakeLists.txt:282-286`（`SOVERSION` 在 `:285`）；此前"全仓 0 命中"的记录见 `docs/DECISIONS.md` §2.1:793`（D24 已被本决定取代）；门禁 `tests/abi/check_soname.cmake` |
 | 版本宏（`CPP_PINYIN_VERSION_MAJOR/MINOR/PATCH`、`kVersion`） | **不落地（已结案）**；树里只有构建期宏 `CPP_PINYIN2_VERSION_STRING`，**无版本分解宏** | `docs/DECISIONS.md` §2.1:948-953`；原文计划 `docs/DECISIONS.md`（已被标未采纳） |
-| `D2` / `D3` 的裁定 | **`D2` 已改判（2026-10-06）：`AnyNewerVersion` → `SameMajorVersion`**（用户口径：只要求 API 兼容、不为不存在的消费者做冗余；1.x 请求不得被 2.0 满足）；D3 = **不做版本宏** | `CMakeLists.txt:345-349` + `docs/DECISIONS.md` §2.1:963-973`（入库且自称唯一权威）；旧裁定记录见 l1 接口稳定台账第 209–210 行（**该文件未跟踪**，已被本次改判取代） |〔**2026-10-09 清除**：台账文档已删，去向见 提交历史〕
+| `D2` / `D3` 的裁定 | **`D2` 已改判（2026-10-06）：`AnyNewerVersion` → `SameMajorVersion`**（用户口径：只要求 API 兼容、不为不存在的消费者做冗余；1.x 请求不得被 2.0 满足）；D3 = **不做版本宏** | `CMakeLists.txt:345-349` + `docs/DECISIONS.md` §2.1:963-973`（入库且自称唯一权威）；旧裁定记录见 l1 接口稳定台账第 209–210 行（**该文件未跟踪**，已被本次改判取代） |〔**2026-10-09 清除**：那份台账文档已删，取回命令见本文开头〕
 
-- `[事实]` **本轮亲自复数的版本宏命中**：
+- `[事实]` **成文时亲自复数的版本宏命中**：
   `git grep -n "CPP_PINYIN_VERSION_\|kVersion" -- src include tools tests examples CMakeLists.txt`
-  ⇒ 3 行，全在构建期路径：`CMakeLists.txt:114`、`src/c_api_internal.h:32,33`。`src/c_api_lifecycle.cpp:9` 用它。
+  ⇒ 3 行，全在构建期路径：`CMakeLists.txt:303`、`src/c_api_internal.h:49,50`。`src/c_api_lifecycle.cpp:73` 用它。
   ⇒ **`include/` 下 0 命中**，与 `tests/abi/expected_public_headers.txt` 的现状一致。
 - `[事实]` **`cppp2_version()` 的值有门禁**：`tests/install/check_install_consumer.cmake` 校验安装树
   `.pc` 与 `ConfigVersion` 等于 `project(... VERSION)`（登记在 `tests/CMakeLists.txt:288-302`，
@@ -542,9 +585,9 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
   `tools/check_bindings.py` 的 `check_version_chain` 比对 CMake / `version.props` / wheel / nuspec / tag。
 - `[事实]` **`D2`/`D3` 的权威落点是分裂的**：入库的那句话在
   `docs/DECISIONS.md` §2.1:926-953`（自称唯一权威）；而"哪个选项被裁定成 (b)/(a)"的
-  决策台账只在 提交历史（**2026-10-09 起已跟踪**）。〔**2026-10-09 清除**：台账文档已删，去向见 提交历史〕  <!-- anchor-history: same ledger, with its deletion already noted -->
-  `[事实]` 另一处入库记录是 提交历史：`L1-D2` **"待拍板（现按推荐维持现状 + 文档写清，可回退）"**
-  —— **与"已结案/保持现状"的口径不完全一致**，本轮照实记录，不替任何一方作结论。
+  决策台账只在旧台账（**2026-10-09 起已跟踪**）。〔**2026-10-09 清除**：那份台账文档已删，取回命令见本文开头〕  <!-- anchor-history: same ledger, with its deletion already noted -->
+  `[事实]` 另一处入库记录是旧台账：`L1-D2` **"待拍板（现按推荐维持现状 + 文档写清，可回退）"**
+  —— **与"已结案/保持现状"的口径不完全一致**，成文时照实记录，不替任何一方作结论。
 
 ### 4.3 ③ 若改动什么会破？
 
@@ -572,7 +615,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
    的第 6 条原写 "**the struct does not grow: new options arrive as a new struct type plus a new entry
    point**"，与同文件 `cppp2_query_opts` 上方那段 APPENDED 规则正面冲突；该条已按后者重写为"新选项
    **APPENDED 在整个旧 `sizeof` 之后**，绝不落在旧声明留下的 padding 里"。
-   〔**2026-10-10 行号锚点改为名字锚点**：原条目按 `:21-24` / `:225-244` 引用，而本轮把那段 45 行的
+   〔**2026-10-10 行号锚点改为名字锚点**：原条目按 `:21-24` / `:225-244` 引用，而成文时把那段 45 行的
    "HOW THIS STRUCT GROWS" 压成头文件里的 "THE GROWTH RULE"（规则留头文件）+ §6.2.1（事故与 padding
    算术）两处 ⇒ **行号锚点整批失效**。结论不变、证据补一句：初版把 `include_reading` 追在旧声明的
    padding（28..31）上，实测用 `0x5A` 填充后"什么都没请求"的调用方拿到了结构化结果；现行
@@ -582,7 +625,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
    （`static_assert(sizeof(OldQueryOptsV1) == 32)` + `CHECK(offsetof(cppp2_query_opts, include_reading) >= 32)`）。
    ⇒ 引用"结构体怎么长"时**必须指到规则段本身**（名字锚点优先），只写"追加在末尾即可"是错的。
 7. `[推断]` **把 `BUILD_SHARED_LIBS` 默认值改成 OFF** ⇒ `ExportGate` 静默不注册
-   （`tests/CMakeLists.txt:250-257`，2026-10-06 复核改准；原引 `:227-217` 是反的区间、该文件里不存在），C ABI 面只剩链接期把守；`CMakeLists.txt:131-132` 的注释本身就
+   （`tests/CMakeLists.txt:283-284`，2026-10-27 重读改准；此前引的 `:227-217` 是反向区间、`:250-257` 已漂），C ABI 面只剩链接期把守；`CMakeLists.txt:131-132` 的注释本身就
    把"默认是共享"当作前提。
 8. `[推断]` **改 `COMPATIBILITY`**：改成 `ExactVersion` 而不做 `SOVERSION` + ABI 版本入口 ⇒
    按 `docs/DECISIONS.md` §2.1:944-946` 的说法属"做半套"；
@@ -624,7 +667,7 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 | R12 | 文档、示例与迁移指南只承诺 R2 的窗口，不得出现对更早版本的兼容承诺。 |
 | R13 | **数据/词典格式自报家门**：每个方言目录一行 `format.txt`（内容 = 数据格式代；2.0 线写 `2`），引擎在**读任何表之前**校验它。判定表：**存在且等于支持值 ⇒ 加载**；**缺失 ⇒ 按 v1 遗产纯文本格式接受**（用户自建目录不必改）；**大于支持值或非数字 ⇒ 响亮失败**（`Code::Load`，消息含目录、发现值与支持上限）；**目录里有 `dialect.json`（安装树产物的标志）却缺 `format.txt` ⇒ 也响亮失败**。用户词典 `user_dict.txt` **不加版本头**（格式冻结；库侧对用户文件是**刻意容忍**的，见 `src/dict/DictUtil.cpp:221-225`，因此不兼容的变化只能走新 API 或新文件名）；未来的二进制表**不得复用文本表名**（`*.cpdict` 用不同文件名 ⇒ 纯文本引擎报"表缺失"，而不是把二进制当文本半读）。**格式代的唯一权威是引擎侧的 `kSupportedDictFormat` 常量**。 |
 | R14 | **头文件里禁止 `using namespace cpp_pinyin::vN;`**：它会把一代的名字**再导出**到包含者的 TU，等于根名以"第三方头"的形式复活，而本仓的任何门禁都扫不到下游。文档只推荐 TU 局部别名 `namespace cp = cpp_pinyin::vN;`；`using namespace` 仅限 `.cpp`。 |
-| R15 | **托管面（Python/C#）也带代令牌**：Python 导入名 `cpp_pinyin{N}`、分发名 `cpp-pinyin{N}`；C# `AssemblyName`/`RootNamespace`/`PackageId` 均带令牌（`CppPinyin{N}`）。理由与 C++ 侧同一条：**每代用户可见的名字都带令牌** ⇒ 两代可共存且不可能静默串味。（现状 2026-10-19 实测：分发名 `cpp-pinyin2`、导入名 `cpp_pinyin2`、`AssemblyName`/`RootNamespace` = `CppPinyin2` **均已带**；**只有 `PackageId=CppPinyin` 未带**——两代若都发这个 id，NuGet 会静默合一。）**2026-10-20：这条已是可执行断言** —— `tools/check_bindings.py` 的 `check_csharp_identity` 冻结这三个属性的值（唯一带 `<PackageId>` 的 csproj 必须等于 `CppPinyin` / `CppPinyin2` / `CppPinyin2`），改值必须同批改该表并留下评审记录；此前无任何门禁看这三个属性（审计 round 3 的 H28） |
+| R15 | **托管面（Python/C#）也带代令牌**：Python 导入名 `cpp_pinyin{N}`、分发名 `cpp-pinyin{N}`；C# `AssemblyName`/`RootNamespace`/`PackageId` 均带令牌（`CppPinyin{N}`）。理由与 C++ 侧同一条：**每代用户可见的名字都带令牌** ⇒ 两代可共存且不可能静默串味。（现状 2026-10-19 实测：分发名 `cpp-pinyin2`、导入名 `cpp_pinyin2`、`AssemblyName`/`RootNamespace` = `CppPinyin2` **均已带**；**只有 `PackageId=CppPinyin` 未带**——两代若都发这个 id，NuGet 会静默合一。）**2026-10-20：这条已是可执行断言** —— `tools/check_bindings.py` 的 `check_csharp_identity` 冻结这三个属性的值（唯一带 `<PackageId>` 的 csproj 必须等于 `CppPinyin` / `CppPinyin2` / `CppPinyin2`），改值必须同批改该表并留下评审记录；此前无任何门禁看这三个属性（此前无任何门禁看这三个属性） |
 | R16 | **公开的别名/回调类型必须带代身份**：`using X = std::function<…>` 这类 RHS **只含标准库类型**的公开名，在两代之间会是**同一个类型**（`is_same_v` 为真），于是"写错代"不会报错。这类别名必须改成版本命名空间**内定义的类型**（构造成员保留"lambda 可直传"）。G3 的"逐个名字断言跨代不同类型"探针负责把它量出来。 |
 
 **升级一个版本时要做什么**（对调用方，逐条可执行）：
@@ -648,10 +691,10 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 **不要**动旧代的命名空间体（它永远是 `vN`），也**不要**为旧代补任何"同名兼容名"（R12）；
 **不要**在任何公共头里写 `using namespace cpp_pinyin::vN;`（R14），也**不要**新增 RHS 只含标准库类型的公开别名（R16）。
 
-**数据侧的第二个版本号 `min_library`：它与换代的关系（2026-10-20 补，审计 H46）**
+**数据侧的第二个版本号 `min_library`：它与换代的关系（2026-10-20 补）**
 
 `data/dialects/*/dialect.json` 的 `min_library` 是**手写的第二份库版本**（产地是词典仓，本仓只消费），它同时
-被两条规则约束，**两条都在 `tools/check_version_tokens.py` 的第八轴里逐轮核对**：
+被两条规则约束，**第一条在 `tools/check_version_tokens.py` 里逐轮核对（`min_library ≤ 包版本`），第二条是人的规则、机器只记录不校验**：
 
 1. **不得超过包版本**（`min_library ≤ project(... VERSION ...)`）—— 超过等于宣称"本库读不了自己的数据"；
 2. **只在数据真的需要更新的库时才抬**：抬它等于承诺"低于此版本的库拒绝加载这份数据"（D4 的运行期表现是
@@ -678,28 +721,47 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 
 
-1. `[事实]` **四个面里没有任何一个的子断言在 CI 被观察运行过**（§1.2 的 `ci.yml:11-12` 自述、
-   §4.2 里 `tests/CMakeLists.txt:463` 的 "whose trigger workflow has never run on GitHub"）。
-   本机能验的三分之四（线程、多实例、ABI 的源级/符号级）全部落在本机 CTest 上。
+1. `[2026-10-09 的记录]` **当时四个面里没有任何一个的子断言在 CI 被观察运行过**（§1.2 的 `ci.yml` 触发段自述、
+   §4.2 引的 `tests/CMakeLists.txt` 那句 "whose trigger workflow has never run on GitHub"）。当时本机能验的
+   三分之四（线程、多实例、ABI 的源级/符号级）全部落在本机 CTest 上。
+   **2026-10-27 更新：这条已不成立。** `test_runner.yml` 那条链自 2026-10-22 起真在 GitHub 上跑，
+   2026-10-23 全绿（运行记录、job 清单见本文件 §0.1），这些 ctest 子断言因此都在 CI 里被观察运行过。
+   `tests/CMakeLists.txt` 与 `ci.yml` 里那几句"从未跑过"的自述**同批过期**，§0.1 已把接线现状改准。
 2. `[事实]` **"能不能验"取决于配置，不只取决于代码**：`ExportGate` 只共享构建注册
-   （`tests/CMakeLists.txt:250-257`，2026-10-06 复核改准）；`InstallConsumerSmoke` 需要 `CPP_PINYIN2_INSTALL`
+   （`tests/CMakeLists.txt:283-284`，2026-10-06 复核改准）；`InstallConsumerSmoke` 需要 `CPP_PINYIN2_INSTALL`
    （`:271`）；`BindingGates`/`LayerIncludes`/`DocClaimsSelfTest` 需要 Python3（`:421-422`，
    缺则 `FATAL_ERROR` `:468-470`）；`MinimalUsage` 只在 examples 打开时存在
    （`examples/CMakeLists.txt:48-59`）。⇒ 引用任何一个"门禁在"的说法，必须同时说清是**哪套配置**。
-3. `[事实]` **每条门禁几乎都带自证**：`ExportGateSelfTest`（`tests/CMakeLists.txt:237`）、
+3. `[事实]` **每条门禁几乎都带自证**：`ExportGateSelfTest`（`tests/CMakeLists.txt:292`）、
    `DialectSetGateSelfTest`（`:244`）、`BindingGatesSelfTest`（`:462`）、`InstallConsumerSmoke*SelfTest`
    （`:278,295`）、`LoadCheckSelfTest`（`:383`）、`CorpusGateSelfTest`（`:134`）、
-   `DumpEquivalenceSelfTest`（`tools/CMakeLists.txt:56`）。⇒ `[推断]` 这套仓库的惯例是"门禁必须能证明自己会红"，
-   因此新增稳定性门禁时**大概率会被要求配一个自证/负对照**（这是惯例推断，不是文档规定）。
-4. `[事实]` **"可执行的稳定性断言"与"文档里的稳定性陈述"之间的那道差，本轮被消掉了一条**：
-   提交历史里的 L6 行原把"多实例/线程用例进 CTest 并计入真实测试数"记为**未完成**；
+   `DumpEquivalenceSelfTest`（`tools/CMakeLists.txt:56`）。
+   **2026-10-27 起这条不再只是推断，而是规定**（原文写的是"惯例推断，不是文档规定"）：
+   任何新增或修复的**守卫分支**——拒绝型 `return false`、`Code::Load` / `Code::NotReady` / `Code::Internal`、
+   边界与上界检查——必须同时留下**负对照**，即"把守卫删掉或改回旧值，某个测试必须变红"的可复现证据，
+   并且该证据要能被别人照做（写进提交信息或紧邻的注释）。
+
+   **为什么从"惯例"升级为"规定"**：2026-10-27 的源码逐模块审读（审计报告 §8.17）在四处发现"守卫在、
+   证据无"，其中**两处是此前修过的缺陷，只剩注释记得**——词组桶的 8 位计数上界（`src/dict/PhraseIndex.cpp`，
+   守门曾误写成 `0xFFFF`）、词典清单里 `Engine::open` 够不到的两条守门（`src/dict/DictManifest.cpp`）。
+   另外两处是：`Code::Internal` 从未被任何测试触发过（唯一生产点是 `catch (...)`），以及移动后状态的
+   `loadTraditionalDict` 在七个入口里唯一没有断言。⇒ **"修过"与"钉住"是两件事**：只靠注释记录的修复，
+   下一次重构就会悄悄复活。
+
+   **负对照的三种可接受形态**：① 临时改坏守卫、跑测试看它红、再还原（本项目最先用的形态，见
+   `tools/check_doc_claims.py` 的 `gate-total` 轴）；② 新增一个**专用自检条目**，用与生产不同的输入打靶
+   （如 `DictSelfCheck` 直接调 `checkDictManifest`，因为公开 API 到不了那两条守门）；③ 让守卫的**两侧边界**
+   都进测试（正好 255 必须过、再多一个必须拒），因为只测拒绝一侧时，索引提前拒绝也会让测试"通过"。
+
+4. `[事实]` **"可执行的稳定性断言"与"文档里的稳定性陈述"之间的那道差，成文时被消掉了一条**：
+   旧台账里的 L6 行原把"多实例/线程用例进 CTest 并计入真实测试数"记为**未完成**；
    2026-10-04 补了 `ThreadSafety` / `InstanceIsolation` 两条独立条目（`tests/CMakeLists.txt:120-123`）
    ⇒ 这两组用例现在**既是独立条目、又计入真实测试数**，"按 case 计还是按条目计"的口径争议随之消失
    （注册表的那一对本来就是独立条目：`:426,431`）。
-5. `[事实]` **多个"稳定性"相关事实的文字记录在未跟踪文件里**：
-   提交历史（L1–L6 台账）与 提交历史〔**2026-10-09 清除**：台账文档已删，去向见 提交历史〕
-   （D2/D3 决策、AC 逐条核验）。它们**不在 git 里**，
-   因此引用它们时必须说明"这是未跟踪台账"，不能当作入库权威。
+5. `[事实]` **多个"稳定性"相关事实只以文字记录存在，而那批记录已不在树里**：
+   旧台账（L1–L6 台账、D2/D3 决策、AC 逐条核验）在 2026-10-22 随过程记录一并删除（取回命令见本文开头）；
+   它 2026-10-09 起曾被跟踪，此前是未跟踪文件。因此引用这类内容时必须写明"来源是过程记录"，
+   不能当作入库权威。
 6. `[事实]` **补充门禁（互补，不是替代）：断言开启构建也要跑一遍套件**（2026-10-06 在 HEAD `0d883e7` 实测）。
    本仓库**既有门禁全部在 Release 下跑**，`NDEBUG` 把 `assert` 编掉 ⇒ "不变量被违反"这一类缺陷对它们
    **完全隐形**（这正是当年"打包进去的 DLL 一 abort、而门禁全绿"的成因）。补跑办法只是换一个
@@ -735,27 +797,26 @@ ABI 是"部分能验"（差二进制兼容这一维，原因是没有消费者�
 
 ---
 
-## 6. 本轮未能核实 / 明确留给下一个人的事
+## 6. 成文时未能核实 / 明确留给下一个人的事
 
-1. `[未证实]` CI（尤其 `linux-sanitizers`）**是否真的在 GitHub 上跑过、结果如何**（§1.2）。
-   本轮禁止联网，无法查 Actions 历史。
+1. `[未证实]` CI（尤其 `linux-sanitizers`）**是否真的在 GitHub 上跑过、结果如何**（§1.2）。 〔**2026-10-27 更新：这一问已有答案** —— §0.1 记 `test_runner.yml` 于 2026-10-23 全绿（19 个 job，运行 `39877724768`）；仍没跑过的是 `release_prep.yml`，见 §0.1 第二段。下面"查不了 Actions 历史"是成文时的限制。〕
+   成文时禁止联网，无法查 Actions 历史。
 2. `[未证实]` 开发板（firefly.local / 内核 4.4）上 ASan 失败的确切原因 ——
-   提交历史 自己就把"内核 4.4 拿不到影子内存预留"标为**推断、未证实**；本轮未连板。
-3. `[未证实]` 提交历史里的 `L1-D2` "待拍板" 与 提交历史〔**2026-10-09 清除**：台账文档已删，去向见 提交历史〕
-   的"保持现状"哪个是当前裁定 —— 两处都是文字记录，且后者未跟踪。**本文只记录分歧**。
-4. `[未核实]` 提交历史 里引用的 HEAD（`afc481d` 等）与本轮实测 HEAD `5fd861f`〔**2026-10-09 清除**：台账文档已删，去向见 提交历史〕
-   不同 ⇒ 该台账的**行号与提交号已过期**；本文所有行号均来自本轮重读，未转抄它。
+   旧台账自己就把"内核 4.4 拿不到影子内存预留"标为**推断、未证实**；成文时未连板。
+3. `[未证实]` 旧台账里的 `L1-D2`（"待拍板"）与该台账 2026-10-09 那份清除记录里的"保持现状"哪个是当前裁定
+   —— 两处都是文字记录，且后者当时未跟踪。**本文只记录分歧**。
+4. `[未核实]` 旧台账里引用的 HEAD（该台账 2026-10-09 已清除，取回命令见本文开头；它引的提交号在本仓历史里**已不可解析**）与成文时实测
+   HEAD（那个提交号同样已不可解析）不同 ⇒ 该台账的**行号与提交号已过期**；本文所有行号均由成文时重读得来，未转抄它。
 5. `[未核实]` 工作区里被修改的 tracked 文件与本文引用的行号可能处于"已改未提交"状态；本文读到的是
-   **磁盘上的当前内容**，不是提交 `5fd861f` 的内容。
+   **磁盘上的当前内容**，不是某个已提交版本的内容。
    `[事实]` 本条不是理论问题：**起草期间工作区就变过一次** —— 开始时 `git status` 显示
-   提交历史、`docs/PERFORMANCE.md`、`tools/CMakeLists.txt`、板上夹具的 README（本机保留）、
-   `board_baseline.sh`（本机保留）5 个文件被修改；那些改动随后由本会话提交为 `4394513`
-   ；
+   旧台账、`docs/PERFORMANCE.md`、`tools/CMakeLists.txt`、板上夹具的 README（本机保留）、
+   `board_baseline.sh`（本机保留）5 个文件被修改；那些改动随后被提交（那次提交的哈希在本仓历史里已不可解析）；
    `tools/CMakeLists.txt` 虽被重写过（mtime 晚于本文引用它的时间），**内容与行号逐行复核未变**
-   （仍 67 行，`:47,53,56,57` 同前）。⇒ 引用本文的提交号是必需的：本文描述的是 `4394513` 那棵树的磁盘状态。
+   （仍 67 行，`:47,53,56,57` 同前）。⇒ 引用本文的提交号是必需的（成文时它指向的那棵树），本文描述的是那一刻磁盘上的状态。
 6. ~~`[未核实]` 本机当前是否真的装着一个没有 libasan 的 MinGW（`CMakeLists.txt:190-191` 的记录）；
-   本轮禁止构建，无法实测本地 sanitizer 路径。~~
+   成文时禁止构建，无法实测本地 sanitizer 路径。~~
    **2026-10-06 更新（部分已实测）**：本地 sanitizer 路径**已在本机跑通一次**（clang/MSVC 目标窄路，
-   配方与数字的唯一处见 §1.1）⇒ 本条原来那句"本机不可验"**不再成立**；但 MinGW 那条路**本轮未重测**，
+   配方与数字的唯一处见 §1.1）⇒ 本条原来那句"本机不可验"**不再成立**；但 MinGW 那条路**成文时未重测**，
    而且"本机跑通"**不证明** §6 第 1 条（CI 腿）与第 2 条（板）任何事。**仍未验证**：Debug 档 10 红的
    **机制**（§1.1 里标 `[推断]`）、Windows 无 LeakSanitizer 这一维。

@@ -1,13 +1,12 @@
 # The contract (2.x)
 
-This is the in-repo home of the rules the public headers used to cite from the working ledger under
-提交历史. It used to say that ledger was untracked, and that this file therefore "ships with the
-repository and with the package, so a clone of this tree always carries its own authority"; since the
-2026-10-09 documentation cleanup the **ledger is tracked too** (the only part of it that is not is the
-`doc-claims`/anchor exclusion, which is a reading rule, not a shipping one) -- and it is still
-**excluded from `git archive`**, so the package keeps carrying this file as its authority rather than the
-ledger. Decision N1 (A), taken in the interface plan's section 4.1 and since retired in the 2026-10-09
-documentation cut, is what created this file .
+This is the in-repo home of the rules the public headers used to cite from the working ledger. That ledger and
+the interface plan beside it were process records under `tests/data/testdata/`; they were removed in the
+2026-10-22 cleanup, and `git log --diff-filter=D -- tests/data/testdata/` still reaches them. Their load-bearing
+facts moved first -- the rulings to `docs/DECISIONS.md` §2.1 -- and what survives in the tree is this file. It
+ships with the repository and with the package, so a clone of this tree always carries its own authority, and it
+is **excluded from `git archive`** so the package keeps carrying this file rather than a ledger. Decision N1 (A),
+taken in the interface plan's section 4.1, is what created this file.
 
 **How to read the status markers.** Each section says whether the rule is *live* in this tree or
 *planned*. A rule that is planned is not a promise about the code you are reading -- it is the
@@ -34,10 +33,14 @@ before anyone relies on it.
   `write_basic_package_version_file(... COMPATIBILITY SameMajorVersion)` means
   `find_package(cpp-pinyin2 1.x)` is refused by a 2.x install instead of silently configuring and
   then failing to compile. One `find_package` behaviour, one place that decides it.
-- **The public surface is four frozen lists, and they are the only authority:**
+- **The public surface is six frozen lists, and they are the only authority:**
   `tests/abi/expected_public_headers.txt`, `tests/abi/expected_c_api_symbols.txt`,
   `tests/abi/expected_plugin_surface.txt` and `tests/abi/expected_public_names.v2.txt` (the C++
-  names of this generation). `docs/REQUIREMENTS.md` carries the human-readable count
+  names of this generation), plus the two added later: `tests/abi/expected_public_members.txt`
+  (the frozen member declarations, read by `tools/check_public_surface.py`) and
+  `tests/abi/expected_c_api_signatures.v2.txt` (the C ABI signature baseline, regenerated with
+  `python tools/check_bindings.py --emit-signatures` in the same commit as any `c_api.h`
+  declaration change). `docs/REQUIREMENTS.md` carries the human-readable count
   and is machine-checked against those files. A change to any of them is made in the same
   commit as the change it describes; there is no "list follows later".
 - **Names containing `detail`, `impl`, `internal` are never part of the surface**, no matter which
@@ -88,26 +91,20 @@ refused. The four lists are at the paths above.
 ## 3. Structured readings (the `Syllable` rules)
 
 **The four rules are stated once, in `include/cpp-pinyin2/core/Syllable.h`** (the block introducing the
-structure). That wording is what `tests/cpp/test_syllable_contract.cpp` pins, so it is the authority: any
-second copy necessarily drifts from it. This section used to restate the four rules in English while the
-header called itself "verbatim from docs/CONTRACT.md section 3 (authoritative wording)" -- each pointing at
-the other, with slightly different text (the English version had dropped the `markNeutralAs5` 0/5 nuance and
-the entering-tone `-p/-t/-k` detail). 2026-10-20 (audit round 2): the copy here is gone, and the rules are
-summarised in one line instead --
+structure) and `tests/cpp/test_syllable_contract.cpp` pins that wording. The header is normative; the list
+below is an index of it, not a second copy:
 
 1. `tone` comes from the word list, never parsed out of a rendered string.
 2. `tone_kind` describes the table entry and changes no output byte.
 3. The two neutral-tone encodings are the same thing at this layer.
 4. Dialect numbers are used as the data gives them (no private 7/8/9 renumbering).
 
-Read them as an index, not as the wording: **the header is normative.**
-
 `spelling` (decision N5) is the word list's original spelling, filled whenever readings or
 candidates were asked for. `candidates` stays a vector of strings, and its de-duplication key is
 fixed to the rendered string -- changing that key would change `candidate_count` and the frozen
 summary.
 
-*STATUS: live for rules 1-4 and for `spelling`; the "verbatim" source of the four rules is the
+*STATUS: live for rules 1-4 and for `spelling`; the wording of the four rules lives in the
 header block itself.*
 
 ## 4. Threading
@@ -125,7 +122,7 @@ header block itself.*
   this bullet is a summary here and the normative wording lives with the declarations.
 
 *STATUS: live for all three bullets. The third one used to be a requirement stated only in this file,
-with the headers deferring to a batch B7 that never landed; 2026-10-20 (audit round 2) put the wording
+with the headers deferring to a batch B7 that never landed; 2026-10-20 put the wording
 into both headers, so this document is now a pointer for it rather than its only home.*
 
 ## 5. Style identity
@@ -144,9 +141,9 @@ into both headers, so this document is now a pointer for it rather than its only
   (`include/cpp-pinyin2/dialects/ManTone.h:11` says so in as many words). There is **no normalization of style names**
   anywhere: `tolower`/`toupper` have 0 hits under `src/` and `include/`. That is a statement about
   *names*; a dialect normalizing its **external readings** is a different thing and does exist
-  (`ToneConverter::normalizeReading`, and `include/cpp-pinyin2/ext/Dialect.h:41` names both roles in one sentence).
+  (`ToneConverter::normalizeReading`, and the comment above `ToneConverter tone;` in `include/cpp-pinyin2/ext/Dialect.h` names both roles in one sentence).
 - **A default-constructed `ToneConverter` is legal**, and an empty style slot is a documented
-  pass-through, not an inconsistency: `include/cpp-pinyin2/ext/Dialect.h:41-43` -- "every style slot is empty, so every
+  pass-through, not an inconsistency: `include/cpp-pinyin2/ext/Dialect.h:42-44` -- "every style slot is empty, so every
   style passes the reading through unchanged". A dialect that declares three styles and fills three
   slots is therefore well formed even though the shared number domain is larger.
 
@@ -184,8 +181,9 @@ not part of the contract and lives in the review record, not here.) `StyleDecl` 
   result per input byte of Chinese** (one `Segment` per character + one extra copy on the C face); a 1 MiB
   input peaks around 100 MB. The measurements behind that factor are in `docs/PERFORMANCE.md`, the decision
   not to impose a cap is in `include/cpp-pinyin2/ext/c_api.h`.
-- **C#**: one-to-one with the C ABI. The suite DECLARES net7.0 and net10.0 and `test_csharp.yml` is set up
-  to run both, but that workflow has never executed on GitHub -- the local runs are the only evidence so far.
+- **C#**: one-to-one with the C ABI. The suite runs net7.0 and net10.0, and `test_csharp.yml` runs
+  both in CI as part of the `test_runner` chain (2026-10-23, run `39877724768`, every job green --
+  `docs/STABILITY.md` §0.1 holds that run and its job list).
 - **A third-party dialect cannot be registered from C, Python or C#.** Registration is a C++
   facility (`include/cpp-pinyin2/ext/Registry.h`); the bindings can only use dialects that the library already knows.
   This is a hard fact of the current design, not an oversight, and it is stated here so nobody has

@@ -82,7 +82,6 @@ std::cout << jres.value().join();  // "nei5 hou2 sai3 gaai3"
 
 > **Cross-generation compatibility and evolution policy** (v2 / v3 / v4...): see [`docs/STABILITY.md`](STABILITY.md) section 4.5 -- this document covers API usage; the compatibility promises, the generation rules and which surfaces must carry the token live there (single authority).
 
-
 All public interfaces live in `namespace cpp_pinyin`.
 
 ---
@@ -257,10 +256,9 @@ public:
 };
 ```
 
-> ! **This section used to say the tone converters "are not part of the public API" -- that half was wrong**
-> (corrected 2026-10-10): the built-in `ManTone` / `CanTone` are internal, but the base class
-> `ToneConverter` is exported, and it is exactly the extension point a custom dialect subclasses (the
-> built-ins are no longer public classes of their own either -- see section 5).
+> **`ToneConverter` is exported**: the built-in `ManTone` / `CanTone` are internal, but the base class
+> `ToneConverter` is the extension point a custom dialect subclasses (the built-ins no longer have public
+> classes of their own either -- see section 5).
 
 - `NormalizeFunc` is a **function pointer rather than a virtual, deliberately**: the engine holds an *object
   copy* of the converter, and a value copy slices to this base subobject, so a virtual would **silently** fall
@@ -408,7 +406,10 @@ std::u16string utf8strToU16str(const std::string &utf8);  // With surrogate pair
 
 - `utf8strToU16str` handles 1-to-4-byte UTF-8 sequences
 - 4-byte sequences (U+10000+) encoded as UTF-16 surrogate pairs
-- Invalid UTF-8 sequences throw `std::invalid_argument`
+- **Malformed UTF-8 becomes U+FFFD — one replacement per malformed code point, never an exception.**
+  1.x threw `std::invalid_argument`; 2.0 makes the conversion total on purpose, `src/U16Str.cpp` carries the
+  reason and `tests/cpp/test_boundary_utf8.cpp` pins it. A 1.x caller that used the throw as validation must
+  now check for U+FFFD. (Until 2026-10-27 this bullet described the 1.x behaviour.)
 
 ---
 
@@ -429,10 +430,8 @@ Each language directory (`mandarin/`, `cantonese/`) contains:
 ## 9. Mandarin Tone Sandhi (ToneSandhi.h)
 
 An **optional caller-side post-pass** -- it is never run inside `query()`, so query behaviour
-and performance stay unchanged. It rewrites `rendered` and writes the new tone into the C++ side's `Segment::reading.tone` (that field is
-the rule's own output; this sentence used to say "rewrites `rendered` only", which the implementation
-contradicted): `text`, `candidates`, `failure_kind`
-and the row count are untouched.
+and performance stay unchanged. It rewrites `rendered` and writes the new tone into the C++ side's `Segment`
+(the rule's own output). `text`, `candidates`, `failure_kind` and the row count are untouched.
 
 ```cpp
 #include <cpp-pinyin2/core/ToneSandhi.h>
@@ -534,9 +533,8 @@ h = lib.cppp2_open(None, b"mandarin", b"D:/path/to/dict", None)  # the error cha
 
 `cppp2_version()` returns the **package version** -- the number `find_package(cpp-pinyin2 <ver>)`
 resolves. It is written down once, in the root `CMakeLists.txt`'s `project(... VERSION)` (D32/D34).
-As of 2026-10-01 this document's header no longer carries a version of its own; it used to say
-"2.0.0" while the package version was 1.0.2 . `v2.x`<!-- doc-claims: historical -->
-elsewhere in this document is an internal refactoring phase label, not the package version.
+As of 2026-10-01 this document's header carries no version of its own. `v2.x` elsewhere in this document
+is an internal refactoring phase label, not the package version. <!-- doc-claims: historical -->
 
 **`cppp2_dict_dir_candidate()` (added 2026-10-18, the 20th ABI symbol; **the frozen face holds 22 as of 2026-10-21** -- the two `load_*_dict_ex` entries joined that day, so this is the ordinal it took when it was added)**: where *this build* installed the
 dictionary tables, derived from the **library's own module location** (`<module dir>/../share/cpp-pinyin2/dict`).
@@ -545,11 +543,12 @@ is exactly the guess this library refuses to make). It is **not a default** (`cp
 `dict_dir`), **not an environment override** (reading `CPP_PINYIN2_DICT_DIR` is the shell's job) and **not a
 check** (call `cppp2_open` and let it name the missing file). It exists for hosts that link the library with no
 CMake package and no `.pc` file -- a Qt application, a Unity/UE plugin -- so they need not hard-code a path.
-**C++ hosts call `cpp_pinyin::v2::dictDirCandidate()`** (added 2026-10-20, audit round 3 H05): same cache, same
+**C++ hosts call `cpp_pinyin::v2::dictDirCandidate()`** (added 2026-10-20): same cache, same
 answer; the difference is that it returns a `std::string` copy you may keep, while the C face returns a
 `const char *` into that cache (empty / `NULL` in a static build). Until then this question had a C face and
 both shells and no C++ face -- while the hosts it exists for are precisely the ones without a CMake package.
-Decision and boundaries: 提交历史.
+Decision and boundaries: the process record that carried this ruling lived under `tests/data/testdata/` and was
+removed in the 2026-10-22 cleanup; the boundary that still binds is the sentence above.
 
 Gate: the CTest entry `CApiSmoke`, a C99 translation unit compiled by the **C compiler**, touching the
 struct fields the way an FFI consumer does.

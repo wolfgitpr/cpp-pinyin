@@ -14,7 +14,7 @@ so they cannot drift apart.
 > **2.0.0 尚未打 tag** ⇒ 本仓是「待发布」而非「已发布」。
 > 下面这一节就是 2.0.0 的完整说明，**发布当天只做一件事：把本节标题改成 `## [2.0.0] - YYYY-MM-DD`**，
 > 不要在这一天之前写上一个日期（2026-10-16 曾提前写死过一天，属记录错误，2026-10-18 改回本形态）。
-> 发布清单（要发一版时该做什么的唯一落点）在 docs/RELEASE_CHECKLIST.md（原 PLUGIN 文档第 6.7.11 节）；本文件的版本标题是其中的**第 ⑦ 处版本投影**，**由 `tools/check_version_tokens.py` 的第 10 轴自动核对**（2026-10-20 起；此前这句写的是"目前无门禁"，那句话已过期，见审计 round 3 的 H27）。
+> 发布清单（要发一版时该做什么的唯一落点）在 docs/RELEASE_CHECKLIST.md（原 PLUGIN 文档第 6.7.11 节）；本文件的版本标题是其中的**第 ⑦ 处版本投影**，**由 `tools/check_version_tokens.py` 的第 10 轴自动核对**（2026-10-20 起）。
 
 Version 2.0.0 is a rewrite rather than a release with additions. It turns the library into something you
 instantiate, gives it a C ABI, and builds Python and C# shells on that ABI. The public C++ and C surfaces are
@@ -90,6 +90,14 @@ ones a 1.x user will notice.
   `cppp_is_ready` / `cppp_last_error` pair is gone -- a failed `cppp2_open` reports through its
   error out-parameter instead, which is the only failure a handle can carry -- while
   `cppp2_apply_tone_sandhi` and `cppp2_style_list` / `cppp2_style_list_free` arrived.
+- **`utf8strToU16str` is a total function: malformed UTF-8 becomes U+FFFD instead of throwing.** 1.x threw
+  `std::invalid_argument` ("Invalid UTF-8 sequence") on input its decoder rejected; 2.0 maps each malformed
+  code point to exactly one U+FFFD and never throws. The reason it is a total function rather than a
+  cleanup: the engine emits one result row per input code point and the accuracy corpora align positionally,
+  so every caller had to catch and re-map the exception anyway. `src/U16Str.cpp` states it and
+  `tests/cpp/test_boundary_utf8.cpp` pins it. A 1.x caller that used the throw as its input validation must
+  check for U+FFFD instead. Until 2026-10-27 `README.md` and both API pages still documented the 1.x
+  behaviour.
 
 ### Added
 

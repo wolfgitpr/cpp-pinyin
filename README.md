@@ -261,174 +261,43 @@ The shell's class/constructor names did **not** change: `Engine(dialect_id=..., 
 
 ## API Reference
 
-All public types live in the `cpp_pinyin` namespace.
+All public types live in the `cpp_pinyin::v2` namespace. This page does not restate the signatures --
+the headers are the authority, and `docs/API_zh.md` / `docs/API_en.md` enumerate every type and member
+with examples.
 
-### Character classification (core/G2pglobal.h)
+| You are looking for | Authority |
+|---|---|
+| `Engine`, `EngineConfig`, `Outcome`, `Code`, `Error` | `include/cpp-pinyin2/core/Engine.h`, `core/Types.h` |
+| `Segment`, `Result`, `Syllable`, `Style`, `ToneKind` | `include/cpp-pinyin2/core/Types.h`, `core/Syllable.h` |
+| `Dialect`, `ToneConverter`, `StyleDecl`, `Registry` (the plugin surface) | `include/cpp-pinyin2/ext/Dialect.h`, `core/ToneConverter.h`, `ext/Registry.h` |
+| Character predicates (`isHanzi`, `isSpace`, ...) | `include/cpp-pinyin2/core/G2pglobal.h` |
+| Mandarin tone sandhi | `include/cpp-pinyin2/core/ToneSandhi.h` |
+| UTF-8 / UTF-16 conversion | `include/cpp-pinyin2/core/U16Str.h` |
+| The C ABI (`cppp2_*`) | `include/cpp-pinyin2/ext/c_api.h` |
 
-```cpp
-bool isLetter(char16_t c);
-bool isHanzi(char16_t c);       // 0x3400..0x4DBF, 0x4E00..0x9FFF, 0xF900..0xFAFF
-bool isKana(char16_t c);        // Hiragana + Katakana
-bool isDigit(char16_t c);       // 0-9
-bool isSpace(char16_t c);       // ' ' only
-bool isSpecialKana(char16_t c); // Small kana (ャ, ュ, ョ, etc.)
-```
+Cantonese declares three styles (`NORMAL` 0, `FIRST_LETTER` 3, `TONE3` 8 -- `zung gwok`, `z g`,
+`zung1 gwok3`); it has no `INITIALS`/`FINALS` styles yet. Mandarin's style table is in `core/Types.h`.
 
-### Segment (core/Types.h)
-
-```cpp
-struct Segment {
-    std::string text;       // Original input run (UTF-8); ASCII letter/digit runs stay together
-    Syllable reading;       // Structure of the reading PICKED for this position (initial/fin/tone/
-                            // tone_kind/source). A failed row -- or one whose string a plugin
-                            // callback wrote -- keeps the default value: it describes nothing.
-    // Every reading of *this* character (dictionary order, de-duplicated after style
-    // conversion). Empty when `includeCandidates == false` -- except on failed rows, which
-    // always carry `{text}`. A phrase/user-dictionary hit may pick a reading that is
-    // not `candidates[0]`, or is not in `candidates` at all (see docs/REQUIREMENTS.md K9).
-    // Still strings, not structures: 7 readings in the shipped corpora are not invertible
-    // (`yo`, `yō`, `ǹ`, `ḿ`, `hm`, ...), so a structure cannot be rendered back to the stored
-    // spelling -- moving this column needs the renderer entry point first.
-    std::vector<std::string> candidates;
-    Code failure_kind = Code::Ok;  // Non-Ok when conversion failed (the old `failed` flag)
-    std::string rendered;   // The row's one rendered string; equals `text` when failed
-};
-```
-
-### Result (core/Types.h)
-
-A `Result` is a read-only sequence of the `Segment` rows above (authority:
-`include/cpp-pinyin2/core/Types.h`). There is **no `readings()` member** — the rows carry the
-readings, so ask the row:
+### The three calls most code needs
 
 ```cpp
-class Result {
-public:
-    using value_type = Segment;
-    using const_iterator = std::vector<Segment>::const_iterator;
-
-    bool empty() const noexcept;
-    std::size_t size() const noexcept;
-
-    const Segment& at(std::size_t i) const;    // throws std::out_of_range
-    const Segment& operator[](std::size_t i) const noexcept;
-    Segment& at(std::size_t i);               // mutable: for post-passes such as tone sandhi
-    Segment& operator[](std::size_t i) noexcept;
-
-    std::string join(const std::string &delimiter = " ") const; // all rows' `rendered`, joined
-    std::vector<std::string> toVector() const;                  // the same, as a vector
-};
+cpp_pinyin::v2::Engine engine(dialect, dictRoot);        // or Engine::open(registry, dictRoot, "mandarin")
+auto result = engine.query("中国");                       // Outcome<Result>; check it before reading
+for (const auto &seg : result.value()) std::cout << seg.rendered;   // Outcome has value()/error(),
+                                                        // no operator* -- value() throws on failure
 ```
-
-`join()` joins **`Segment::rendered`**, i.e. the reading each row actually got — not its candidates.
-
-### Styles and configuration (core/Types.h)
-
-#### EngineConfig
 
 ```cpp
-struct EngineConfig {
-    Style style;                            // Style{} asks for the dialect default; an explicit 0 is NORMAL
-    ErrorHandling onError = ErrorHandling::Default;
-    bool includeCandidates = true;
-    bool includeReading = false;            // fills Segment::reading; off by default (hot path)
-    bool vToU = false;                      // ignored, not reinterpreted, where unsupported
-    bool markNeutralAs5 = false;            // same masking rule
-};
+// Structured readings: Segment::reading carries initial / fin / tone / tone_kind / source.
+// `candidates` stays a column of STRINGS on purpose -- seven shipped readings cannot be
+// rendered back from (initial, fin), so moving it to structures needs the renderer first.
+config.includeReading = true;
 ```
-
-#### Engine
-
-`cpp_pinyin::v2::Engine` 是唯一的公开入口：用 `cpp_pinyin::v2::Engine::open(registry, dictRoot, dialectId)` 从注册表
-取方言，或用 `Engine(const Dialect&, dictDir[, subdir])` 直接按描述构造（不看注册表，适合未注册的方言）。
-
-两处失败都走**同一条错误通道**：`open` 与查询都返回 `Outcome`，失败时 `error().code`（`Code::NotReady` /
-`Code::Load`）配 `error().detail`（详情里带上是哪个文件、哪个目录）。**完整签名与逐条语义以
-`include/cpp-pinyin2/core/Engine.h` 为准**（这里不复制一遍，避免同一份 API 三处维护），逐条可编译示例见
-`docs/API_zh.md` / `docs/API_en.md`。
-
-> **描述构造没有 `Outcome` 可返回**，所以它失败时既不会抛、也不会留一个"看似成功"的半成品：对该对象
-> **查询**会明确回 `Code::NotReady`，`error().detail` 给出原因（是哪个目录、哪个文件）；`open` 则干脆不交出
-> 这样的引擎——它在返回前就检查完，把同一句话放进 `Code::Load` 的 `detail`。
-> 旧的 `isReady()` / `lastError()` 公开访问器**已删除**（S11a 收尾）：就绪与否对使用者只有上面这两条错误
-> 通道可读；引擎内部那个等价判断仍在，但已是私有实现，不再属于公开接口。
-
-#### MandarinStyle
-
-| Style | Value | Example |
-|-------|-------|---------|
-| `NORMAL` | 0 | `zhong guo` (no tone) |
-| `TONE` | 1 | `zhōng guó` (Unicode diacritics) |
-| `TONE2` | 2 | `zho1ng guo2` (number after the vowel) |
-| `FIRST_LETTER` | 3 | `z g` (first letter only) |
-| `BOPOMOFO` | 4 | `ㄓㄨㄥ ㄍㄨㄛˊ` (Zhuyin/Bopomofo) |
-| `INITIALS` | 5 | `zh g` (声母; empty for zero-initial syllables) |
-| `FINALS` | 6 | `ong uo` (韵母; `gui` → `uei`, `yu` → `v`) |
-| `FINALS_TONE3` | 7 | `ong1 uo2` (final + tone digit) |
-| `TONE3` | 8 | `zhong1 guo2` (number after the syllable) |
-
-The numbering is this library's own; it is *not* pypinyin's `Style` numbering.
-`INITIALS`/`FINALS`/`FINALS_TONE3` follow pypinyin 0.55.0 (`strict=True`, `v_to_u=False`)
-and are verified case-by-case against it .
-
-**Mandarin-specific config**:
-- `vToU`: When `true`, a reading that spells `ü` itself keeps the `ü`; when `false` (default) it becomes `v`. Note that tone-marked `ǚ/ǘ/ǖ/ǜ` always reduce to `v` — only the literal `ü` spelling is affected (pinned by `test_golden_pinyin.cpp`).
-
-### Cantonese style (core/Types.h)
-
-#### CantoneseStyle
-
-| Style | Value | Example |
-|-------|-------|---------|
-| `NORMAL` | 0 | `zung gwok` (no tone) |
-| `FIRST_LETTER` | 3 | `z g` (first letter only) |
-| `TONE3` | 8 | `zung1 gwok3` (number after the syllable) |
-
-Cantonese has no `INITIALS`/`FINALS` styles yet (the rules above are Mandarin-specific).
-
-### Tone sandhi (core/ToneSandhi.h)
-
-Optional post-pass for Mandarin, applied by the caller after `query()` — it never re-runs
-segmentation, phrase matching or disambiguation and only rewrites `rendered` (mirroring the new tone into `reading.tone`):
 
 ```cpp
-#include <cpp-pinyin2/core/ToneSandhi.h>
-
-cpp_pinyin::v2::Registry registry;
-cpp_pinyin::v2::Engine man = cpp_pinyin::v2::Engine::open(registry, "path/to/dict", "mandarin").value();
-auto res = man.query("你好世界", {.style = cpp_pinyin::v2::MandarinStyle::TONE3});
-cpp_pinyin::v2::applyMandarinToneSandhi(res.value());   // "ni2 hao3 shi4 jie4"
+cpp_pinyin::v2::ToneSandhiOptions opts;                  // all three Mandarin rules on by default
+const size_t changed = cpp_pinyin::v2::applyMandarinToneSandhi(result.value(), opts);
 ```
-
-- third-tone chains (`你好` → `ní hǎo`, `老鼠` → `láo shǔ`), `不` + 4th tone (`不是` → `bú shì`),
-  `一` + 4th tone (`一定` → `yí dìng`), `一` + 1st/2nd/3rd tone (`一天` → `yì tiān`),
-  `一` at the end / before a digit → `yī`
-- works on `TONE3` / `FINALS_TONE3` readings (a trailing digit); other styles have no
-  recoverable tone and are left untouched
-- row count, `text`, `candidates` and `failure_kind` are never modified
-- **the pass belongs to the dialect**: `Dialect::toneSandhi` (`ToneSandhiPass`) says whether a dialect has
-  one, and `applyMandarinToneSandhi` is the only pass declared today. Cantonese declares none — jyutping
-  readings happen to look the same, but the 不/一 rules do not apply there, so the C entry
-  `cppp2_apply_tone_sandhi(engine, result, opts, &changed)` takes the engine and **refuses** with
-  `CPPP2_ERR_INVALID_ARG` instead of rewriting them. A second dialect's pass arrives as a new symbol
-  (`cppp2_apply_<dialect>_sandhi`), never as a change to this one
-- individual rules can be turned off with `ToneSandhiOptions`
-
-### U16Str utilities (core/U16Str.h)
-
-```cpp
-std::string u16strToUtf8str(const char16_t &ch16);   // Single BMP char
-std::string u16strToUtf8str(const std::u16string &u16); // Full string
-std::u16string utf8strToU16str(const std::string &utf8); // With surrogate pair support
-```
-
-- `utf8strToU16str` handles 1-to-4-byte UTF-8 sequences
-- 4-byte sequences (U+10000+) encoded as UTF-16 surrogate pairs
-- Invalid UTF-8 sequences throw `std::invalid_argument`
-
-Normative source for those three, and for the reverse direction: `include/cpp-pinyin2/core/U16Str.h`.
-(`docs/API_en.md` repeats the three bullets; that is deliberate -- a reader of either page should not have
-to hop. Nothing in the two copies is a number, so they cannot drift apart in the way counts do.)
 
 ## Custom Dialect Support
 

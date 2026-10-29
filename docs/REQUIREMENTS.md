@@ -6,13 +6,17 @@
 > | 主题 | 权威文档 |
 > |---|---|
 > | 性能数字、测量协议、否决记录 | **`docs/PERFORMANCE.md`** |
-> | 目标架构、决策台账 D1–D23、验收线 AC-01..10 | **`docs/DECISIONS.md`** |
+> | 目标架构、决策台账 D1–D23、验收线 AC-1..5 / AC-9（**编号 AC-6..8 在本仓没有任何记录**；AC-10 见 `docs/NEW_DIALECT_PLAYBOOK.md` §5） | **`docs/DECISIONS.md`** §6 |
 > | 测试集清单、判据缺陷、缺陷编号 | `docs/STABILITY.md` §0（门禁与用例清单） |
 > | 未实现的功能需求（待排期） | 本文件 §5 与 `docs/DECISIONS.md` §8（"明确不做"） |
 >
-> **留档口径（v2 起）**：文中凡出现 `<scratch>/...`、带 `.tmp` 前缀的路径，或「本地留档（未入库）：...」，均指**开发期本机临时目录/文件**（板上脚本、探针、日志、dump、临时构建目录）——**不随库分发、也不在 提交历史中**，复现时用任意本地目录替代；随库分发的内容以 `docs/` 与 提交历史为准。v2 分支把 2026-09-21/22 的 33 个分步提交压成 4 个提交，**原提交号对照表附在这 4 个提交的信息正文里**；文中标注「原 `<sha>`」的提交号指向压缩前的历史，在 v2 分支上不可解析（仅作者本地与该对照表可查）。
+> **留档口径（v2 起）**：文中凡出现 `<scratch>/...`、带 `.tmp` 前缀的路径，或「本地留档（未入库）：...」，均指**开发期本机临时目录/文件**（板上脚本、探针、日志、dump、临时构建目录）——**不随库分发、也不在仓库里**，复现时用任意本地目录替代；随库分发的内容以 `docs/` 与 `conformance/` 为准。v2 分支把 2026-09-21/22 的 33 个分步提交压成 4 个提交，**原提交号对照表附在这 4 个提交的信息正文里**；文中标注「原 `<sha>`」的提交号指向压缩前的历史，在 v2 分支上不可解析（仅作者本地与该对照表可查）。
 >
-> 快照：压缩前提交 `d36f73a`（2026-09-22）→ **第 3 期 `8995a04`（v2.3）→ 第 4 期：本文件随 v2.4 提交更新（接口扩展，见 §4.2；等价性门禁与准确率逐字未变）**。**本文件所有 `文件:行号` 均在快照下实测；行号会漂移，引用前必须自行复核。**
+> **"过程记录"指什么**：本文件提到的**过程记录**是 2026-10-22 删掉的那批本机台账（31 个文件，原在 `tests/data/testdata/`：
+> 逐轮审计、覆盖率、缺陷清单、状态页等）。`git log --diff-filter=D -- tests/data/testdata/` 仍能从删除它们的提交里取回；
+> 本文件的结论、数字与判据都不依赖它们成立——需要出处时，各节自己写明了出处。
+>
+> 快照：压缩前提交 `d36f73a`（2026-09-22；**该提交不在本仓历史里**，见 `docs/README.md` §5）→ **第 3 期 `8995a04`（v2.3）→ 第 4 期：本文件随 v2.4 提交更新（接口扩展，见 §4.2；等价性门禁与准确率逐字未变）**。**本文件所有 `文件:行号` 均在快照下实测；行号会漂移，引用前必须自行复核。**
 
 ---
 
@@ -37,7 +41,7 @@
 | **K6** 用户词典 | 用户词典优先级最高，命中即用；`clear=true` 先清空再加载 | `docs/DECISIONS.md`；实现 `EngineImpl::loadUserDict()`/`loadUserDictLayer()`（`src/EngineImpl.cpp:546`/`:550`）、`EngineImpl::rebuildPhrases()`（`:681`）、`DictUtil::loadAdditionalDict()`（`src/dict/DictUtil.cpp:149`；2026-10-09 更新：该文件已从 `src/dict/DictUtil.cpp` 移入 `src/dict/`，行号 149 仍是同一处 `if (!file.is_open())`） |
 | **K7** 样式转换 | 与 pypinyin 的 tone/tone2/tone3/bopomofo/first_letter 规则对齐 | `docs/DECISIONS.md`；实现 `src/toneUtil/ManTone.cpp`、`src/toneUtil/CanTone.cpp` |
 | **K8** 结果装配 | 输出项数 == 分词 token 数；无读音项保留原文并标 `failure_kind != Ok` | `docs/DECISIONS.md`；实现 `EngineImpl::assemble()`（`src/EngineImpl.cpp:409`：先按 token 逐行填 `character` 与 failed 行，再由窗口按行写回读音） |
-| **K9** 候选契约 | `candidates` = **该字自身**的全部读音（词典行序、转换后去重保首次）；词组/用户词典命中行的 `rendered` 可 ≠ `candidates[0]`、甚至不在其中；`includeCandidates=false` 清空**汉字行**，失败行恒为 `{character}` | 实测钉住：提交历史tests/cpp/test_candidates.cpp`；实现 `EngineImpl::defaultReadings()`（`src/EngineImpl.cpp:148`）、`EngineImpl::assemble()`（`:409`） |
+| **K9** 候选契约 | `candidates` = **该字自身**的全部读音（词典行序、转换后去重保首次）；词组/用户词典命中行的 `rendered` 可 ≠ `candidates[0]`、甚至不在其中；`includeCandidates=false` 清空**汉字行**，失败行恒为 `{character}` | 实测钉住：`tests/cpp/test_candidates.cpp`；实现 `EngineImpl::defaultReadings()`（`src/EngineImpl.cpp:233`）、`EngineImpl::assemble()`（`:511`） |
 
 > **第 3 期（v2.3）后的实现形状**（语义仍然如上，逐字节门禁已证）：
 > 结果**不再经过中间 `std::vector<Syllable>`**。`assemble()`（`:407-450`）先建好足量输出行并记下
@@ -46,14 +50,14 @@
 > - 原来的 `popLast`（②方向先 `pop_back()` 再重新 append）**等价于把上一行原址重写**，参数已删除；
 > - 原 `result.size()` 承担的"已决定行数"由内部 `decided` 计数维持，二者不变式逐条对应；
 > - 词组读音条数与词组长度不等（畸形词库）时按"不是词组"处理，避免把行写歪；
-> - **第 3 期第三项（v2.3）把 12 次尝试的闸门提到游标层**并合并两张闸门表为 `PhraseGate`（`src/EngineImpl.h:113`）：
+> - **第 3 期第三项（v2.3）把 12 次尝试的闸门提到游标层**并合并两张闸门表为 `PhraseGate`（`src/dict/PhraseIndex.h:39` 的 `struct PhraseGate`；原文写的 `src/EngineImpl.h:113` 已漂）：
 >   顺序与语义逐条不变（`kAttempts[12]` 就是原有的"长度 4→2 × ①②③④"展开），
 >   四条方向守卫合并为**等价的一条** `start >= 0 && start + len <= n`，见 §1.1 说明。
 
 
 ### 1.1 K5 四个方向的守卫（**行号已漂移，以此表为准**）
 
-**本表不再记录行号**：行号每重构一次就腐一次 —— `docs/DECISIONS.md` 正文写的 `:332/336/340/345`（修复 C-01 前）与本表此前写的 `:366-381`（2026-10 的某个快照）实测**都已漂移**。以下一律用**符号锚点**定位：`src/EngineImpl.cpp` 里 `static constexpr Attempt kAttempts[12]` 之后的那个 `for (int i = 0; i < 12; ++i)` 循环，以及循环内紧随 `const long long start = static_cast<long long>(cursor) + a.rel;` 之后的统一守卫 `if (start < 0 || static_cast<size_t>(start) + a.len > chars.size()) continue;`。
+**本表不记录行号**：行号每重构一次就腐一次，所以这里只给守卫与表达式，位置以符号名为准。
 
 | 方向 | 守卫（快照取第 3 期第三项落地后的 HEAD） | 表达式 | 读取末位 | 所需上界 |
 |---|---|---|---|---|
@@ -73,7 +77,7 @@
 四个守卫的**语义逐字未变**（第 3 期只把 `result.size()` 换成内部的 `decided` 计数、把分支换成了等价的一条守卫）。
 
 **② 是唯一曾被写错的分支**：它原先只有下界 `cursor >= 1`，缺上界，可使 `assign` 越过缓冲区
-末尾最多两个码位。详见 提交历史里的 C-01 记录。
+末尾最多两个码位。详见过程记录里的 C-01 记录。
 
 > ⚠️ **不可**把 ② 加到 `cursor + length <= chars.size()`：那会连 `chars[n-1]` 这个**合法读取**
 > 也禁止，丢掉句末 2 字词组匹配（实测退步 0.16pt）。③④ 的原始守卫**本来就是对的，不要动**。
@@ -132,8 +136,10 @@ I4 才可修（预计收益 <10%，按 D7 本就不做）。I1–I3 是**契约*
 > 而 `pass` 是**测试运行时对引擎的实时判定**。两者来自不同时刻、不同判据，**不能互相推算**：把 `pass`
 > 当成 `decided - ENGINE_BUG - DICT_GAP` 之类的算式就会与权威表冲突（实测差异正来自此）。
 
-（第三轮抽样审计 + 第四轮定向修复 + 第五轮自洽修复之后冻结；四轮共改金标 1,274 行、`cm` 的 `ENGINE_BUG` 净增 7 条
-（逐条审计台账已随过程记录一并删除；结论在本节，逐条改动随提交保存在 git 历史里），旧记录见 `md`、`audit_round8.md`、`audit_round9.md`、`audit_round10.md`、`audit_round11.md`、`audit_round12.md`、`audit_round13.md`、`audit_round14.md`、`audit_round15.md`、`audit_round16.md`、`audit_round17.md`、`audit_round18.md`、`audit_round19.md`、`audit_round20.md`、`audit_round21.md`、`audit_round22.md`、`audit_round23.md`、`audit_round24.md`；审阅覆盖率见 `coverage.md`。）
+（第三轮抽样审计 + 第四轮定向修复 + 第五轮自洽修复之后冻结；四轮共改金标 1,274 行、`cm` 的 `ENGINE_BUG` 净增 7 条；
+逐条审计台账是 `tests/data/testdata/` 下的过程记录（`audit_round3.md`…`audit_round24.md`、`coverage.md` 等），
+2026-10-22 随那批文件一并删除，`git log --diff-filter=D -- tests/data/testdata/` 仍能从删除它们的那个提交里取回；
+结论在本节。）
 
 判据把每次数字**逐项精确比对**（不是阈值），因此"修好一个缺陷"必须同步重新冻结，方向只许变好；
 按分层读数字（失配行被刻意过采样）。**同一批位置在旧 harness 与金标裁决下的对照**（口径修正的最终结果，冻结在此）：
@@ -183,11 +189,10 @@ ledger / consistency / cross_set / projection，标签 `corpus`）/ `CorpusGateS
 > 所以用例本身没动；代价是 `ctest -R CppPinyinTests` 单跑不再覆盖语料，那部分由 `-R CorpusAccuracy`
 > 或 `-L corpus` 负责（这条已写在 `tests/CMakeLists.txt` 的注释里）。
 
-**2026-09-28 修正**：顶层构建目录此前**没有** `enable_testing()`，所以 `ctest` 只能在 `<build>/tests` 下跑
-（顶层报 `No tests were found`，6 个已注册门禁实际不可达）；现在 `enable_testing()` 已提到根
-`CMakeLists.txt` 的 `if (CPP_PINYIN2_BUILD_TESTS)` 里，两个目录都能跑。CI（`.github/workflows/ci.yml`
-的 linux/macos/windows 三个 job）同步从 `./CppPinyinTests` 改为 `ctest --test-dir build -j <n>`，
-这样 CI 与本地跑的是同一组门禁，Python 侧的五条与 `DumpEquivalence` 不再只在本地被跑到。
+**`enable_testing()` 在根 `CMakeLists.txt` 的 `if (CPP_PINYIN2_BUILD_TESTS)` 里**，所以 `ctest` 在顶层构建目录
+与 `<build>/tests` 下都能跑（早先在顶层会报 `No tests were found`，六个已注册门禁实际不可达）。CI 的三个
+job 因此统一用 `ctest --test-dir build -j <n>` 而不是 `./CppPinyinTests`，这样 CI 与本地跑的是同一组门禁，
+Python 侧的五条与 `DumpEquivalence` 不再只在本机被跑到。
 
 > **前置条件（第三十轮踩到，实测）**：`tests/` 与 `tools/` 由 `-DCPP_PINYIN2_BUILD_TESTS=ON` 控制，而它**默认 OFF**（`CMakeLists.txt:17`，第 97–99 行 `if (CPP_PINYIN2_BUILD_TESTS) add_subdirectory(tests) add_subdirectory(tools)`）。用默认参数配置**只会构建库**：`bin/` 里没有测试/工具可执行文件，`ctest` 报 `No tests were found`（响亮的失败，不是静默通过，所以只是易踩、不算危险）。含共享库与 Release 的完整一条：
 > ```
@@ -221,9 +226,9 @@ v2.3 为 624 断言 / 91 用例——v2.4 新增 `test_candidates.cpp` / `test_s
 - `tests/data/verified/source/cpp_dataset.txt` 格式为 **`句子▁音节下标▁该位置期望读音`**（如 `…▁17▁le5`）。
   `▁` = U+2581。**判分只比较该下标出的一个音节**，不是整句、也不是"句末标记"。
   
-- 期望值支持 `a/b` 多可接受答案（旧 harness 入口 `the legacy batch test, replaced by tests/cpp/test_accuracy_v2.cpp` **已随旧语料于 2026-09-29 删除** ⇒ 本条留作历史口径）。
+- 期望值支持 `a/b` 多可接受答案（旧 harness 入口 `tests/cpp/test_batch_accuracy.cpp` **已随旧语料于 2026-09-29 删除** ⇒ 本条留作历史口径）。
 - **粤语旧宽松判据已退役**（"整行任意位置出现过即算对" ✗）：其宿主测试随旧语料一同删除，现行金标集对粤语**同样逐位置严格**比较。
-  同一批位置的旧→新对照见本节上方的准确率表：`jyutping_test` 94.94% → **98.52%**、`jyutping_untone_test` 98.11% → **99.42%**（原表另有一处 `11% → **99.42%**。历史缺陷记录见提交历史。
+  同一批位置的旧→新对照见本节上方的准确率表：`jyutping_test` 94.94% → **98.52%**、`jyutping_untone_test` 98.11% → **99.42%**（原表另有一处的读数已更正为 **99.42%**；历史缺陷记录见过程记录。）
 - **金标集口径（`tests/data/verified/`，`tests/cpp/test_accuracy_v2.cpp`）**：每行 4 个 TAB 字段
   （句子 / 逐位置期望 / 状态 / 备注），**逐位置严格比较**，`a/b` 按备选展开；
   位置数不一致的行**不许比较到 `min()` 就停**，必须 `REQUIRE(status == "EXCLUDED")`；
@@ -287,9 +292,9 @@ v2.3 为 624 断言 / 91 用例——v2.4 新增 `test_candidates.cpp` / `test_s
 | §4.8.1 | 快路径逐段拆解 | 整支只占约 13% | — |
 | §4.8.2 | 词组表换容器 | 三种替代慢 2–4 倍 | — |
 | §4.9 | 删三个结构性死格 | 省 24.8% 查找**只值 3.0%** | 单次尝试实际成本约 1.8 ns，非 23.8 ns |
-| §4.16.4 | ~~词组容器扁平化 / 开放寻址~~ | **已撤销**：第 3 期专用索引 本机 1.2083 / 板上 1.1193 | 见 提交历史、§4.17.5 |
-| §4.16.4 | ~~C/F 融合单遍装配~~ | **已撤销**：第 3 期 本机 1.2208 / 板上 1.2529 | 见 提交历史、§4.17.5 |
-| §4.16.4 | ~~H 后续「掩码判定提到窗口外」~~ | **部分撤销**：v2.3 把 12 次尝试的**闸门**提到游标层（板上 1.0887 单步）+ 合并闸门表（合计 **1.1063**） | 见 提交历史–§4.18.5；"守卫去零"仍不做，失效条件见 §4.18.7 |
+| §4.16.4 | ~~词组容器扁平化 / 开放寻址~~ | **已撤销**：第 3 期专用索引 本机 1.2083 / 板上 1.1193 | 见过程记录、§4.17.5 |
+| §4.16.4 | ~~C/F 融合单遍装配~~ | **已撤销**：第 3 期 本机 1.2208 / 板上 1.2529 | 见过程记录、§4.17.5 |
+| §4.16.4 | ~~H 后续「掩码判定提到窗口外」~~ | **部分撤销**：v2.3 把 12 次尝试的**闸门**提到游标层（板上 1.0887 单步）+ 合并闸门表（合计 **1.1063**） | 见过程记录–§4.18.5；"守卫去零"仍不做，失效条件见 §4.18.7 |
 | §4.2 | gprof / 自写 IP 采样器 | 本环境不可用 | — |
 | §4.19 | `-flto`（跨 TU 内联） | 板上 9 轮 × 4 passes **1.0028**（med 1.0097）＝**0.3%** | **方向已关闭**（P5 丢弃，且无收益不该改进默认构建）。**本机不可测**：CLion MinGW GCC 15.2 报 "LTO support has not been enabled"，勿在本机重试 |
 | §4.19.1 | `toneToTone3` + `u16strToUtf8str` 融合成单遍转换 | 静态上限：两者自耗合计 **38.2%**（板上 callgrind），融合后上限 ≈10–15% | **不做**（超 D7 的「单点 ≤15 行」，需 30+ 行新路径且与 9 个风格共用面分叉）。**失效条件**：出现"必须再挤 10%"的硬需求时先做只测不改的融合探针 |
@@ -297,7 +302,7 @@ v2.3 为 624 断言 / 91 用例——v2.4 新增 `test_candidates.cpp` / `test_s
 **已落地的净收益（按时间顺序）**：`原 846d944`（装载期合并词组两层，min A/B 1.1404）→ 第 2 期（§4.13/§4.14/A/B/E1+H，
 板上链式 ≈1.915×）→ **第 3 期（直接索引 + 单趟装配 + 窗口闸门批量化/槽合并，板上 1.4024 × 1.1063 = 1.5516）**。
 **相对 v1 累计 ≈2.95×**（3066.3 → 1040.5 ms；乘积口径 2.972、保守端 2.877；**v2.4 板上复核 min 1039.4 ms，维持该结论**），判优口径与每步门禁见
-提交历史 与 §5。
+过程记录与 §5。
 
 ---
 
@@ -382,7 +387,7 @@ v2.3 为 624 断言 / 91 用例——v2.4 新增 `test_candidates.cpp` / `test_s
    **本轮不改**（改它属于行为变更，收益 0，风险高）。
 3. pypinyin 的 `tone_sandhi` 与规则本体有两处实现差异，本库**按规则本体实现**：
    三声串"仅当结束于该分段时才生效"（`老鼠`→pypinyin `lao3 shu3`，本库 `lao2 shu3`）；
-   缺"一 + 数字/一 → 一声"例外。见 `include/cpp-pinyin2/core/ToneSandhi.h` 顶部与 提交历史。
+   缺"一 + 数字/一 → 一声"例外。见 `include/cpp-pinyin2/core/ToneSandhi.h` 顶部与过程记录。
 
 **未采纳**：slug/lazy 包装（`join()`/`toVector()` 已覆盖）、
 `errors='replace'`、西里尔/威妥玛/盲文/GR 等风格、插件注册表、`pinyin(heteronym=True)` 投影、
@@ -424,7 +429,7 @@ v2.3 为 624 断言 / 91 用例——v2.4 新增 `test_candidates.cpp` / `test_s
 
 | 契约面 | 权威在哪（单一真相源） | 判据 |
 |---|---|---|
-| ① 接口冻结 | `tools/CMakeLists.txt` 与各公共头 | 15 公开头 / 23 C ABI / 18 插件面声明（本行由 `tools/check_doc_claims.py` **机器校验**）<br>**历史注记（2026-10-06 补）**：改成本行这一版之前，本行写的是"公共头 / 插件声明"，**不匹配该检查器的任何 pattern**，因此当时那句"机器校验"的自述**为假**（自述比数字更值得修）。现已改成本版并由 `tools/check_doc_claims.py` 真正校验 ✓；**本行的数字仍只允许在这一处**。<br>**第 11 轮（2026-10-06）**：C ABI **18 → 16**（N4b 删 `cppp_is_ready`/`cppp_last_error`）；记账另有两个加项未落地——N7A 的 `cppp_apply_tone_sandhi`（+1 = 17）与 N29 的 `cppp_style_list`/`_free`（+2）⇒ **C 面目标读数 19**。<br>**第 12 轮（2026-10-06）**：插件面 **16 → 18**（N3 给 `Dialect` 加 `styles`/`defaultStyle`，冻结清单 `tests/abi/expected_plugin_surface.txt` 同批改）——⚠️ **注意**：方案 §11 曾写"插件面 16→19（`styles`+`defaultStyle`+`notation` 之类 +3）"，实测是 **+2**（`notation` 是当时的推测项，未落地）⇒ **以实测 18 为准**，方案里那个 19 是估算不是读数<br>**2026-10-18**：C ABI **19 → 20**<br>**2026-10-19**：公开头 **14 → 15**（新增 `core/Version.h`：编译期版本宏，让消费方能 `#if`；数字由 `tools/check_version_tokens.py` 轴 9 对着 `project(VERSION)` 校验，不靠人记） |
+| ① 接口冻结 | `tools/CMakeLists.txt` 与各公共头 | 15 公开头 / 23 C ABI / 18 插件面声明（本行由 `tools/check_doc_claims.py` **机器校验**） |
 | ② 全量行为等价 | `tools/CMakeLists.txt` 的 `CPP_PINYIN2_FROZEN_DUMP_SHA256` / `_ENTRIES` / `_BYTES` | 全量 dump 字节流 SHA256 与条数/字节（清单第 1 步据此判 PASS；**权威值只在该文件**） |
 | ③ 出厂数据一致 | 词典仓 `tools/check_drift.ps1`（**字节权威**） | 本仓 `data/dialects` **逐字节**等于词典仓生成物 ⇒ `0 drift` |
 | ④ 配置矩阵 | `docs/NEW_DIALECT_PLAYBOOK.md`（计数与**指纹算法**） | 四套配置的条目计数 + 集合指纹；只允许按已记录方式变化并同步文档 |
@@ -441,10 +446,13 @@ cd <pinyin-makedict>; powershell -File tools/check_drift.ps1 -CppPinyinRoot <cpp
 
 - 词典仓 `.cpdict` 二进制工作流（`binary/`）：**不进 CTest**（2026-10-04 裁定）。它当前是干净的
   （`build_binary.py --all` exit 0、`tools/check_binary.py --all` = `OK: binary matches the text tables exactly`）。
-- sanitizer：**门禁化**的那条腿仍**只能靠 CI**（需 push 才能接线）⇒ 归"出仓后第一件事"。
+- sanitizer：**门禁化**的那条腿当年**只能靠 CI**（需 push 才能接线）⇒ 曾归"出仓后第一件事"。
+  **2026-10-27 更新：那条腿已经接上并跑过** —— `.github/workflows/ci.yml` 的 `linux-sanitizers` job
+  （`CPP_PINYIN2_SANITIZE=ON`、`-fno-sanitize-recover=all`、`ASAN_OPTIONS=detect_leaks=1`）随 `test_runner.yml`
+  在 2026-10-22 起跑、2026-10-23 全绿（运行记录见 `docs/STABILITY.md` §0.1），所以"出仓后第一件事"这一项已结。
   **2026-10-06 更正（原句只说"只能靠 CI"、且未限定是哪条腿，结论过强）**：本机另有**一条已实测可跑的 clang/MSVC 目标窄路**
-  （**examples OFF** 配置下全量 **32** 条：`-LE slow` 27/28、`-L slow` 4/4、ASan/UBSan 报告 0 条），但那只是**手工复现**、替代不了 CI 腿
-  —— 配方与全部边界见 `docs/STABILITY.md` §1.1（本节只写指针，不复写命令）；条目计数与指纹的权威清单在 `docs/NEW_DIALECT_PLAYBOOK.md`。
+  （**examples OFF** 配置下全量 **32** 条：`-LE slow` 27/28、`-L slow` 4/4、ASan/UBSan 报告 0 条），但那只是**手工复现**；
+  配方与全部边界见 `docs/STABILITY.md` §1.1（本节只写指针，不复写命令）；条目计数与指纹的权威清单在 `docs/NEW_DIALECT_PLAYBOOK.md`。
 - 板上复验（firefly.local）：只在改动**构建 / 门禁 / 数据 / 历史形状**时是必须的；纯文档或纯工具改动
   用本机清单即可（口径与配方见 `docs/STABILITY.md`；**板上夹具不入库**（2026-10-23 决定：`board_baseline.sh` / `checklist.sh` / `run_local_gate.sh` 随本机保留，见 `.gitignore`））。
 

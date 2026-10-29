@@ -27,7 +27,6 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
 3. **本仓不得出现这些语种的记录** ✓：语料、词表、清单、统计、达标数字一律不留 ✗；本仓只保留**方法与决策**
    （本 playbook、词典制作仓库里的拓展语种记录）✓，且必须写明**非规范、不代表本仓支持该语种** ✓。
 
-
 | 事实 | 证据 |
 |---|---|
 | 新语种一律留在词典仓库，**与本仓无写入关系** | `docs/DECISIONS.md` §2.1:617` |
@@ -61,8 +60,8 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
 | `License.txt` | 建议 | 许可随数据走 |
 
 - **装载名单的唯一权威**：`src/EngineImpl.cpp:42-47`（四张表，按 `phrases_map` → `phrases_dict` → `word` → `trans_word` 顺序）。
-- **行语法**：`src/dict/DictUtil.cpp:22-38` —— 去首尾空白后在 trim 区间找第一个分隔符。空行不是数据（可以存在）；**无分隔符或空键的行自 `507aa09` 起不再被丢弃**：它计入 `skippedNonBlank`，使**整张表**装载失败、文件名进 `lastError()`、引擎 `isReady()` 为假（判据在 `src/dict/DictUtil.cpp:43-74` 与 `:142-169`，两处字面量相同）。
-  **例外**：`user_dict.txt` 走 `loadAdditionalDict`（`src/dict/DictUtil.cpp:171-204`）——文件打不开会返回 false（`test_user_dict.cpp` 钉住），但**内容级零校验**：其中的坏行既不计数也不报行号。
+- **行语法**：`src/dict/DictUtil.cpp:39-56`（`splitLine`）—— 去首尾空白后在 trim 区间找第一个分隔符。空行不是数据（可以存在）；**无分隔符或空键的行自 `507aa09` 起不再被丢弃**：它计入 `skippedNonBlank`，使**整张表**装载失败、文件名进 `lastError()`、引擎 `isReady()` 为假（判据在 `src/dict/DictUtil.cpp:43-74` 与 `:142-169`，两处字面量相同）。
+  **例外**：`user_dict.txt` 走 `loadAdditionalDict`（`src/dict/DictUtil.cpp:199-229`）——文件打不开会返回 false（`test_user_dict.cpp` 钉住），但**内容级零校验**：其中的坏行既不计数也不报行号。
   分隔符默认 `sep1=':'`、`sep2=','`（`src/dict/DictUtil.h:39`,`:48`,`:53`）。样例：`word.txt` 的 `日:rì`、`phrases_dict.txt` 的 `一下儿:yī,xià,er`、`phrases_map.txt` 的 `下:234`、`trans_word.txt` 的 `魚:鱼`。
 - **归一化函数必传**（`src/dict/DictUtil.h:61-64` 原文）：`normalizeReading` 是 **MANDATORY**；它曾经默认用普通话的函数，
   于是静默把粤语用户词典的 `jyut6` 改写成 `jyu6t6`。**新语种必须自带归一化，不能继承普通话的。**
@@ -78,11 +77,13 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
 
 > `Adding a dialect does NOT require touching this library: provide dictionary files, a ToneConverter subclass, and one Dialect, then hand either to Pinyin::Engine (directly, or through DialectRegistry so it can be addressed by id).`
 
-具体：`Dialect`（`include/cpp-pinyin2/ext/Dialect.h:32`）是聚合类型，字段 `id`(`:34`)、`dictSubDir`(`:38`，空则等于 `id`)、
-`tone`(`:43`，按值)、`supportsVToU`(`:48`)、`supportsNeutralTone5`(`:51`)、`postProcess`(`:57`，只对返回 `Result` 的 query 生效)。
-拿到后可直接构造 `Engine(dialect, dictRoot)`；要按 id 解析，就用**调用方自持**的注册表：`cpp_pinyin::v2::Registry registry;`（`include/cpp-pinyin2/ext/Registry.h:44` 的类、`:48` 的构造 —— 构造即含两个内置方言）→ `registry.add(id, creator)`（`:55`，`:17` 是 creator 的类型）→ `Engine::open(registry, dictRoot, id)`（`:31-32` 的原文示例）。**2026-10-05（S3）起没有自注册宏、也没有进程级注册表** —— 见本页末尾那节的作废说明。
-`include/cpp-pinyin2/ext/Dialect.h:26-28` 明确 **`Dialect` 不携带词典路径、不携带已加载状态**；`include/cpp-pinyin2/ext/Registry.h:44-45` 明确解析失败
-**不得**被当成"回落到普通话"；`include/cpp-pinyin2/ext/Dialect.h:55-56` 明确消歧窗口**冻结**，不要在 `postProcess` 里重造引擎。
+具体：`Dialect`（`include/cpp-pinyin2/ext/Dialect.h`）是聚合类型，字段 `id`、`dictSubDir`（空则等于 `id`）、
+`tone`（按值）、`supportsVToU`、`supportsNeutralTone5`、`postProcess`（只对返回 `Result` 的 query 生效）。
+拿到后可直接构造 `Engine(dialect, dictRoot)`；要按 id 解析，就用**调用方自持**的注册表：`cpp_pinyin::v2::Registry registry;`（`include/cpp-pinyin2/ext/Registry.h` 的 `Registry` 类与它的默认构造 —— 构造即含两个内置方言）→ `registry.add(id, creator)`（creator 的类型是 `DialectCreator`）→ `Engine::open(registry, dictRoot, id)`（`Engine.h` 的 `open` 注释里有原文示例）。**2026-10-05（S3）起没有自注册宏、也没有进程级注册表** —— 见本页末尾那节的作废说明。
+`include/cpp-pinyin2/ext/Dialect.h` 的 `Dialect` 注释明确 **`Dialect` 不携带词典路径、不携带已加载状态**；`include/cpp-pinyin2/ext/Registry.h` 的 `resolve` 注释明确解析失败
+**不得**被当成"回落到普通话"；`postProcess` 的注释明确消歧窗口**冻结**，不要在 `postProcess` 里重造引擎。
+
+> 这一段按**名字**引用，不写 `文件:行号`：行号每次重构都会漂，指错的引用比没有更糟。
 
 ⚠️ **C ABI 没有注册入口**（`include/cpp-pinyin2/ext/c_api.h` 末尾那段的原文 `DELIBERATELY NOT HERE`）：C 无法构造 `ToneConverter`，
 所以 C#/Python 壳今天**挂不了第三方方言**，只能拿两个内置方言（外加 C++ 宿主在交出句柄前注册过的）。
@@ -108,9 +109,9 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
    （客家语的 PFS→MOE 是这一类的正例）。**禁止从被测语料里学出对应关系**——上一轮留下的教训原文在
    那条"从被测语料学出来的转换器"**已不在盘上**（不可复现，只作教训引用），
    它自己的 docstring 就写着"**对应关系越加越多本身就是危险信号**"。
-4. **两种设置并列报出**（用户第 33 轮裁定 D1）：字形一致口径与"承认方言字对应"口径**都要报**，
+4. **两种设置并列报出**（裁定 D1）：字形一致口径与"承认方言字对应"口径**都要报**，
    并写清差异来源。参照：客家语 `81.26%`（零映射）/ `93.20%`（承认 `我←𠊎`、`他/她←佢`）。
-5. **达标线逐语种单独定**（用户第 33 轮裁定 D5）：不设全局固定阈值。每个语种首次报数时**逐例给定**，且必须写清
+5. **达标线逐语种单独定**（裁定 D5）：不设全局固定阈值。每个语种首次报数时**逐例给定**，且必须写清
    **分母是多少、依据是什么**；若某语种存在**算术上限**，必须给出证明。参照：客家语已证明
    `(2545+213)/3132 = 88.06% < 90%`，即只要表把「我」读 `ngai` 之外的写法、「他/她」读 `ta`，任何修正都到不了 90%。
 6. **盲测下限对照**：低于"随机选一读"的下限时（吴语实测 5.95% < 下限 43.27%），**不得报为准确率** ——
@@ -175,15 +176,15 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
      `docs/DIALECT_EXTENSION_RECORD.md` 的语种表。
    - **短语表行数以产出为准 = 6,975 行**（`out/dict/mandarin/phrases_dict.txt` 与本仓现役文件**行数一致**）。
      ⚠️ 常被引用的 **6,931** 是**审计分母**（该仓 `pinyin-makedict/data/overrides/man_overrides.py:195` 的原话是"All 6931 Mandarin phrase entries were
-     compared against the corpus …"），**不是产物行数**——本仓 `tests/cpp/test_accuracy_v2.cpp` 与 提交历史 曾按 6,931 记，
+     compared against the corpus …"），**不是产物行数**——本仓 `tests/cpp/test_accuracy_v2.cpp` 与过程记录曾按 6,931 记，
      已更正。
    - **加新语种的落点**（该仓 `docs/DIALECT_EXTENSION_RECORD.md`；潮州话先例的生成器与数据已出仓，只存记录）：
      `data/<lang>_sanitized.txt`（`词\t读音`）→ 无 G2P 库时再给 `data/<lang>_origin_vocab.txt`（`字#r1|r2`）→
      空 `data/<lang>_overrides.py` → `<lang>.py` 子类实现 `load_dict` / `fill_unicode_pinyin` / `make_dict` →
-     非普通话音位用**构造参数** `MakeDict(..., preserve_e_hat=True)`（2026-10-20 更正：模块级全局
-     `common.PRESERVE_E_HAT` 已删除，见审计 H36）→ **`tools/check_drift.ps1` 不需要改**：它从两棵树的
-     目录名**派生**方言集合（2026-10-20 更正，见审计 H34；原文写"加进 check_drift.ps1"，而那份清单早已改成派生，
-     这一步无从执行）→ **不改本仓**。
+      非普通话音位用**构造参数** `MakeDict(..., preserve_e_hat=True)`（模块级全局 `common.PRESERVE_E_HAT` 已删除）
+      → **`tools/check_drift.ps1` 不需要改**：它从两棵树的目录名**派生**方言集合，没有需要维护的清单 →
+      **不改本仓**。
+
    - **未验证**：历史上那批"未提交改动"是否仍在（`man_overrides.py` 里的 61+35 条已随提交 `de7d3d4` 落地，但两个仓库的
      Δpt 记法不一致：cpp 侧记 **+24.85pt**、该仓记 **+24.32pt**，**未核实哪个是权威** ✗）。
 
@@ -209,11 +210,31 @@ pinyin-makedict 产出 out/dict/<lang>/  ──►  cpp 侧【只读】指向该
 | + `-DBUILD_SHARED_LIBS=OFF` | **48** | **44** | `822eb3cb318453cf` |
 | + 两者同时 | **49** | **45** | `a131c1e6c36e0485` |
 
+**这四行由谁复核、以及复核它需要什么**（2026-10-27 补，因为这一点此前只写在代码里）：`tools/check_doc_claims.py`
+的 `check_config_fingerprints` 会重算每一行并与表比对，但它读的是**四个固定目录**——`.tmp/mk-default`、
+`.tmp/mk-examples`、`.tmp/mk-static`、`.tmp/mk-min`。后三个名字**没有任何文档或 workflow 会去创建**，
+所以"某一行没被复核"完全可能悄悄发生；检查器会把这种行单独报成 *unverified*（不是通过）。
+
+要让四行都可复核，按下面四行建树（都在仓库根，产物只落 `.tmp/`）：
+
+| 表里的行 | 目录 | 配置 |
+|---|---|---|
+| 默认 | `.tmp/mk-default` | `Release` / Ninja / 共享 / tests ON / examples OFF |
+| + examples | `.tmp/mk-examples` | 同上，`-DCPP_PINYIN2_BUILD_EXAMPLES=ON` |
+| + 静态 | `.tmp/mk-static` | 同上，`-DBUILD_SHARED_LIBS=OFF` |
+| + 两者同时 | `.tmp/mk-min` | 两者都开（**名字是历史遗留**："min" 指当年"没有导出面门禁的最小构建"，今天就是"静态 + examples"） |
+
+2026-10-27 实测：四棵树齐备时，**四行的计数与指纹全部与表一致**（`93b0e403a39ffa01` / `fe3bb3d3b3465f4f`
+/ `822eb3cb318453cf` / `a131c1e6c36e0485`），也就是说这张表不是抄的，是可复现的。
+
 文档里单独出现的用例数一律指**默认配置**；`tools/check_doc_claims.py` 以 `.tmp/mk-default` 为规范配置，
 被测配置另由 `--ctest-inventory` 传入，因此同一份文档在四套配置下给出同一结论。
 
 本机不可验的配置是 `-DCPP_PINYIN2_SANITIZE=ON`：`CMakeLists.txt` 在编译器不支持时配置期就报错（这是对的），
 而本机 MinGW 无 sanitizer 运行库、Windows clang 缺 `stl_asan.lib` ⇒ 它属 Linux CI 路径，本地只能记"未验证"。
+**探针必须实例化一个 STL 类型**（如 `std::string`）：只编译 `int main() { return 0; }` 的探针在 Windows clang 上
+会**通过**配置期，真到链接期才炸 `stl_asan.lib`。现在的探针实例化 `std::string`（见 `CMakeLists.txt` 该分支），
+所以本机确实是**配置期**给出那条 FATAL_ERROR。
 
 ---
 

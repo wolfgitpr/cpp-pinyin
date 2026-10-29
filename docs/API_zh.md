@@ -81,7 +81,6 @@ std::cout << jres.value().join();  // "nei5 hou2 sai3 gaai3"
 
 > **跨代兼容与演进政策**（v2 / v3 / v4…）：见 [`docs/STABILITY.md`](STABILITY.md) §4.5 —— 本文只讲 API 用法，兼容承诺、换代规则与"哪些面必须带代令牌"在那里成文（唯一权威）。
 
-
 所有公开接口位于 `namespace cpp_pinyin`。
 
 ---
@@ -241,9 +240,8 @@ public:
 };
 ```
 
-> ⚠️ **本节原先写着"普通话和粤语引擎内部使用的类，不属于公开 API"——那半句是错的**（2026-10-10 更正）：
-> 内置的 `ManTone` / `CanTone` 确实是内部实现，但**基类 `ToneConverter` 是导出类**，正是自定义方言要继承的
-> 那个扩展点（内置方言也不再是公开类了，见 §5）。
+> **`ToneConverter` 是导出类**：内置的 `ManTone` / `CanTone` 是内部实现，但基类 `ToneConverter` 正是自定义方言
+> 要继承的那个扩展点（内置方言本身不再有各自的公开类，见 §5）。
 
 - `NormalizeFunc` 是**函数指针而不是虚函数**，这是刻意的：引擎持有转换器的**对象副本**，值拷贝会切到基类
   子对象，虚函数会**静默**退回基类实现而不是方言的实现。
@@ -376,7 +374,11 @@ std::u16string utf8strToU16str(const std::string &utf8);  // 含 surrogate pair 
 
 - `utf8strToU16str` 支持从 1 到 4 字节的 UTF-8 序列
 - 4 字节序列（U+10000 以上）映射为 UTF-16 surrogate pair
-- 无效 UTF-8 序列抛出 `std::invalid_argument`
+- **无效 UTF-8 序列变成 U+FFFD——每个畸形码位恰好一个，从不抛异常**。1.x 在这里抛 `std::invalid_argument`；
+  2.0 把转换做成**有意的总函数**：引擎对每个输入码位输出一行结果、金标语料按位置对齐，抛出去也只会在
+  上游被接住再映射一次。理由写在 `src/U16Str.cpp` 的注释里，字节级行为由
+  `tests/cpp/test_boundary_utf8.cpp` 钉住。**把异常当输入校验用的 1.x 调用方，现在必须自己检查 U+FFFD。**
+  （本行 2026-10-27 之前写的是"抛出 `std::invalid_argument`"——那描述的是 1.x，不是这一代。）
 
 ---
 
@@ -494,17 +496,16 @@ h = lib.cppp2_open(None, b"mandarin", b"D:/path/to/dict", None)  # 错误通道�
 | 首字符语义 | `cppp2_to_simplified` / `cppp2_is_polyphonic` 只看**首个字符**（与 C++ API 一致，不是整串转换） |
 
 `cppp2_version()` 返回构建时的**包版本**，也就是 `find_package(cpp-pinyin2 <ver>)` 解析到的那个数；
-数字只在根 `CMakeLists.txt` 的 `project(... VERSION)` 里写一次（D32/D34）。本文档抬头自 2026-10-01
-起不再自带版本号；它曾自称 2.0.0 而包版本是 1.0.2。<!-- doc-claims: historical -->
-本文档其余小节里出现的 `v2.x` 是**内部重构分期标签**，不是包版本。
+数字只在根 `CMakeLists.txt` 的 `project(... VERSION)` 里写一次（D32/D34）。本文档抬头不自带版本号；
+这里出现的 `v2.x` 是**内部重构分期标签**，不是包版本。<!-- doc-claims: historical -->
 
 **`cppp2_dict_dir_candidate()`（2026-10-18 新增，第 20 个 ABI 符号；**2026-10-21 起冻结面是 22 个，2026-10-22 加入 `cppp2_tone_convert` 后为 23 个**——那天新增了 `cppp2_load_user_dict_ex` 与 `cppp2_load_traditional_dict_ex`，本句说的是它当年入列时的序号）**：返回**本次构建把词典装到哪**，
 按**库自身模块位置**推导（`<模块目录>/../share/cpp-pinyin2/dict`），静态串、不需要释放；静态链接时返回
 `NULL`（那时"本模块"就是宿主可执行文件，属于本库明确不做的猜测）。它**不是默认路径**（`cppp2_open` 仍要求
 `dict_dir`）、**不读环境变量**（那是包装层的事）、**不做校验**（目录可能不存在或装的是别的表——交给
 `cppp2_open` 报出"哪个目录、哪个文件"）。用途：直接链库、又没有 CMake 包/pc 文件的宿主（Qt 应用、
-Unity/UE 插件）不必把路径硬编死。决策与边界见提交历史。
-**C++ 宿主用 `cpp_pinyin::v2::dictDirCandidate()`**（2026-10-20 补，审计 round 3 的 H05）：同一份缓存、同一答案，
+Unity/UE 插件）不必把路径硬编死。决策与边界：承载这条裁定的过程记录（原在 `tests/data/testdata/`）已在 2026-10-22 的清理中删除；仍然生效的边界是上面那句话。
+**C++ 宿主用 `cpp_pinyin::v2::dictDirCandidate()`**（2026-10-20 补）：同一份缓存、同一答案，
 差别只在于它返回 `std::string` 拷贝（可长期持有），C 面返回指向缓存的 `const char *`（静态构建里是空串 / `NULL`）。
 此前这条查询只有 C 面和两个壳有，而它面向的正是"没有 CMake 包/pc"的宿主 —— C++ 宿主不该为了问这一句去 include C 头。
 

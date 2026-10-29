@@ -1,8 +1,7 @@
 # 发布清单（发布一版的唯一落点）
 
-**这是「要发一版时该做什么」的唯一落点**——原在 `docs/DECISIONS.md` §2.1，
-2026-10-19 抽出成独立文件：它是**动作清单**（逐条勾选），而 PLUGIN 那份是**方案与台账**。放在一起
-的后果是可查性——1243 行的台账里翻 178 行清单，谁也不会每次发版都去翻。
+**这是「要发一版时该做什么」的唯一落点**：它是**动作清单**（逐条勾选），而 PLUGIN 那份是**方案与台账**。
+两者放在一起的后果是可查性——一份厚台账里翻清单，谁也不会每次发版都去翻。
 
 **发布动作永不自动化**（原 §6.7.12 的裁定仍在）：下面每一条都要有人真的做，并留下读数。
 
@@ -16,13 +15,27 @@
 
 **0. 前提：三件事不是本项目能单方面完成的**（dispatcher、仓库设置、商店账号），本节只把它们列成入口，不假装已就绪。
 
-**0b. 发版前置（2026-10-20 新增）：CI 必须先在 GitHub 上真跑过一次。** 本仓的 `.github/workflows/` 至今
-**一次都没有真跑过**（`ci.yml` / `release_prep.yml` 里多处自注 `UNVERIFIED`；本清单 §3 与 §6 的多行读数标着
-"CI 未跑"）。在那之前，凡"CI 会拦住"的说法都只是**配置层推断**，不是证据。⇒ 发版动作的第 0 步是**先完整
-跑一轮 CI 并把结论写回本节**，再开始下面任何一条。
+**0b. 发版前置：两份工作流的"跑过没跑过"不是同一个答案。** 这里拆成三条：
 
-**1. 版本号：唯一真相源是 `CMakeLists.txt` 的 `project(cpp-pinyin2 VERSION x.y.z)`**，其余**六处**必须是它的投影
-（本节此前在同一屏里并存「其余五处」「版本链六处」两种数法；2026-10-20 统一为**七处** = ①–⑦，因为 ⑦ 是后加的一处，不在原来那六处之内）：
+- **套件链 `test_runner.yml` 已真跑过并全绿。** 运行记录、job 清单与它覆盖的平台见 `docs/STABILITY.md` 的
+  §0.1（**单一落点，本节不复制**）⇒ "CI 会拦住"这一层已从配置层推断变成证据。
+- **发布预备 `release_prep.yml` 一次都没跑过**（该文件头部自述，`docs/STABILITY.md` §0.1 同记）。而 PyPI 的
+  manylinux 轮子、NuGet 的三个单 RID 包与池化包**只有它会产出** ⇒ 两个渠道此刻仍无产物来源。
+- **上一轮全绿不覆盖"要发的那棵树"。** ⇒ 发版动作的第 0 步是**在要打标签的同一棵树上重跑一轮
+  `test_runner`、并 `dispatch` 一次 `release_prep`，把两个结论写回本节**，再开始下面任何一条。
+
+**0c. 出厂测试语料的许可仍是 `UNRESOLVED`（`[事实]`；2026-10-27 用户裁决：保持未定，但必须显著标注）。**
+四个准确率夹具（`tests/data/verified/{mandarin,cantonese}_{tone,untone}.txt`）的 `#!meta` 里，`license`
+字段的值是 `UNRESOLVED (audit T-09)`——语料来源的许可条款没有任何人给过结论，本版也不假装它解决了。
+
+- **不影响产物**：这批语料是**测试数据**，不进 wheel、不进 nupkg；`check_wheel.py` 与 `check_bindings.py
+  --nupkg` 都不要求它出现在包里。
+- **影响的是可复现的准确率数字**：`docs/PERFORMANCE.md` 与 `tests/data/verified/` 里每一个准确率读数都由
+  这批数据算出来。发版说明里若引用准确率，读者有权知道其底层数据的许可状态。
+- **为什么不是剔除**：剔除会把准确率测试的覆盖面削掉（用户 2026-10-27 的裁决是保留并标注）。若要改变这个
+  状态，只有一个动作——有人给出语料的许可结论，然后把它写进 `#!meta` 的 `license` 字段。
+
+**1. 版本号：唯一真相源是 `CMakeLists.txt` 的 `project(cpp-pinyin2 VERSION x.y.z)`**，其余**七处**（①–⑦）必须是它的投影：
 
 | # | 位置 | 由什么守住 |
 |---|---|---|
@@ -32,7 +45,7 @@
 | ④ | wheel `METADATA` 的 `Version:` | `tools/check_bindings.py --wheel`（`check_wheel.py` 另行断言 `Requires-Python: >=3.9`） |
 | ⑤ | `nuspec` | `tools/check_bindings.py --nupkg` |
 | ⑥ | **git tag** | `tools/check_bindings.py --tag <tag>`（裸 `x.y.z` 与 `vx.y.z` 都接受；不符即红） |
-| ⑦ | **CHANGELOG.md 的版本标题** | **有门禁**（2026-10-20 起）：`tools/check_version_tokens.py` 的第十轴比对该文件**最新**一个 `## ...` 标题里的版本与 package 版本；历史小节按记录保留、不改写，门禁只看第一个标题。**同一条的第二个判断（2026-10-20 新增，审计 H49）**：**打了 tag 之后**，那个标题必须是**已发布形态** `## [x.y.z] — YYYY-MM-DD`——此前 `[Unreleased] — x.y.z` 与已发布形态**都算绿**，于是"发布日只改标题"这一步无门禁可证已做 |
+| ⑦ | **CHANGELOG.md 的版本标题** | **有门禁**（2026-10-20 起）：`tools/check_version_tokens.py` 里「CHANGELOG 最新标题」那条比对该文件**最新**一个 `## ...` 标题里的版本与 package 版本；历史小节按记录保留、不改写，门禁只看第一个标题。**同一条的第二个判断（2026-10-20 新增）**：**打了 tag 之后**，那个标题必须是**已发布形态** `## [x.y.z] — YYYY-MM-DD`——此前 `[Unreleased] — x.y.z` 与已发布形态**都算绿**，于是"发布日只改标题"这一步无门禁可证已做 |
 
 **2. 发布前的构建与验收（全是已有命令，没有新动作）**
 
@@ -51,7 +64,7 @@ Linux 两条腿**必须在各自架构的 manylinux 容器内**跑同一条脚�
 `python/tools/ci_manylinux_aarch64.sh` —— 它把"我们自己盖的 `linux_<arch>`"与"`auditwheel` 盖章后的
 `manylinux_2_28_<arch>`"**两份都留下**，因为只有后者可以声称 manylinux（6.5 第 1b 条）。
 
-**3. 待 CI 首次运行才成立的两条（如实标注，不得写成"已支持"）**
+**3. 两条仍未成立的事（如实标注，不得写成"已支持"；2026-10-27 改标题——原来写的是"待 CI 首次运行才成立"，而套件链已经跑过了）**
 
 - **runner 接线**：`.github/workflows/release_prep.yml` 的两个 Linux job 与 Windows job **一次都还没在 GitHub 上跑过**（`test_runner.yml` 那条链已于 2026-10-22 跑过，见 §6；这两条是**不同的**工作流，前者的标签、镜像拉取、runner 的 Docker 都仍未验证）。命令本身有实测出处：Linux 侧是板测（ledger V110），Windows 侧是 2026-10-09 从 （压缩前提交，克隆内不可达） 重建（见下节读数）。
 - **裸 `check_wheel.py` 今天没有 macOS 那一半**（2026-10-09 实测档位）：非 Linux 轮子上它**只留一句 note**——"no ELF shared objects in this wheel, so the glibc surface was not measured"（Windows 轮子上实测如此），而 PE/DLL 成员按"原生库成员但非 ELF/Mach-O，故未测动态面"记；**Mach-O 成员根本不会被解析**。要补这一半，前置是四项、且都是未验证面：① 一个走遍 `LC_LOAD_DYLIB`/`LC_RPATH` 的 Mach-O 读取器（薄二进制与 `FAT_MAGIC` 通用二进制两种形态）；② 6.7.10 那两行 macOS 设置（`MACOSX_DEPLOYMENT_TARGET` / `-arch`）；③ 一条"装载时不依赖 libstdc++（macOS 只有 libc++）+ 必须有 `@loader_path` 相对 rpath"的判据；④ 一台能跑它的 macOS 机器（6.7.9 记"无机器、无 osxcross"）。**没有第 ④ 项，前三项只能写成未验证**——本轮试过写①②③，在本机既跑不了真 dylib 又只能靠合成夹具自证，故**整体未入库**，只把踩到的形态学坑留在这里见 3d。
@@ -64,12 +77,15 @@ Linux 两条腿**必须在各自架构的 manylinux 容器内**跑同一条脚�
 一个 macOS 轮子问五件事：`lipo -archs` 是否与轮子标签一致、`LC_LOAD_DYLIB` 里**不许有 Homebrew/`/usr/local`
 路径也不许出现 libstdc++**、install name 是否 `@rpath` 形、`LC_RPATH` 是否含 `@loader_path` 自相对项、
 以及无索引无编译器的 venv 装机 + `smoke_installed.py`（附 `check_wheel.py` 成员集比对）。
-**仍缺第 ④ 项（一台 Mac），所以这两项都还没在 macOS 上跑过一次**：CMake 分支只在本机验了"非 Apple 路径
-不受影响"（Windows 上 `--fresh` 重配置 + 全量重建跑通；用例数随配置变化的原因在 `examples/CMakeLists.txt:48`，
-见 §4），脚本只过了 `sh -n`/`bash -n`。
-**第一次上 Mac 才是第一次真凭据**，此句在两份文件、一处脚本头部都写着。
+**第 ④ 项（一台能跑它的 macOS 机器）2026-10-22 起由 CI 补上了，但脚本本身仍没有接线（2026-10-27 更正）**：
+`ci.yml` 的 `macos` 腿跑全量 `ctest` 与一条只构建的 10.15/x86_64 地板腿，`test_python.yml` 的 macos 腿每轮
+构建 macOS 轮子→成员集→绑定契约→无索引无编译器装机冒烟，`test_csharp.yml` 的 `osx-arm64` 腿跑 dotnet 套件
+——**机器这一项不再是缺口**。缺的是：`python/tools/ci_macos_verify.sh` 的五问**在 `.github/` 下 0 处调用**，
+所以"`lipo -archs` 与轮子标签一致、`LC_LOAD_DYLIB` 里没有 Homebrew 路径、install name 是 `@rpath` 形、
+`LC_RPATH` 含 `@loader_path`"这四问，仍然一次都没有在任何地方跑过；`check_wheel.py` 也只解析 ELF、不看
+Mach-O。**⇒ 缺的是接线，不是机器**：把该脚本挂到 macos 腿（哪怕先只跑在 CI 造的轮子上）才是第一次真凭据。
 
-**3d. 一个可复用的教训（2026-10-09，写 Mach-O 读取器时踩的）**：**不要用"合成夹具全绿"当作"读取器正确"的证据**——本轮合成夹具一度在自认正确时也全绿，而在真相被钉住后又全红，来回若干轮，根因从一开始就在**夹具自己**的两条规则上：`cmdsize` 是命令自身的固定长（LC_LOAD_DYLIB 24、LC_RPATH 12），**不含路径字节**；而路径字符串位于**整个命令块之后**，其偏移相对**命令块起点**（即 `sizeofcmds`），**不是**相对该命令起点。把这三件事搞混的读取器会读到命令头被当成路径（实测表现为 `dependencies [\x1c]`）。另附本机两条工具坑：**PowerShell 会吞掉命令里 `<IIII` 这类格式字面量**（inline 命令实测把 `len(body)` 从 72 降到 48），凡是要按字节断言的探针，**一律落成仓库内脚本再跑**；以及 `git check-ignore <目录>` 对目录本身返回"未匹配"，**要判目录是否被忽略须给一个目录内文件路径**（`python/repaired/` 实测如此，规则本身无误）。
+**3d. 一个可复用的教训**：**不要用"合成夹具全绿"当作"读取器正确"的证据**——合成夹具可以在实现自认正确时全绿，而在真相被钉住后全红。
 
 **3b. 多版本的 CI 半边（2026-10-09 新增，仍待首次运行）**：`test_python.yml` 新增 job `python_versions`
 （`needs: python`，矩阵 **cp39 / cp310 / cp311 / cp312 / cp313**）——把 x86_64 那一个 `py3-none-linux_x86_64`
@@ -90,21 +106,45 @@ Linux 两条腿**必须在各自架构的 manylinux 容器内**跑同一条脚�
 | nupkg | `CppPinyin.2.0.0.nupkg`，**约 1.25 MB**（1,282,732～1,282,758 字节，同上） |
 | `check_wheel.py` | `PASS  every packaged file matches its source byte for byte; nothing missing, nothing extra` |
 | `check_bindings.py --wheel` / `--nupkg` | 两个都 `PASS`，且**签名基线 23 条**与头文件一致（`tests/abi/expected_c_api_signatures.v2.txt`，本轮新增） |
-| `ctest --preset default` | `100% tests passed, 0 tests failed out of 50` |
+| `ctest --preset default` | 原写 `100% tests passed, 0 tests failed out of 50` —— **2026-10-27 复核：这个数与同文件下方 2026-10-21 块的 49/49、以及 `tools/run_all_gates.py` 钉住的 `--expect-total 49` 冲突**。规范配置是 examples **OFF**（`CMakePresets.json` 的 `CPP_PINYIN2_BUILD_EXAMPLES=OFF`），examples 打开时才 50（见本节末"用例数必须带配置"）⇒ **重跑后按树重写此格**，不要照抄旧值 |
 | `python -m pytest python/tests` | `125 passed` |
 | `csharp/tools/run_tests.py --native-dir <abs>` | `net7.0` 76/76、`net10.0` 76/76 |
-| `tools/run_all_gates.py --with-build` | `all 20 gates pass`；`check_bindings --self-test` 77/77 |
+| `tools/run_all_gates.py --with-build` | **需要先装两样工具**：`clang-format==22.*`（`check_format --require`）与 `pyyaml`（`check_parsable --require`，缺它该门禁 exit 2 而不是跳过）；CI 的 linux 腿两样都显式 `pip install`。`all 22 gates pass`；`check_bindings --self-test` 77/77。**注意 `RESULT` 行的"pass"指全部退出码 0 且自检通过**——有门禁按设计只能回 `SKIP`（缺 .NET SDK、暂存库陈旧）或 `NOT MEASURED`（单代际树），这类会单独打一行 `note: N gate(s) reported SKIP / NOT MEASURED`，并把该行标成 `skip`（2026-10-27 起；此前它们在汇总里显示成 `ok`，"22 条全绿"实际是 21 条 + 1 条什么都没做） |
 
 > **新的一步（本轮起必需）**：任何改动 `c_api.h` 声明的提交，都要在同一提交里跑
 > `python tools/check_bindings.py --emit-signatures` 重新生成签名基线。门禁只认"类型序列"，
 > **改参数名不会变红**（那是刻意留的自由），改类型/顺序/个数都会。
+
+**写数字的句式表（2026-10-27 补；`tools/check_doc_claims.py` 的 `claims()` 是唯一权威）**：
+门禁**不是按语义**读数字，而是按**句式**——同一个数字换一种写法，它就整条读不到，等于没写。
+这条缝隙 2026-10-27 实测咬过一次：`docs/RELEASE_RUNBOOK.md` 把门禁条数写成 `21/21`（`N/N` 形状），
+而 `gate-total` 轴只认 `all N gates pass`，于是那行过期了整整两轮都没人发现（已修）。
+
+| 数字 | 必须写成 | 对应轴 |
+|---|---|---|
+| 冻结面（头文件 / 声明 / 符号） | `N 公开头 + M C ABI + K 插件面声明`，或用 `/` 代替 `+`，或 `N headers … M declarations … K symbols` | `frozen-plus` / `frozen-slash` / `frozen-printed` |
+| AC-3 扫描面 | `N 文件 0 违例`、`N files scanned` 或 `从 10 个文件补到全 src/ 的 N 个` | `ac3-scan` / `ac3-scanned` / `ac3-scan-floor` |
+| CTest 注册条目 | `注册用例数：N` 或 `N registered` | `gate-registered` / `gate-registered-en` |
+| **门禁条数** | **`all N gates pass`**（runner 的原话） | `gate-total` |
+| 某个 label 的条目数 | `` `<label>` N 条 ``（label 名必须是 `ctest -N` 里的真名） | `label-counts` |
+| 某门禁的自检用例数 | `` `<tool>.py … --self-test N/M` ``、`` `<tool>` 自检 **N** 条 ``、或 `绑定门禁 N/M` | `selftest-slash` / `selftest-cases-zh` / `selftest-role` |
+| 四种构建配置的条目数与指纹 | playbook §7 那张表的**表格行**（`| 配置 | **N** | **M** | \`指纹\` |`） | `check_config_fingerprints` |
+
+**刻意不读的写法**（写了也不会被核对，别以为门禁会兜底）：
+
+- **裸 `N/M`**，前面没有工具名——文档里 `22/22`、`14/14` 也可能是 ctest 运行数，工具分不清；
+- **`N 运行`**——既可能指门禁跑了多少条目，也可能指某次 ctest 实际跑了多少；
+- 任何**没有列进上表**的散文数字（例如"22 条门禁全绿"这种句式）——**要么改成上表的写法，要么自己核对**。
+
+> 判据一句话：**写完数字，去 `tools/check_doc_claims.py --ctest-inventory <build>` 里看它是否出现在输出中**；
+> 没出现就说明这条断言没有核对者，只有你自己。
 
 **4. 2026-10-09 本机实测读数（Windows x64，从 `50be016`（压缩前提交，克隆内不可达） 重建）**——发布链路在本机的证据：
 
 | 环节 | 读数 |
 |---|---|
 | `build_native.py` | exit 0；staged `libcpp-pinyin.dll`（sha256 `aed598c1fd450057…`）、中粤各 7 个词典文件；`version=2.0.0 commit=50be016` |
-| wheel | `cpp_pinyin2-2.0.0-py3-none-win_amd64.whl`，**1,094,773 字节**〔2026-10-21 更正：包名一直是 `cpp_pinyin2`（`setup.py` 的 `name=`），原来这里少写了一个 `2`；字节数保持当时读数未动〕 |
+| wheel | `cpp_pinyin2-2.0.0-py3-none-win_amd64.whl`，**1,094,773 字节**〔2026-10-21 更正：原来这里少写了一个 `2`；**2026-10-27 再更正**：distribution 名是 `cpp-pinyin2`（`python/setup.py` 的 `name=`），`cpp_pinyin2` 是导入包名与轮子文件名的规范化形态——上一版那条注把两者混成了一个名字；字节数保持当时读数未动〕 |
 | `check_wheel.py` | `PASS  every packaged file matches its source byte for byte; nothing missing, nothing extra` |
 | `check_bindings.py --wheel` | `PASS`（插件面 18 声明、导出 19 符号、C# 壳逐字段转写 6 结构 + 19 入口） |
 | 干净 venv（`--no-index --no-deps`） | 安装 exit 0；`smoke_installed.py` **SMOKE OK**（`version: 2.0.0`、`dialects: ['cantonese','mandarin']`、mandarin `ni3 hao3 shi4 jie4`、cantonese `nei5 hou2 sai3 gaai3`） |
@@ -121,7 +161,7 @@ Linux 两条腿**必须在各自架构的 manylinux 容器内**跑同一条脚�
 
 **用例数必须带配置**：`examples/CMakeLists.txt` 的 `MinimalUsage` 只在 `CPP_PINYIN2_BUILD_EXAMPLES` 与
 `CPP_PINYIN2_BUILD_TESTS` **同时**开启时才注册。规范配置是 examples 关闭的 `.tmp/mk-default`（**49 条**）；
-examples 开启时是 **50 条**。`tools/check_doc_claims.py` 以 `.tmp/mk-default` 为准，四套配置的实测读数见
+examples 开启时是 **50 条**。`tools/check_doc_claims.py` 以 `.tmp/mk-default` 为准（**可覆盖**：设 `CPP_PINYIN2_CANONICAL_BUILD=<dir>` 即可改判基准，2026-10-27 起；此前报错信息让人"point CANONICAL_BUILD"，而那个常量根本没有覆盖入口），四套配置的实测读数见
 `docs/NEW_DIALECT_PLAYBOOK.md` §7 的指纹表 —— 引用这个数而不写明配置，下一次复核就会把"配置差异"读成"门禁漂移"。
 
 **`TEMP`/`TMP` 必须先指到仓内可写目录**，否则 `CppPinyinTests` / `ThreadSafety` / `InstanceIsolation` 三项会红；
@@ -140,7 +180,7 @@ examples 开启时是 **50 条**。`tools/check_doc_claims.py` 以 `.tmp/mk-defa
 wheel METADATA 的唯一来源。`python/tools/check_wheel.py` **不再自带那份常量**（原来写的是
 `Requires-Python: >=3.8`），改为**解析 `setup.py` 得出期望值**再比对 METADATA（不 import：`setup.py` 一
 import 就会执行 `setup()`），并新增两条自检：METADATA 里写别的下限**必须被拒**、树里如实写就**不许报**。
-动机是实测过的漂移：第 28 轮把下限由 3.9 降到 3.8 时，这个常量必须**手工跟着改**，而漏改不会有任何提示，
+动机是实测过的漂移：把下限由 3.9 降到 3.8 时，这个常量必须**手工跟着改**，而漏改不会有任何提示，
 只有"轮子里写着一个没人选过的下限"这种事后才发现。**这次上调当场演示了这条门禁是活的**：改完
 `setup.py` 后拿**未重建的旧轮子**跑 `check_wheel.py`，它立刻报
 `METADATA does not declare 'Requires-Python: >=3.9'`，重建后转绿。
@@ -152,15 +192,15 @@ import 就会执行 `setup()`），并新增两条自检：METADATA 里写别的
 | 项 | 状态 | 最硬的凭据 | 权威落点 |
 |---|---|---|---|
 | Windows x64 轮子 | **已实测** | 2026-10-09 从 `50be016`（压缩前提交，克隆内不可达） 重建：`check_wheel.py` PASS（逐字节）、`check_bindings.py --wheel` PASS、干净 venv `--no-index --no-deps` 装机 + `SMOKE OK`；ctest 32/32 | 本节 §4 |
-| Linux x86_64 轮子（`linux_x86_64` + auditwheel 盖章） | **脚本已板测 / CI 未跑** | 同一条脚本的 aarch64 腿在真板上 `RESULT: OK`（含盖章与盖章后复检，ledger V110）；x86_64 腿只换了 `uname -m` | 6.7.12（原 6.7.11 顺延）、`python/tools/ci_manylinux_aarch64.sh` |
-| Linux aarch64 轮子 | **板测已实测 / CI 未跑** | 板上 `RESULT: OK`；盖章后标签为压缩标签集（auditwheel 判 2_26 更宽） | 6.7.9 / 6.7.10 行内 |
-| Linux 原生构建 + **全量 ctest 50/50**（当时注册 50 条；现为 49 条） | **已实测** | 2026-10-21 在 firefly 板（aarch64 / glibc 2.31 / gcc 9.4 / cmake 3.21.3 / python 3.8.10 / binutils 2.34，快照 `4772b3f`（压缩前提交，克隆内不可达））：configure、build、`ctest` **50/50**、install 全过；README 的前置是词典仓检出在 `../pinyin-makedict` 且先跑一次 `emit_build_info.py` | 提交历史 |
-| macOS 轮子 | **未实测（缺机器）** | 只有：部署目标进树（`CMakeLists.txt` 的 `if (APPLE)`，硬拒 < 10.15）、验收脚本进树（`ci_macos_verify.sh`，五项问句）、以及"非 Apple 路径不受影响"的本机回归 | §3c |
-| 一个轮子覆盖多解释器 | **板测已实测 + CI 检查点已建（未跑）** | 板上 cp39/cp310/cp311/cp312/cp313 各 91 passed 且同一 wheel 都能装能冒烟；CI 侧 `python_versions` job | §3b、§5 |
+| Linux x86_64 轮子（`linux_x86_64` + auditwheel 盖章） | **脚本已板测 / 只有 `release_prep` 会造，而它从未运行** | 同一条脚本的 aarch64 腿在真板上 `RESULT: OK`（含盖章与盖章后复检，ledger V110）；x86_64 腿只换了 `uname -m`。aarch64 那条另有 CI 门（`test_python.yml` 的 manylinux 容器 job），x86_64 这条没有 | 6.7.12（原 6.7.11 顺延）、`python/tools/ci_manylinux_aarch64.sh` |
+| Linux aarch64 轮子 | **板测已实测 / CI 也跑过** | 板上 `RESULT: OK`；盖章后标签为压缩标签集（auditwheel 判 2_26 更宽）。CI 侧由 `test_python.yml` 的 manylinux 容器 job 每轮跑同一条脚本，运行记录见 `docs/STABILITY.md` §0.1（本节不复制） | 6.7.9 / 6.7.10 行内 |
+| Linux 原生构建 + **全量 ctest 50/50**（当时注册 50 条；现为 49 条） | **已实测** | 2026-10-21 在 firefly 板（aarch64 / glibc 2.31 / gcc 9.4 / cmake 3.21.3 / python 3.8.10 / binutils 2.34，快照 `4772b3f`（压缩前提交，克隆内不可达））：configure、build、`ctest` **50/50**、install 全过；README 的前置是词典仓检出在 `../pinyin-makedict` 且先跑一次 `emit_build_info.py` | 过程记录（2026-10-22 删除，`git log --diff-filter=D -- tests/data/testdata/`） |
+| macOS 轮子 | **构建/装机冒烟已由 CI 每轮跑到；Mach-O 面仍未实测（2026-10-27 更正，原写"未实测（缺机器）"）** | **已跑到的**：`test_python.yml` 的 macos 腿每轮构建 macOS 轮子 → `check_wheel.py`（成员集逐字节）→ `check_bindings.py --wheel` → 无索引无编译器 venv 装机 + `smoke_installed.py`；`ci.yml` 的 macos 腿跑全量 `ctest` 与一条只构建的 10.15/x86_64 地板腿。**仍缺的**：`python/tools/ci_macos_verify.sh` 的五问没有接线（`.github/` 下 0 处调用），`check_wheel.py` 不解析 Mach-O，`release_prep` 故意不产 macOS 轮子（文件头自述）⇒ macOS 轮子今天只是 CI 工件，不是发布物件 | §3c、§3b |
+| 一个轮子覆盖多解释器 | **板测已实测 + CI 检查点已建且已跑** | 板上 cp39/cp310/cp311/cp312/cp313 各 91 passed 且同一 wheel 都能装能冒烟；CI 侧 `python_versions` job 跑 3.9–3.13 五档，运行记录见 `docs/STABILITY.md` §0.1 | §3b、§5 |
 | Python 下限这个数字 | **单一真相源已收敛** | `setup.py` 的 `python_requires` 是唯一权威，`check_wheel.py` 解析它并比对 METADATA，两条自检一红一绿（2026-10-09） | §5 末段、`python/tools/check_wheel.py` |
-| 版本链六处一致（发版前提） | **①②③机械化为用例，④⑤⑥在 `check_bindings.py`，数据下限在 `check_version_tokens` 的第七轴，⑥ 的 tag 检项待 CI 传参** | `python/tests/test_contract.py::test_version_chain_three_of_six`；`check_bindings.py --self-test 77/77` | 本节第 1 条 |
+| 版本链六处一致（发版前提） | **①②③机械化为用例，④⑤⑥在 `check_bindings.py`，数据下限在 `check_version_tokens` 里 `min_library` 那条，⑥ 的 tag 检项待 CI 传参** | `python/tests/test_contract.py::test_version_chain_three_of_six`；`check_bindings.py --self-test 77/77` | 本节第 1 条 |
 | 发布动作自动化 | **故意不做** | 只做"预备"（构建 + 验收 + 上传 artifact），不发 PyPI/NuGet | 6.7.12 第三条、`release_prep.yml` 头部 |
-| C# / NuGet 侧 | **矩阵工作流已在（3 平台）；合池工具 + 池化 job 均在，本机两个 RID 实跑过，CI 未跑** | `merge_nupkgs.py --self-test` 6/6；同源两包 → 34 成员 / rids `linux-x64`+`win-x64` / `check_bindings.py` PASS（不带 `--rid`） | 第 7 条、`csharp/tools/merge_nupkgs.py`、`release_prep.yml` 的 `csharp`+`csharp_pool` |
+| C# / NuGet 侧 | **矩阵工作流已在 CI 跑过（3 平台）；合池只在 `release_prep` 里，从未跑过** | `merge_nupkgs.py --self-test` 10/10；同源两包 → 32 成员 / rids `linux-x64`+`win-x64` / `check_bindings.py` PASS（不带 `--rid`；2026-10-27 重测，修掉"首包运行库写两遍"之前是 33 成员且含 1 个重名）；`test_csharp.yml` 的三腿运行记录见 `docs/STABILITY.md` §0.1 | 第 7 条、`csharp/tools/merge_nupkgs.py`、`release_prep.yml` 的 `csharp`+`csharp_pool` |
 
 **6b. 2026-10-21 的本机复测（补在上面那张 2026-10-09 总账之后，不覆盖它）**
 
@@ -183,7 +223,7 @@ import 就会执行 `setup()`），并新增两条自检：METADATA 里写别的
 |---|---|---|
 | Windows x64 轮子（从当时的 HEAD 重建） | `check_wheel.py` **PASS**（成员逐字节）、`check_bindings.py --wheel` **PASS**；METADATA 新增 9 条 classifiers 与 5 条 `Project-URL` | `python -m pip wheel . --no-build-isolation --no-deps` ⇒ 见 `python/dist/` |
 | 单个 RID `win-x64` 的 nupkg | `check_bindings.py --nupkg --tag v2.0.0` **PASS**；nuspec 新增 `projectUrl`/`repository url`/`tags`/`releaseNotes`；许可证表达式见 上面的包许可证一行；原 vcpkg 那条（同源数据） | `emit_build_info.py` → `dotnet pack -p:CppPinyinRid=win-x64` |
-| C++ 编译腿 | MinGW g++ / MSVC 19.51 / Clang 22.1.4 **三条腿各 49/49**（20 门禁全绿） | `cmake --preset default\|msvc\|clang` ⇒ 提交历史 |
+| C++ 编译腿 | MinGW g++ / MSVC 19.51 / Clang 22.1.4 **三条腿各 49/49**（20 门禁全绿） | `cmake --preset default\|msvc\|clang` ⇒ 过程记录（2026-10-22 删除，`git log --diff-filter=D -- tests/data/testdata/`） |
 | 包的许可证表达式 | 从两项补成三项（`CC-BY-SA-3.0` 是粤语表，之前漏了），并由 `check_bindings.py` 的 `check_package_licence` 与各表 `License.txt` 逐版本比对（2026-10-23 起读 `CppPinyin.csproj` 的 `<PackageLicenseExpression>`——原先读的是已删除的 vcpkg 清单） | 第 8 节 |
 **6c. 复跑读数前必须知道的两个假信号（2026-10-21 实测，都是当场踩到的）**
 
@@ -198,8 +238,10 @@ import 就会执行 `setup()`），并新增两条自检：METADATA 里写别的
 **2026-10-22 首次真正跑起来（`v2` 分支推送后共 4 轮）**：这条教训当场应验——首轮 9 个 job 里 6 个红，且**没有一条是本机复算得出的**
 （GCC 13 在 libstdc++ 内部的 `-Wnull-dereference` 误报、macOS 的 `<filesystem>` 要 10.15、PEP 639 的许可证目录、shallow
 clone 打死三个查历史的门禁、`nm -D` 只有 GNU 有、clang-format 18 与 22 的分歧、两处并发写同一临时目录）。这些都已按
-**真因**修掉并各自留了控制项；本机按 CI 的形状复验过（干净检出 + `ctest -j8` + 按 `cd python` 打的 wheel），但
-**Linux 运行时 / macOS 运行时 / ASan 腿 / manylinux 容器仍只有 CI 能证**，所以上面的"已实测"一栏在下一轮绿之前仍按未实测读。
+**真因**修掉并各自留了控制项；本机按 CI 的形状复验过（干净检出 + `ctest -j8` + 按 `cd python` 打的 wheel）。
+**2026-10-23 那条链已经全绿**（运行记录、job 清单与覆盖面见 `docs/STABILITY.md` §0.1，本节不复制），
+所以"Linux 运行时 / macOS 运行时 / ASan 腿 / manylinux 容器只有 CI 能证"这一句说的是**证据来源**，不再
+意味着"还没有证据"——**唯一仍然没有证据的是 `release_prep`（发布预备）**，它一次都没跑过。
 
 其中两条当时看着像打包代码坏了、其实是口径坏了的：C# 记录的本机库名必须**不带版本号**（CMake 在 macOS 上产出
 `libcpp-pinyin2.2.0.0.dylib`，加载器自己拼扩展名，所以记录值只能是 `libcpp-pinyin2`）；wheel 的许可证文本有
@@ -257,7 +299,7 @@ clone 打死三个查历史的门禁、`nm -D` 只有 GNU 有、clang-format 18 
   （本机只有 Windows），所以"三个 RID 都合得进一个包"目前只有**两个 RID 的本机证据**（7.4：同源两包 →
   34 成员 / `linux-x64` + `win-x64` / 门禁 PASS / 带 `--rid` 时按预期红）。**NuGet 上传同样不动**（6.7.12 第三条）。
 
-**7.6 可复现构建（2026-10-20 新增，审计 round 2 / G13）**：发版前跑一次"同一提交、两个不同目录"的
+**7.6 可复现构建（2026-10-20 新增）**：发版前跑一次"同一提交、两个不同目录"的
 构建，两个产物的 SHA-256 必须相同：
 
 ```powershell
@@ -287,19 +329,18 @@ foreach ($d in @('.tmp\repro-a', '.tmp\repro-b')) {
 ——原来 `/pathmap` 单独使用会被静默忽略。
 **仍无法验证**的只剩 macOS/Apple 工具链那半句，以及「两次构建字节一致」本身（仍只在发版时做）。
 
-
 ---
 
-**8. 四个渠道的就绪状态（2026-10-21 新增：一页齐平，别再靠翻四处）**
+**8. 三个渠道的就绪状态（2026-10-21 新增：一页齐平，别再靠翻四处；2026-10-27 更正：vcpkg 端口已于 2026-10-23 移除，那个"四"不再成立）**
 
-写这一节的原因：发版面分散在四个生态系统里，各自的"还差什么"以前只写在各自的文件里，发版时要翻四处才
+写这一节的原因：发版面分散在三个生态系统里（vcpkg 移出后由四变三），各自的"还差什么"以前只写在各自的文件里，发版时要翻三处才
 拼得出来。下表每一行的**本机实测**都是真跑过的，**未实测**的一律写明，不写成"已支持"。
 
 | 渠道 | 产物（本机实测的那个） | 本机实测 | 发版还差什么 | 阻塞 |
 |---|---|---|---|---|
-| **PyPI** | 构建产物：`python/dist/` 下的 `cpp_pinyin2-2.0.0` wheel（**不入库、文件名随平台变**；2026-10-23 重建自压缩后的 `v2` 树） | `python/tools/check_wheel.py` **PASS**（成员逐字节）；`check_bindings.py --wheel` **PASS**；`Requires-Python: >=3.9`；classifiers 与 5 条 project_urls；许可证表达式改为三项，`THIRD_PARTY_NOTICES.md` 随包进 `<dist-info>/`（2026-10-21 补） | manylinux / macOS 轮子（要 CI）；`twine check` **本机没跑**（本机没装 `twine`）；上传是**人的动作** | CI 首次运行；上传按 6.7.12 第三条 |
-| **NuGet** | `.tmp/pkgs/CppPinyin.2.0.0.nupkg`（单 RID `win-x64`，本机打；2026-10-23 重建自压缩后的 `v2` 树） | `check_bindings.py --nupkg` **PASS**（含 8+8 词典文件、`runtimes/win-x64/native`、三 TFM 的 `lib/` 与 `ref/`）；nuspec 的 `projectUrl`/`repository`/`tags`/`releaseNotes`；三项许可证表达式 + 随包 `THIRD_PARTY_NOTICES.md`（2026-10-21 补） | 另外两个 RID 的包与池化（要 CI 的三个平台腿）；上传是人的动作 | CI 首次运行（7.5） |
-| **pkg-config** | 安装树里的 `lib/pkgconfig/cpp-pinyin2.pc` | 2026-10-21 读安装树逐字段核对：`prefix` 相对、`Version: 2.0.0`、`Cflags`/`Libs`/`dictdir` 齐全；由 `InstallConsumerSmoke` 这条 ctest 每次构建都验 | 无（随 CMake install 一起发） | 无 |
+| **PyPI** | 构建产物：`python/dist/` 下的 `cpp_pinyin2-2.0.0` wheel（**不入库、文件名随平台变**；2026-10-23 重建自压缩后的 `v2` 树） | `python/tools/check_wheel.py` **PASS**（成员逐字节）；`check_bindings.py --wheel` **PASS**；`Requires-Python: >=3.9`；classifiers 与 5 条 project_urls；许可证表达式改为三项，`THIRD_PARTY_NOTICES.md` 随包进 `<dist-info>/`（2026-10-21 补） | manylinux / macOS 轮子（要 CI）；`twine check` **本机没跑**（本机没装 `twine`）；上传是**人的动作** | **`release_prep` 从未运行**（manylinux 轮子无来源）；`twine check` 未跑；上传按 6.7.12 第三条 |
+| **NuGet** | `.tmp/pkgs/CppPinyin.2.0.0.nupkg`（单 RID `win-x64`，本机打；2026-10-23 重建自压缩后的 `v2` 树） | `check_bindings.py --nupkg` **PASS**（含 8+8 词典文件、`runtimes/win-x64/native`、三 TFM 的 `lib/` 与 `ref/`）；nuspec 的 `projectUrl`/`repository`/`tags`/`releaseNotes`；三项许可证表达式 + 随包 `THIRD_PARTY_NOTICES.md`（2026-10-21 补） | 另外两个 RID 的包与池化（要 CI 的三个平台腿）；上传是人的动作 | **`release_prep` 从未运行**（`linux-x64`/`osx-arm64` 与池化包无来源，见 §7.5） |
+| **pkg-config** | 安装树里的 `lib/pkgconfig/cpp-pinyin2.pc` | 2026-10-21 读安装树逐字段核对：`prefix` 相对、`Version: 2.0.0`、`Cflags`/`Libs`/`dictdir` 齐全；由 `InstallConsumerSmoke` 这条 ctest 每次构建都验——**但 Windows 腿不跑该用例**（`ci.yml` 的 `-E '^InstallConsumerSmoke$'`，判词见 `docs/DECISIONS.md` 的 D45），所以这条覆盖在 Windows 侧是空的 | 无（随 CMake install 一起发）；**静态消费面另有一处已知缺口**：`.pc` 没有 `Libs.private: -ldl`，而 `CMakeLists.txt` 说 glibc<2.34 上 `dladdr` 必须显式带 `dl` ⇒ `pkg-config --static` 在旧 glibc 上会链接失败，且该组合无门禁 | Windows 侧：`InstallConsumerSmoke` 的排除未撤；静态面：未验 |
 
 三个渠道各自的**发版命令**在 [`RELEASE_RUNBOOK.md`](./RELEASE_RUNBOOK.md)——这份清单管"发之前验收什么"，那份管"发布当天怎么敲"。vcpkg 不是渠道：仓库不提供端口（2026-10-23 移除）。
 

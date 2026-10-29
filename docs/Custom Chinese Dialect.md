@@ -65,7 +65,7 @@ public:
 } // namespace cpp_pinyin
 ```
 
-A subclass defines its own style constants: `ToneConverter` used to carry a `Style` enum (`NORMAL` / `TONE`) that nothing referenced and that duplicated the library's own numbering, and it was deleted on 2026-10-01 (D27). An **in-tree** dialect does not redeclare the values at all — `ManTone::Style` / `CanTone::Style` are `using`-aliases of `MandarinStyle` / `CantoneseStyle` in `Types.h`, the single authority for the numbering; an **out-of-tree** dialect keeps its own enum, as the example above does, because it cannot extend those enums.
+A subclass defines its own style constants: `ToneConverter` does not declare a `Style` enum, so a dialect owns its numbering (`MandarinStyle` / `CantoneseStyle` are the built-ins').
 
 Each conversion function takes a tone-marked pinyin string (UTF-16) and returns the reformatted version. Look at [ManTone.h](../include/cpp-pinyin2/dialects/ManTone.h) for a full example with nine styles, or [CanTone.h](../include/cpp-pinyin2/dialects/CanTone.h) for a minimal setup that registers two conversions (`NORMAL`, `FIRST_LETTER`) and leaves `TONE3` as a passthrough — three styles in total.
 
@@ -158,10 +158,9 @@ Facts worth knowing before you fill in the fields:
   something for your dialect. A dialect that does not set them **ignores** the switch instead of
   having its output silently reinterpreted — this is how the built-in Cantonese behaves.
 * `postProcess` is an optional pass over a finished `Result`. Since D33 it applies to **every**
-  `query` overload there is, because the "streaming" overload that used to bypass it was deleted. Use
-  it for caller-side fixes. Do **not** use it to re-implement reading selection: the disambiguation window is frozen and
-  a second implementation of it will disagree with the engine on exactly the polyphones you care
-  about.
+  `query` overload there is. Use it for caller-side fixes. Do **not** use it to re-implement reading
+  selection: the disambiguation window has one implementation, and a second one will disagree with the
+  engine on exactly the polyphones you care about.
 * `tone` is copied into the engine by value, which slices it to the `ToneConverter` base. That is
   intentional and harmless: every dialect behaviour lives in the base's function-pointer table
   (`m_converts`, `m_normalize`), never in a virtual. Do not turn it into a virtual.
@@ -298,9 +297,5 @@ promise.
 |---------|--------------|-------------|-------------------|
 | Mandarin | [ManTone](../include/cpp-pinyin2/dialects/ManTone.h) | `Engine::open(registry, root, "mandarin")` | `data/dialects/mandarin/` |
 | Cantonese | [CanTone](../include/cpp-pinyin2/dialects/CanTone.h) | `Engine::open(registry, root, "cantonese")` | `data/dialects/cantonese/` |
-
-> **2026-10-10 更正**：本表第三列原先链接到 `dialects/Mandarin.h` / `dialects/Cantonese.h` ——
-> 那两个头与它们声明的门面类**均已删除**，链接是死的。这里改成**现行入口**
-> （[Registry.h](../include/cpp-pinyin2/ext/Registry.h) 的注册 id + `Engine::open`）。
 
 ManTone registers all nine styles in `MandarinStyle` (`NORMAL`, `TONE`, `TONE2`, `FIRST_LETTER`, `BOPOMOFO`, `INITIALS`, `FINALS`, `FINALS_TONE3`, `TONE3`). CanTone supports three (NORMAL, FIRST_LETTER, TONE3). Your dialect can support as many as needed, up to `MAX_STYLE` (9).

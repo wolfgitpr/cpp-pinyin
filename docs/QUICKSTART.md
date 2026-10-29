@@ -11,12 +11,12 @@
 
 1. **三种形态任选其一**：C++ 库（CMake 安装）、Python 包、C# 包。
    它们共用同一个引擎（同一个 C ABI），所以**说话方式一致**：注册表 / 打开 / 配置 / 查询。
-2. **平台状态**（截至 2026-10-09，详见 `docs/DECISIONS.md` §2.1 `docs/RELEASE_CHECKLIST.md`（原 §6.7.11））：
+2. **平台状态**（截至 2026-10-27，详见 `docs/RELEASE_CHECKLIST.md` §6 与 `docs/STABILITY.md` §0.1）：
    | 平台 | 状态 |
    |---|---|
-   | Windows x64 | ✅ 已实测（含现成 wheel / nupkg） |
+   | Windows x64 | ✅ 已实测（含现成 wheel / nupkg）；⚠️ CI 的 windows 腿**不跑** `InstallConsumerSmoke`（判词见 `docs/DECISIONS.md` 的 D45） |
    | Linux x86_64 / aarch64 | ✅ 能构建：脚本在板上跑过，**CI 也跑过**（2026-10-22 起，构建与 `linux`/`linux-sanitizers` 两条腿；测试侧的修复见 `docs/RELEASE_CHECKLIST.md` §6） |
-   | macOS | ⚠️ **未实测**——本仓没有 Mac；部署目标（10.15）与验收脚本已进树 |
+   | macOS | ✅ CI **每轮**构建 macOS 轮子并做无编译无索引装机冒烟（`test_python.yml` 的 macos 腿），`ci.yml` 的 macos 腿还跑全量 `ctest`；⚠️ **二进制面未验**：`lipo`/`LC_LOAD_DYLIB`/`@rpath` 那五项检查的脚本没有接线，且 `release_prep` 不产 macOS 轮子 ⇒ 别读成"有发布用的 macOS 包" |
 3. **词典要能被找到**：库本身**不含**默认词典路径（`Engine::open` / `cppp2_open` 都要求显式路径）。
    谁能替决定，优先级是固定的：
 
@@ -200,10 +200,16 @@ Chinese above, English below. The two halves correspond one to one.
 
 1. **Three surfaces, one engine**: the C++ library (installed with CMake), the Python package and the C# package all
    drive the same engine over the same C ABI, so they speak the same way: registry / open / config / query.
-2. **Platform status** (as of 2026-10-09; details in `docs/DECISIONS.md` §2.1 `docs/RELEASE_CHECKLIST.md`（原 §6.7.11）):
-   Windows x64 is measured end to end; Linux x86_64/aarch64 build and have run on real hardware (the CI legs
-   themselves have not run on GitHub yet); **macOS is not measured** -- there is no Mac in this project, though
-   the deployment target (10.15) and a verification script are in the tree.
+2. **Platform status** (as of 2026-10-27; details in `docs/RELEASE_CHECKLIST.md` section 6 and `docs/STABILITY.md`
+   section 0.1): Windows x64 is measured end to end, and the CI windows leg runs `InstallConsumerSmoke` with the
+   rest of the suite again -- the exclusion that used to skip it was withdrawn on 2026-10-27 (D45 in
+   `docs/DECISIONS.md` keeps the history, including that the fix's first runner evidence is the next Windows run,
+   not a green record that already exists); Linux x86_64/aarch64 build, have run on real hardware, and their CI
+   legs run on GitHub; macOS **is** built and its wheel installed and smoke-tested by CI on every run, and since
+   2026-10-27 its binary surface is checked too (`lipo` / `LC_LOAD_DYLIB` / `@rpath`, via
+   `python/tools/ci_macos_verify.sh` wired into the macOS job) -- that step has not run yet, so its first result
+   is evidence, not confirmation; `release_prep` still produces no macOS wheel -- do not read any of this as
+   "a macOS package can be released".
 3. **The dictionaries have to be findable**: the library ships no implicit dictionary path. Through
    `find_package` it is `CPP_PINYIN2_DICT_DIR` (set by `cpp-pinyin2Config.cmake` to `share/cpp-pinyin2/dict`);
    the Python and C# packages carry a copy; a source build has to
