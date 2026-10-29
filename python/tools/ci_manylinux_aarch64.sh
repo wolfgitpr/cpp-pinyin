@@ -220,10 +220,19 @@ int main(void) {
     return 0;
 }
 C_EOF
+  # COMPILE WITH THE C DRIVER, LINK WITH THE C++ ONE. `c_api.h` is a C header and must compile as C --
+  # that is half of what this step proves. But `libcpp-pinyin2.a` is a C++ archive, so the final link needs
+  # libstdc++: driving it with `gcc` failed with "undefined reference to std::__cxx11::basic_string<...>" and
+  # "operator new" (measured here, manylinux aarch64, 2026-10-29). Adding -lstdc++ to the .pc would encode one
+  # platform's runtime into a file that also ships for MSVC and Apple, so the link uses `g++` instead -- the
+  # same thing any consumer of a C++ library does, and `Cflags` already says `-std=c++17`.
   # Word-splitting is the point here: the flags have to reach the compiler as separate arguments.
   # shellcheck disable=SC2046
-  gcc /tmp/static-consumer.c -o /tmp/static-consumer \
-      $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --cflags --libs cpp-pinyin2) >> /tmp/static.txt 2>&1
+  gcc -c /tmp/static-consumer.c -o /tmp/static-consumer.o \
+      $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --cflags cpp-pinyin2) >> /tmp/static.txt 2>&1
+  # shellcheck disable=SC2046
+  g++ /tmp/static-consumer.o -o /tmp/static-consumer \
+      $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --libs cpp-pinyin2) >> /tmp/static.txt 2>&1
   static_link_rc=$?
   echo "link exit: $static_link_rc"
   check "a consumer links through pkg-config --static" \

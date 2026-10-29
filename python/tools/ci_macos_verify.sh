@@ -170,7 +170,7 @@ $PY -m venv "$VENV"
 "$VENV/bin/python" -m pip install --quiet --no-index --no-deps "$WHEEL" > "$STAGE/pip.txt" 2>&1
 echo "pip install exit: $?"
 tail -n 3 "$STAGE/pip.txt"
-"$VENV/bin/python" -c "import cpp_pinyin2, sys; print('import ok:', cpp_pinyin2.__version__, cpp_pinyin2.default_dict_dir())" \
+"$VENV/bin/python" -c "import cpp_pinyin2, sys; print('import ok:', cpp_pinyin2.__version__, cpp_pinyin2.Engine.default_dict_dir())" \
     > "$STAGE/import.txt" 2>&1
 import_rc=$?
 echo "import exit: $import_rc"

@@ -106,6 +106,7 @@ jobs:
           # the gate compares it against the canonical count (which `run_all_gates` alone asserts).
           # Reading it off `build/` (examples ON) made one wrong source report as two red gates -- a claim
           # mismatch and a total mismatch.
+          ctest --test-dir .tmp/mk-default --show-only=json-v1 > .tmp/mk-default-inventory.json
           # NO second `check_gate_inventory --expect-total <n>` here. It used to be, with its own copy of
           # the count, and the copy drifted from the one in `tools/run_all_gates.py`: the two would run
           # back to back in this job and one of them had to be red. The count assertion lives in
