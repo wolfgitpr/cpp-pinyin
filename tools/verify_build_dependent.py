@@ -352,7 +352,12 @@ def link_probes(root: Path, build: Path, authorised: bool, generator: str) -> in
     results: dict[str, int] = {}
     for label, source in sources.items():
         out = scratch / f"probe_{label}.exe"
-        code, _ = run([linker, "-o", str(out), str(source), "-L", str(build / "bin"),
+        # BOTH -L DIRECTORIES, for the same reason the library search above uses both: on Linux and macOS
+        # the .so/.dylib lands in `lib` and only Windows puts the import library in `bin`. Passing `bin`
+        # alone made BOTH probes fail to link on Linux, which this section reports as "NOT VERIFIED" -- the
+        # one verdict that says nothing about the tree (measured on CI, ubuntu-latest, 2026-10-29).
+        code, _ = run([linker, "-o", str(out), str(source),
+                       "-L", str(build / "lib"), "-L", str(build / "bin"),
                        f"-l{library.stem[3:] if library.stem.startswith('lib') else library.stem}"],
                       root, quiet=True)
         results[label] = code

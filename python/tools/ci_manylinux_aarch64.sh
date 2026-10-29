@@ -182,11 +182,21 @@ if command -v pkg-config >/dev/null 2>&1; then
   STATIC_BUILD=/tmp/static-build
   STATIC_PREFIX=/tmp/static-prefix
   rm -rf "$STATIC_BUILD" "$STATIC_PREFIX"
-  cmake -S "$WORK" -B "$STATIC_BUILD" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+  # NO `-G Ninja` HERE. Step 1 installs ninja when pip can, and this image sometimes cannot (no wheel for
+  # the architecture, no network): forcing the generator then made configure fail, the .pc was never written,
+  # and the two checks below reported "Libs.private contributes -ldl" as FALSE -- an environment gap wearing
+  # the verdict of a code defect (measured on CI, manylinux aarch64, 2026-10-29). CMake picks its own default
+  # generator when none is named, and the question here is pkg-config, not the generator.
+  if command -v ninja >/dev/null 2>&1; then STATIC_GEN="-G Ninja"; else STATIC_GEN=""; fi
+  # shellcheck disable=SC2086  # word-splitting is the point: an empty STATIC_GEN must vanish, not become ""
+  cmake -S "$WORK" -B "$STATIC_BUILD" $STATIC_GEN -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
         -DCPP_PINYIN2_BUILD_TESTS=OFF -DCPP_PINYIN2_BUILD_EXAMPLES=OFF -DCPP_PINYIN2_INSTALL=ON \
         > /tmp/static.txt 2>&1
   static_configure_rc=$?
   echo "configure exit: $static_configure_rc"
+  # A failed configure is a failure of THIS step, not a missing flag: without this line the empty .pc read
+  # as "Libs.private is wrong".
+  check "the static configure succeeds" "$([ "$static_configure_rc" = 0 ] && echo 1 || echo 0)" "exit=$static_configure_rc"
   cmake --build "$STATIC_BUILD" >> /tmp/static.txt 2>&1
   echo "build exit: $?"
   cmake --install "$STATIC_BUILD" --prefix "$STATIC_PREFIX" >> /tmp/static.txt 2>&1

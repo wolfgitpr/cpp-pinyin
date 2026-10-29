@@ -95,17 +95,17 @@ jobs:
           mkdir -p .tmp/tmpdir
           # THE CANONICAL CONFIGURATION FIRST. `check_doc_claims` measures it, and the documents define it
           # as `.tmp/mk-default` with examples OFF; `check_gate_inventory` compares the inventory file
-          # against that same configuration. Configuring costs a configure and no build -- the measurement
-          # measurement is `ctest -N`. Order matters: reading the inventory before the tree existed made
-          # this step exit 1 with no output at all (measured 2026-10-22).
+          # against that same configuration. Configuring costs a configure and no build -- the
+          # measurement is `ctest -N`. Order matters: reading the inventory before the tree existed
+          # made this step exit 1 with no output at all (measured 2026-10-22).
           cmake -S . -B .tmp/mk-default \
             -DCMAKE_BUILD_TYPE=Release \
             -DCPP_PINYIN2_BUILD_TESTS=ON \
             -DCPP_PINYIN2_BUILD_EXAMPLES=OFF
-          # FROM `.tmp/mk-default`, not from `build/`: the name promises the canonical configuration and the
-          # gate compares it against the canonical count (which `run_all_gates` alone asserts).
-          # report as two red gates -- a claim mismatch and a total mismatch.
-          ctest --test-dir .tmp/mk-default --show-only=json-v1 > .tmp/mk-default-inventory.json
+          # FROM `.tmp/mk-default`, not from `build/`: the name promises the canonical configuration and
+          # the gate compares it against the canonical count (which `run_all_gates` alone asserts).
+          # Reading it off `build/` (examples ON) made one wrong source report as two red gates -- a claim
+          # mismatch and a total mismatch.
           # NO second `check_gate_inventory --expect-total <n>` here. It used to be, with its own copy of
           # the count, and the copy drifted from the one in `tools/run_all_gates.py`: the two would run
           # back to back in this job and one of them had to be red. The count assertion lives in
@@ -233,10 +233,17 @@ jobs:
       # information about the script, not automatically as a regression.
       - name: Build the macOS wheel
         run: |
-          python3 -m pip install --upgrade pip setuptools wheel
-          python3 python/tools/build_native.py
+          # A VENV, because this image's python3 is PEP 668 "externally managed": `pip install --upgrade pip`
+          # and `pip wheel .` both die with "error: externally-managed-environment" (measured on macos-latest,
+          # 2026-10-29, the first run of this job after the image moved to an externally managed interpreter).
+          # --break-system-packages would also silence it, by writing into the image's own site-packages; a
+          # venv keeps the runner and the wheel build separate and needs no flag to be honest.
+          python3 -m venv .tmp/macos-wheel-venv
+          . .tmp/macos-wheel-venv/bin/activate
+          python -m pip install --quiet --disable-pip-version-check --upgrade pip setuptools wheel
+          python python/tools/build_native.py
           cd python
-          python3 -m pip wheel . --no-build-isolation --no-deps -w dist
+          python -m pip wheel . --no-build-isolation --no-deps -w dist
       - name: Verify the wheel's binary surface
         run: bash python/tools/ci_macos_verify.sh python/dist/cpp_pinyin2-*.whl
 

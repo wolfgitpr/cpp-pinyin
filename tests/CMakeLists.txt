@@ -364,6 +364,13 @@ set(_install_gate_args
         "-DINSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}"
         "-DCPP_PINYIN2_EMBEDDED=${_cpp_pinyin_embedded}"
         "-DBUILD_SHARED=${BUILD_SHARED_LIBS}"
+        # THE CONFIGURATION, EXPLICITLY. `$<CONFIG>` is the configuration ctest is running this test in,
+        # and a `cmake -P` script cannot see it any other way: `CTEST_CONFIGURATION_TYPE` is not in a
+        # test's environment on the runners this project uses, so the inner consumer configure fell back to
+        # the multi-config default and built a DEBUG consumer against a RELEASE dll -- MSVC's /MDd against
+        # /MD, the CRT split whose symptom is "not ready: " followed by a hang (Windows runner, 2026-10-29).
+        # Empty for a single-config generator, where CMAKE_BUILD_TYPE is what matters instead.
+        "-DCONFIG=$<CONFIG>"
         "-DWORK=${CMAKE_BINARY_DIR}/tests/install")
 if (CPP_PINYIN2_INSTALL)
     add_test(NAME InstallConsumerSmoke

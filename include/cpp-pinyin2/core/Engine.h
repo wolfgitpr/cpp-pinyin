@@ -15,7 +15,6 @@ namespace cpp_pinyin::v2
     class Registry;
 
     /// Dialect-agnostic query facade: every dialect's operations, parameterized by a dialect description
-    /// Dialect-agnostic query facade: every dialect's operations, parameterized by a dialect description
     /// instead of per-class (the `Mandarin` / `Cantonese` classes are no longer public). The dictionary
     /// root is a constructor argument with no setter (FR-4.5 of docs/REQUIREMENTS.md), so objects with
     /// different roots or dialects coexist in one process without interfering.
@@ -128,7 +127,6 @@ namespace cpp_pinyin::v2
         /// Why construction failed. Empty whenever `impl_` is set.
         std::string m_error;
         /// How to classify that failure when `open` turns it into an `Outcome`. `Load` unless the
-        /// How to classify that failure when `open` turns it into an `Outcome`. `Load` unless the
         /// dictionary's manifest asks for a newer library (docs/CONTRACT.md section 2), which is the whole
         /// point of the separate code: "upgrade the library" is actionable, "the data is broken" is not.
         ///
@@ -140,7 +138,6 @@ namespace cpp_pinyin::v2
         Code m_errorCode = Code::Load;
     };
 
-    /// Where this build installed the dictionary tables -- the C++ face of `cppp2_dict_dir_candidate`,
     /// Where this build installed the dictionary tables -- the C++ face of `cppp2_dict_dir_candidate`,
     /// with ONE implementation behind both spellings (a C++ host should not have to include the C header).
     ///

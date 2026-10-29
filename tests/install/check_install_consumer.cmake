@@ -40,10 +40,28 @@ if (NOT DEFINED BUILD_DIR OR NOT DEFINED VERSION OR NOT DEFINED WORK OR NOT DEFI
             "-DINSTALL_LIBDIR=<lib|lib64|...> -P check_install_consumer.cmake")
 endif ()
 
-# ctest -C <cfg> exports this; a multi-config consumer build needs it, a single-config one ignores it.
-set(_config_args "")
-if (DEFINED ENV{CTEST_CONFIGURATION_TYPE} AND NOT "$ENV{CTEST_CONFIGURATION_TYPE}" STREQUAL "")
-    set(_config_args --config "$ENV{CTEST_CONFIGURATION_TYPE}")
+# THE CONFIGURATION, from three sources in order of authority (2026-10-29):
+#   * `-DCONFIG=<cfg>` -- the `$<CONFIG>` tests/CMakeLists.txt passes at test registration, which is the only
+#     value that is right for a MULTI-CONFIG generator (the runner runs `ctest -C Release`, and a `cmake -P`
+#     script never sees that);
+#   * `$ENV{CTEST_CONFIGURATION_TYPE}` -- what a `ctest -C` exports for `ctest --build-and-test` style scripts;
+#     kept because it costs nothing and other CMake versions do set it;
+#   * `Release` -- the configuration this project configures by default.
+# Measured on the Windows runner (2026-10-29): only the environment variable was consulted, it was empty, the
+# inner consumer configure therefore used the multi-config default (Debug), and a /MDd consumer against a /MD
+# dll printed "not ready: " and never returned -- the stall the old ci.yml exclusion was written around.
+set(_cfg "")
+if (DEFINED CONFIG AND NOT CONFIG STREQUAL "")
+    set(_cfg "${CONFIG}")
+elseif (DEFINED ENV{CTEST_CONFIGURATION_TYPE} AND NOT "$ENV{CTEST_CONFIGURATION_TYPE}" STREQUAL "")
+    set(_cfg "$ENV{CTEST_CONFIGURATION_TYPE}")
+else ()
+    set(_cfg "Release")
+endif ()
+set(_config_args --config "${_cfg}")
+if (DEFINED GENERATOR AND GENERATOR STREQUAL "")
+    # single-config generator: CMAKE_BUILD_TYPE is the channel, and --config is harmless but meaningless.
+    set(_config_args "")
 endif ()
 
 set(_prefix "${WORK}/prefix")
@@ -234,19 +252,13 @@ foreach (_lang C CXX)
 endforeach ()
 
 # The consumer MUST be configured for the SAME configuration as the library it links (2026-10-21, MSVC leg).
-# Without this, a single-config generator leaves `CMAKE_BUILD_TYPE` empty and the consumer is built with MSVC's
-# DEBUG runtime (`/MDd`) against a RELEASE `cpp-pinyin2.dll` (`/MD`): two CRT heaps in one process, and the
-# `std::string` / `Registry` objects that cross the module boundary come back mangled. Measured on MSVC 19.51:
-# the C++ consumer printed "not ready: " with an EMPTY detail while the C face opened the very same dictionary
-# successfully -- MinGW hid the defect because g++ has no separate debug CRT, which is why this only surfaced
-# when the MSVC build was actually run. `CTEST_CONFIGURATION_TYPE` is what `ctest -C <cfg>` exports; an unset
-# value (single-config parent) falls back to Release, matching how this project configures.
-set(_type_args "")
-if (DEFINED ENV{CTEST_CONFIGURATION_TYPE} AND NOT "$ENV{CTEST_CONFIGURATION_TYPE}" STREQUAL "")
-    set(_type_args "-DCMAKE_BUILD_TYPE=$ENV{CTEST_CONFIGURATION_TYPE}")
-else ()
-    set(_type_args "-DCMAKE_BUILD_TYPE=Release")
-endif ()
+# With a single-config generator and no `CMAKE_BUILD_TYPE` the consumer is built with the DEBUG runtime
+# (`/MDd`) against a RELEASE `cpp-pinyin2.dll` (`/MD`): two CRT heaps in one process, and the `std::string` /
+# `Registry` objects that cross the module boundary come back mangled. Measured on MSVC 19.51: the C++
+# consumer printed "not ready: " with an EMPTY detail while the C face opened the very same dictionary
+# successfully -- MinGW hid the defect because g++ has no separate debug CRT. The value comes from `_cfg`
+# above, so a multi-config runner no longer falls back to its default configuration.
+set(_type_args "-DCMAKE_BUILD_TYPE=${_cfg}")
 
 # NOTE: no --config here: that is a build/install flag, not a configure flag.
 execute_process(
