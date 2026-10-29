@@ -195,7 +195,7 @@ TEST_CASE("Style: ü 记法由 vToU 决定；轻声是否补 5 由 markNeutralAs
 TEST_CASE("Style: ê 系列罕见声调拼写不做特判（与 pypinyin 的有意差异）", "[style][mandarin][divergence]") {
     // pypinyin's symbol table additionally accepts ê̄ / ế / ề (the interjection spellings of 欸), while this
     // library only accepts the tone characters `lookupTone` covers, so those spellings fall back to an
-    // empty string. Every word-list file under res/dict was checked and none carries such characters, so
+    // empty string. Every word-list file under data/dialects was checked and none carries such characters, so
     // the library's own data is unaffected.
     CHECK(finalsOf(u8"ê̄").empty());
     CHECK(finalsOf(u8"ế").empty());

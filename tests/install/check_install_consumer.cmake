@@ -220,6 +220,19 @@ if (DEFINED GENERATOR AND NOT GENERATOR STREQUAL "")
     set(_gen_args -G "${GENERATOR}")
 endif ()
 
+# THE COMPILER IS PART OF THE PAIRING, so it is passed down like the generator and the configuration
+# (2026-10-27, measured). Without this the consumer's inner project lets CMake pick the default compiler
+# from PATH: on this machine that is MinGW g++ while a `clang`-preset library is MSVC-ABI, so the link
+# died on `__imp__ZN10cpp_pinyin2v28RegistryD1Ev` and friends -- the same tree and the same preset giving
+# a different verdict depending on PATH order. Each CI leg has exactly one toolchain, which is why the
+# workflow never showed it.
+set(_cc_args "")
+foreach (_lang C CXX)
+    if (DEFINED CMAKE_${_lang}_COMPILER AND NOT CMAKE_${_lang}_COMPILER STREQUAL "")
+        list(APPEND _cc_args "-DCMAKE_${_lang}_COMPILER=${CMAKE_${_lang}_COMPILER}")
+    endif ()
+endforeach ()
+
 # The consumer MUST be configured for the SAME configuration as the library it links (2026-10-21, MSVC leg).
 # Without this, a single-config generator leaves `CMAKE_BUILD_TYPE` empty and the consumer is built with MSVC's
 # DEBUG runtime (`/MDd`) against a RELEASE `cpp-pinyin2.dll` (`/MD`): two CRT heaps in one process, and the
@@ -237,7 +250,7 @@ endif ()
 
 # NOTE: no --config here: that is a build/install flag, not a configure flag.
 execute_process(
-    COMMAND ${CMAKE_COMMAND} -S "${_proj}" -B "${_proj}/build" ${_gen_args} ${_type_args}
+    COMMAND ${CMAKE_COMMAND} -S "${_proj}" -B "${_proj}/build" ${_gen_args} ${_type_args} ${_cc_args}
             "-DCMAKE_PREFIX_PATH=${_prefix}"
     RESULT_VARIABLE _cfg_rc OUTPUT_VARIABLE _cfg_out ERROR_VARIABLE _cfg_err)
 if (_expect_failure)
@@ -262,7 +275,7 @@ project(crossmajor LANGUAGES CXX)
 find_package(cpp-pinyin2 1.0.0 REQUIRED)
 ")
 execute_process(
-    COMMAND ${CMAKE_COMMAND} -S "${_proj}/cross-major" -B "${_proj}/cross-major/build" ${_gen_args}
+    COMMAND ${CMAKE_COMMAND} -S "${_proj}/cross-major" -B "${_proj}/cross-major/build" ${_gen_args} ${_cc_args}
             "-DCMAKE_PREFIX_PATH=${_prefix}"
     RESULT_VARIABLE _x_rc OUTPUT_VARIABLE _x_out ERROR_VARIABLE _x_err)
 if (_x_rc EQUAL 0)
@@ -387,7 +400,7 @@ if (EXISTS "${_prefix}/${INSTALL_LIBDIR}/cmake/cpp-pinyin2")
     list(APPEND _plugin_cfg_args "-Dcpp-pinyin2_DIR=${_prefix}/${INSTALL_LIBDIR}/cmake/cpp-pinyin2")
 endif ()
 _run_and_report("plugin dialect configure" ${CMAKE_COMMAND} -S "${_plugin_src}"
-        -B "${_proj}/plugin-build" ${_gen_args} ${_type_args} ${_plugin_cfg_args})
+        -B "${_proj}/plugin-build" ${_gen_args} ${_type_args} ${_cc_args} ${_plugin_cfg_args})
 _run_and_report("plugin dialect build" ${CMAKE_COMMAND} --build "${_proj}/plugin-build" ${_config_args})
 
 # Same candidate-list reasoning as phase 4: `cmake -P` has no project(), so CMAKE_EXECUTABLE_SUFFIX is

@@ -1,7 +1,7 @@
 // The 2.0 face's `Syllable` is DATA: `tone` is the dialect's own tone-category number, read from the
 // dictionary surface, and nothing about it may be recovered from a rendered string. That rule and its three
 // companions are stated once in the header's comment (wording authority: the 2.0 plan's section E, retired
-// in the 2026-10-09 documentation cut -- see docs/HISTORY.md). This suite pins both halves:
+// in the 2026-10-09 documentation cut; that plan is not in this tree). This suite pins both halves:
 //
 //   * the shape -- default values, distinct enum values, and a value-semantics round trip of the tone
 //     numbers each dialect actually uses (Cantonese 1..6, Mandarin 0/5);

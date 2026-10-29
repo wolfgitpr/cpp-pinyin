@@ -122,6 +122,47 @@ TEST_CASE("Tone sandhi: 失败行是边界", "[sandhi][mandarin]") {
     CHECK(readingsOf(loneBu) == "bu4");
 }
 
+TEST_CASE("Tone sandhi: 三条规则各自独立", "[sandhi][mandarin][contract]") {
+    cpp_pinyin::v2::Engine man = cpp_test::mandarin();
+
+    // The switches are three separate public fields, and before this case existed the only test of them
+    // turned ALL THREE off at once -- so a refactor that coupled the rules (one guard hoisted above
+    // another, or a `&&` turned into `||`) would have left every existing assertion green. Each case
+    // below leaves exactly one rule on and asserts that the other two did nothing.
+    struct Case {
+        const char *text;
+        bool thirdTone;
+        bool bu;
+        bool yi;
+        const char *raw;
+        const char *after;
+        size_t changed;
+    };
+    const Case cases[] = {
+        // 你好不是: 你+好 is a third-tone run, 不+是 is 不 before a fourth tone. Two independent rewrites.
+        {u8"你好不是", true, false, false, "ni3 hao3 bu4 shi4", "ni2 hao3 bu4 shi4", 1},
+        {u8"你好不是", false, true, false, "ni3 hao3 bu4 shi4", "ni3 hao3 bu2 shi4", 1},
+        {u8"你好不是", false, false, true, "ni3 hao3 bu4 shi4", "ni3 hao3 bu4 shi4", 0},
+        {u8"你好不是", true, true, false, "ni3 hao3 bu4 shi4", "ni2 hao3 bu2 shi4", 2},
+        // 一定: only the 一 rule can fire here.
+        {u8"一定", false, false, true, "yi1 ding4", "yi2 ding4", 1},
+        {u8"一定", true, false, false, "yi1 ding4", "yi1 ding4", 0},
+        {u8"一定", false, true, false, "yi1 ding4", "yi1 ding4", 0},
+    };
+
+    for (const auto &c : cases) {
+        auto result = queryTone3(man, c.text);
+        cpp_pinyin::v2::ToneSandhiOptions options;
+        options.thirdTone = c.thirdTone;
+        options.bu = c.bu;
+        options.yi = c.yi;
+        INFO("text=" << c.text << " thirdTone=" << c.thirdTone << " bu=" << c.bu << " yi=" << c.yi);
+        CHECK(readingsOf(result) == c.raw);
+        CHECK(cpp_pinyin::v2::applyMandarinToneSandhi(result, options) == c.changed);
+        CHECK(readingsOf(result) == c.after);
+    }
+}
+
 TEST_CASE("Tone sandhi: 只改 reading，不动其它字段；非 TONE3 风格原样保留", "[sandhi][mandarin][contract]") {
     cpp_pinyin::v2::Engine man = cpp_test::mandarin();
     // The engine is opened with .value(), which throws if it fails -- an "is it ready" assertion here would

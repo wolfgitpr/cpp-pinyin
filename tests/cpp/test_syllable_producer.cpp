@@ -1,5 +1,5 @@
 // S5: the structured syllable's producer and its renderer, checked against the shipped data.
-// `core/Syllable.h` states the contract (tone from the table's own notation; both neutral-tone
+// `include/cpp-pinyin2/core/Syllable.h` states the contract (tone from the table's own notation; both neutral-tone
 // spellings one surface; Cantonese stays 1..6) but declares no producer; `src/toneUtil/ReadingCodec.{h,cpp}`
 // is that producer plus the renderer, and this suite holds the pair to the data: the producer on the
 // contract's shapes; the renderer byte for byte against `ManTone`/`CanTone` (every style, v_to_u and

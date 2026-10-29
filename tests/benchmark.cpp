@@ -20,9 +20,9 @@
 // Benchmark: what the library costs per API path, comparable between runs -- the per-section table a
 // human reads (format unchanged, so quoted output stays valid), a `--json` report + greppable marker
 // line for archiving/diffing, and `--compare <baseline.json>` per-case ratios for the A/B the board work
-// did by hand (PERFORMANCE.md §4.18). Cases are warm and measure ~50 ms (a 22 us case x200 measures the
-// scheduler); `--repeat N` reports the best run -- min-of-N, as that A/B did -- because measured
-// 2026-09-29 over eight identical runs per-case min moves 0.55% where the median moves 25% (§2.4), and a
+// did by hand (PERFORMANCE.md §1, the P1-P6 protocol). Cases are warm and measure ~50 ms (a 22 us case
+// x200 measures the scheduler); `--repeat N` reports the best run -- min-of-N, as that A/B did -- because
+// measured 2026-09-29 over eight identical runs per-case min moves 0.55% where the median moves 25% (§2.4), and a
 // ratio inside the printed band is "tied". No timing assertion lives here on purpose: a gate would fail
 // on that noise, so CTest only checks this still runs (BenchmarkSmoke).
 
@@ -44,9 +44,9 @@ namespace
         // 0 when --repeat 1 (the value then says "not measured", not "perfectly stable").
         double repeat_spread_pct = 0;
         // Cases whose cost is dominated by I/O and page cache rather than by our code (dictionary
-        // loading). Measured: load time swings ~12% run to run even at min-of-N (docs/BACKLOG.md,
-        // LoadCheck used a ~20x margin for the same reason), so a comparison must not judge them with
-        // the +/-2% band it uses for the rest.
+        // loading). Measured: load time swings ~12% run to run even at min-of-N (recorded in a ledger
+        // that is not in this tree; LoadCheck used a ~20x margin for the same reason), so a comparison must not judge
+        // them with the +/-2% band it uses for the rest.
         bool noisy = false;
         double throughput = 0;
         std::string throughput_unit;
@@ -628,13 +628,14 @@ namespace
     static constexpr double kNoiseBandRatio = 1.06;
 
     // The wide band for the cases the report marks noisy (dictionary loading), measured the same day:
-    // five runs spread 11.0-11.1%, three runs 10.5-19.0%, and BACKLOG.md section 1.1 records max/min =
-    // 1.39 across five samples inside ONE run. 20% covers the tail; the LoadCheck gate next door uses a
-    // 20x margin for the same reason.
+    // five runs spread 11.0-11.1%, three runs 10.5-19.0%, and one run whose five samples spread max/min =
+    // 1.39. (That last figure used to cite BACKLOG.md, a document this repository never tracked; the
+    // measurement stands on its own -- PERFORMANCE.md §2.4 records the same day's load-case spread.)
+    // 20% covers the tail; the LoadCheck gate next door uses a 20x margin for the same reason.
     static constexpr double kNoisyBandRatio = 1.20;
 
     // The comparison is on MIN, not on the median the tables show. Two reasons, both measured: the
-    // project's own A/B methodology is min-of-N (PERFORMANCE.md §4.18 "9 轮 x 4 passes min"), and the
+    // project's own A/B methodology is min-of-N (PERFORMANCE.md §1, the P1-P6 protocol: P3 取最小, P4 轮数), and the
     // median of a sub-microsecond case is quantised by the clock -- a 1.0 vs 2.0 us pair made a first
     // version of this table report a 2.0x "regression" on `readings` that no code change could explain.
     // Min over thousands of samples is the stable estimator for exactly those cases; the tables keep

@@ -127,7 +127,7 @@ def test_c_abi_only_ops_are_present_and_carry_measured_values() -> None:
     What makes them covered is that the fixture's values were PRODUCED by running the C ABI
     (``CApiSmoke --emit-conformance``), so a behavioural regression on any of the three changes the fixture
     on the next regeneration instead of passing unnoticed. Before 2026-10-20 none of the three appeared in
-    any cross-language fixture at all (audit round 2, B18).
+    any cross-language fixture at all.
 
     This test is the anti-shrink guard for them: the cases must exist, and their expectations must be
     non-empty, so deleting a case or emptying its expectation cannot look like success.

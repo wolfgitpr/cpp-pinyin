@@ -3,7 +3,7 @@
 //     compare the two doors byte for byte on a small sample (candidates and the failed flag included); the
 //     frozen corpus numbers would show such drift only after a full run, and only in aggregate.
 // (2) an out-of-repo dialect works: the probe dictionary is written into the temp directory (nothing
-//     third-language enters `res/dict`), and its converter WRAPS every reading -- "output == input" cannot
+//     third-language enters `data/dialects`), and its converter WRAPS every reading -- "output == input" cannot
 //     distinguish "the slot was read" from "the slot was empty and the reading passed through".
 // (3) nothing is process-global: every case builds its own engines from its own roots and compares against
 //     a single-threaded baseline; the concurrency case constructs engines (which resolves an id through the
@@ -257,6 +257,13 @@ TEST_CASE("Engine reports an unknown dialect instead of falling back", "[engine]
     const auto loaded = engine.loadUserDict(root / "mandarin" / "user_dict.txt");
     CHECK_FALSE(loaded.has_value());
     CHECK(loaded.error().code == cpp_pinyin::v2::Code::NotReady);
+    // The sibling entry point has the same guard (src/Engine.cpp:259) and had no moved-from case:
+    // every other accessor above was covered, which made this the one hole left in the matrix.
+    const auto traditional = engine.loadTraditionalDict(root / "mandarin" / "trans_word.txt");
+    CHECK_FALSE(traditional.has_value());
+    CHECK(traditional.error().code == cpp_pinyin::v2::Code::NotReady);
+    // Documented as a no-op with nobody underneath; it must not dereference the missing impl.
+    engine.setDisambiguationCallback(cpp_pinyin::v2::DisambiguationCallback{});
 }
 
 TEST_CASE("a dialect description drives the engine end to end", "[engine][plugin]") {

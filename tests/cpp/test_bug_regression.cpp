@@ -321,8 +321,9 @@ TEST_CASE("broken optional user_dict.txt makes the engine not ready", "[loader][
     std::filesystem::remove_all(root, ec);
 }
 
-// The thread contract is written down in Mandarin.h:25-32 (and Cantonese.h) but had NO test --
-// docs/BACKLOG.md lists it as "无锁无测试". This pins the supported half: after
+// The thread contract is stated once on `Engine` (include/cpp-pinyin2/core/Engine.h); the per-dialect headers
+// that used to carry it went with the dialect classes. It had NO test, and the backlog entry that recorded the
+// gap ("无锁无测试") is in a ledger that is not in this tree. This pins the supported half: after
 // construction, concurrent READ-ONLY calls (query/readings/toSimplified/isPolyphonic, the exact
 // list the contract names) on a SHARED object must agree with single-threaded results.
 //

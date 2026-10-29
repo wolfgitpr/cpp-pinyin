@@ -1,7 +1,7 @@
 // Contract tests for candidate readings (`Segment::candidates`).
 //
 // These cases pin the MEASURED semantics of the candidate feature; the authority is docs/REQUIREMENTS.md
-// section 1 K9, and the conclusion of a 3.6M-line full-corpus scan (docs/HISTORY.md).
+// section 1 K9, and the conclusion of a 3.6M-line full-corpus scan (the scan's write-up is not in this tree).
 // Wherever the behaviour disagrees with intuition the reason is written out -- these are DELIBERATE layered-dictionary
 // semantics, not bugs waiting to be fixed:
 //   * for a row that hit the phrase or user dictionary, `reading` comes from the phrase table and may differ
@@ -31,7 +31,7 @@ namespace
             if (!line.empty() && line.back() == '\r')
                 line.pop_back();
             // The verified tables are `sentence<TAB>cells<TAB>status<TAB>notes`; the legacy corpora in
-            // tests/verified/source/ used `▁` or `|` between the sentence and its readings. Both are
+            // tests/data/verified/source/ used `▁` or `|` between the sentence and its readings. Both are
             // accepted, and `#` (the `#!meta` header, comments) is skipped.
             if (line.empty() || line[0] == '#')
                 continue;
@@ -243,7 +243,7 @@ TEST_CASE("Candidates: 粤语同一套语义", "[candidates][cantonese]") {
     // The first reading of 行 is haang4, not hang4. That was not an arbitrary edit: in the measured corpus
     // haang4 occurs 67 times and hang4 50 times, while the engine ranked hang4 first -- so it was wrong at
     // all 67 positions where the corpus wants haang4 and right at the 50 that want hang4. Promoting haang4
-    // is a net +13 polyphonic positions (see .tmp/SHIP.md round 10 and data/can_overrides.py). The reading
+    // is a net +13 polyphonic positions (see data/overrides/can_overrides.py). The reading
     // SET is unchanged: what this case asserts is the ORDER, while `reading == candidates.front()` below is
     // the invariant it really guards -- the selected reading and the first candidate must be the same, or
     // the query result and the candidate table would disagree.

@@ -94,8 +94,8 @@ TEST_CASE_METHOD(Fixture, "loadCustomFanJianDictionary", "[dict][fanjian]") {
     {
         std::ofstream ofs(dictFile);
         REQUIRE(ofs.is_open());
-        // Separator must be ':' like res/dict/*/trans_word.txt ("魚:鱼"). This used to be a space,
-        // which parses to ZERO entries: the loader reported success anyway (audit S-02) and the
+        // Separator must be ':' like data/dialects/*/trans_word.txt ("魚:鱼"). This used to be a space,
+        // which parses to ZERO entries: the loader reported success anyway and the
         // CHECK below therefore asserted nothing at all.
         ofs << u8"臺:台" << std::endl;
         ofs << u8"國:国" << std::endl;
@@ -259,11 +259,28 @@ TEST_CASE_METHOD(Fixture, "EngineConfig all fields", "[new_api][jyutping_config]
     CHECK(can.query(u8"你好世界", cfg).value().join() == "nei hou sai gaai");
 }
 
-TEST_CASE_METHOD(Fixture, "Cross-language config is rejected at type level", "[type][safety]") {
+// The name here used to be "Cross-language config is rejected at type level", which is the OPPOSITE of
+// the design: include/cpp-pinyin2/core/Types.h:105-108 says `Style` converts from BOTH enums implicitly and on purpose,
+// so that one merged config can be dialect-agnostic. Nothing is rejected, and no assertion here ever tested a rejection
+// -- it assigned a Mandarin style to a Mandarin engine and checked the query worked, which the case below still does.
+// What the old name gestured at is a real hazard worth stating, so this case now records what actually happens when the
+// spellings are crossed: the NUMBER travels, and the dialect's own style table decides what it means.
+TEST_CASE_METHOD(Fixture, "EngineConfig takes either dialect's style spelling; the dialect decides the meaning",
+                 "[type][safety]") {
     cpp_pinyin::v2::EngineConfig cfg;
     cfg.style = cpp_pinyin::v2::MandarinStyle::TONE3;
-    auto res = man.query(u8"中国", cfg).value();
-    CHECK_FALSE(res.empty());
+    CHECK_FALSE(man.query(u8"中国", cfg).value().empty());
+    const std::string asMandarin = man.query(u8"中国", cfg).value().join();
+
+    // A Cantonese spelling on a Mandarin engine compiles (by design) and reaches the same engine: the
+    // NUMBER is what travels, and `resolveStyle` hands it to the dialect. Measured 2026-10-27:
+    // CantoneseStyle::TONE3 == MandarinStyle::TONE3 == 8, so the crossed spelling is accepted and answers
+    // exactly what the right-dialect spelling answers. That is the hazard the old name was gesturing at,
+    // and it is a hazard only in the other direction -- a number with no meaning in this dialect.
+    cfg.style = cpp_pinyin::v2::CantoneseStyle::TONE3;
+    const auto crossed = man.query(u8"中国", cfg);
+    REQUIRE(crossed.has_value());
+    CHECK(crossed.value().join() == asMandarin);
 }
 
 TEST_CASE_METHOD(Fixture, "NODISCARD attribute compiles", "[attribute][nodiscard]") {

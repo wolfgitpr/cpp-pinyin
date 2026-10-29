@@ -1,6 +1,6 @@
 """The wheel's platform tag: never `any`, and an explicit `--plat-name` is honoured.
 
-Why this file exists (audit H47, 2026-10-20). The wheel is `py3-none-<platform>` on purpose: the native
+Why this file exists. The wheel is `py3-none-<platform>` on purpose: the native
 library is opened with ctypes, so no CPython ABI is involved, but the artifact is still platform-specific.
 Two things were worth pinning:
 

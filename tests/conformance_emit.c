@@ -2,7 +2,7 @@
  * conformance/cases.json emitter, `--emit-conformance` of the CApiSmoke program (its own TU so
  * c_api_smoke.c stays one job). PROVENANCE (decision D35 = A, 2026-10-01): inputs are hand-picked and
  * expected values come from the engine under test, so this is a lock against regression, NOT an oracle
- * -- the oracle stays tests/catch2/test_c_api.cpp, deliberately not converted to read this fixture.
+ * -- the oracle stays tests/cpp/test_c_api.cpp, deliberately not converted to read this fixture.
  * Two invariants the writer must keep: BINARY mode (a text-mode stream on Windows would rewrite "\n" as
  * "\r\n", and cases.sha256 is checked against the bytes, so it would pass on the generating machine and
  * fail in a fresh checkout; .gitattributes pins eol=lf likewise), and write "<path>.tmp" then rename only
@@ -118,7 +118,7 @@ static const conf_case g_cases[] = {
     {"m-poly-ni", "mandarin", "is_polyphonic", T_NI, 0, 0, 0},
     {"m-poly-ascii", "mandarin", "is_polyphonic", "a", 0, 0, 0},
     {"c-poly-hang", "cantonese", "is_polyphonic", T_HANG, 0, 0, 0},
-    /* --- style_list / render_syllable / apply_tone_sandhi (2026-10-20, audit round 2 §12.3 B18) ---
+    /* --- style_list / render_syllable / apply_tone_sandhi ---
        C-ABI-ONLY ON PURPOSE. The Python shell and the C# shell expose none of these three as a public
        method of their own (they are C-surface operations: a style table dump, a re-render of one
        structured syllable, and an in-place transform of a built result), so a case here compares the C

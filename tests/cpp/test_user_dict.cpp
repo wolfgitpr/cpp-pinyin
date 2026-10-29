@@ -1,6 +1,6 @@
 // Regression tests for user-dictionary loading.
 //
-// Background: res/dict/cantonese/user_dict.txt ships empty (0 bytes), so nothing in the fleet
+// Background: data/dialects/cantonese/user_dict.txt ships empty (0 bytes), so nothing in the fleet
 // of golden tests ever exercised the user-dictionary path for Cantonese. Two real defects hid
 // behind that:
 //
@@ -115,6 +115,23 @@ TEST_CASE_METHOD(UserDictFixture, "Mandarin user dict still converts tone3 to to
     CHECK(tone(man, u8"你好") == u8"nǐ hǎo");
     CHECK(tone3(man, u8"仄声") == "ze4 sheng1");
     CHECK(tone(man, u8"仄声") == u8"zè shēng");
+}
+
+TEST_CASE_METHOD(UserDictFixture, "a user dict may spell ü in a TONE3 reading", "[userdict][umlaut]") {
+    // pypinyin's TONE3 convention spells the umlaut as ü -- `lazy_pinyin('女', style=Style.TONE3)` is
+    // ['nü3'] -- while this engine spells it v internally, and the two spellings have to mean the same
+    // row in a hand-written file. Measured 2026-10-27 while looking for a conversion hole: they do, in
+    // both styles, because the renderer converts per style instead of trusting the stored string.
+    //
+    // A PHRASE key on purpose: the user layer IS the phrase layer, and a single-character key does not
+    // reach it (a bare `女:nü2` row is ignored and 女 still answers nǚ from word.txt -- also measured).
+    // The tones here are ones the built-in readings do not have, so the checks fail differently if the
+    // row is ignored (nǚ nǚ) and if the ü is left unconverted (nv2 nv1 in the TONE style).
+    writeScratch(u8"女女:nü2 nü1\n");
+    REQUIRE(man.loadUserDict(scratch));
+
+    CHECK(tone3(man, u8"女女") == "nv2 nv1");
+    CHECK(tone(man, u8"女女") == u8"nǘ nǖ");
 }
 
 TEST_CASE_METHOD(UserDictFixture, "loadUserDict(clear=false) keeps the built-in phrase layer", "[userdict][mandarin]") {

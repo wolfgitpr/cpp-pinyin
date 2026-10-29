@@ -88,7 +88,7 @@ target_compile_definitions(CppPinyinTests PRIVATE
 
 # Same idiom, same reason, for the 2.0 face's tone contract: the four authoritative sentences live in
 # the header's own comment (the 2.0 plan's section E, adopted verbatim; that ledger was retired in the
-# 2026-10-09 documentation cut -- docs/HISTORY.md), so
+# 2026-10-09 documentation cut, and that ledger is not in this tree), so
 # tests/cpp/test_syllable_contract.cpp reads that header and fails when a rule goes away. The test
 # runs from the build tree, hence a definition rather than a relative path.
 target_compile_definitions(CppPinyinTests PRIVATE
@@ -199,8 +199,8 @@ add_dependencies(Benchmark CopyTestAssets)
 
 # Smoke-run the benchmark, but do NOT assert timings. Measured 2026-09-29 on five to eight identical
 # runs of this binary: a case's min moves up to 4.55% and the dictionary-loading cases move 11-19%
-# (BACKLOG.md section 1.1 measured max/min = 1.39 inside ONE run of LoadCheck), so a timing gate
-# would fail on noise every few runs. What this entry does catch is runtime bit-rot that the compiler
+# (one run of LoadCheck spread max/min = 1.39 across five samples), so a timing gate would fail on
+# noise every few runs. What this entry does catch is runtime bit-rot that the compiler
 # cannot see: a changed dictionary layout, an API change that still compiles, missing test assets.
 # Measured 2026-09-29: `Benchmark.exe` exits 0 in ~3 s (the iterations are sized so every case
 # measures for ~50 ms, which is what makes its numbers comparable between runs -- see the comment in
@@ -356,6 +356,11 @@ set(_install_gate_args
         "-DBUILD_DIR=${CMAKE_BINARY_DIR}"
         "-DVERSION=${cpp-pinyin2_VERSION}"
         "-DGENERATOR=${CMAKE_GENERATOR}"
+        # The consumer must be built by the compiler that built the library it consumes; without these two
+        # the inner project picks its own default from PATH (2026-10-27: a clang-preset library linked
+        # against a MinGW-built consumer and failed on __imp_-prefixed symbols).
+        "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
         "-DINSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}"
         "-DCPP_PINYIN2_EMBEDDED=${_cpp_pinyin_embedded}"
         "-DBUILD_SHARED=${BUILD_SHARED_LIBS}"
@@ -376,6 +381,8 @@ if (CPP_PINYIN2_INSTALL)
                 "-DBUILD_DIR=${CMAKE_BINARY_DIR}"
                 "-DVERSION=${cpp-pinyin2_VERSION}"
                 "-DGENERATOR=${CMAKE_GENERATOR}"
+                "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                 "-DINSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}"
                 "-DWORK=${CMAKE_BINARY_DIR}/tests/install-selftest"
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/install/check_install_consumer.cmake)
@@ -405,8 +412,8 @@ endif ()
 # Every header under include/cpp-pinyin2 must compile **on its own**: included first, twice (which
 # also exercises the include guard), with nothing else in the translation unit. A header that
 # forgets <string>/<vector>/<cstdint> therefore fails THIS build instead of the user's build.
-# The requirement was documented but had no automated guard (docs/BACKLOG.md,
-# "公共头自包含"), and a manual sweep in the audit had to be re-done by hand to be trusted.
+# The requirement was documented but had no automated guard (a backlog entry titled "公共头自包含",
+# in a ledger that is not in this tree), and a manual sweep in the audit had to be re-done by hand to be trusted.
 # EXCLUDE_FROM_ALL keeps the extra TUs (one per public header -- 15 of them) out of normal builds; the
 # CTest entry builds them.
 set(_selfcheck_targets "")
@@ -540,8 +547,12 @@ if(Python3_Interpreter_FOUND)
     # public headers (16 on that day), C ABI symbols (16) and the C++ plugin surface (16) -- only the C ABI one
     # had a CTest entry (ExportGate, and only in shared builds). The plugin surface and the header
     # set were owned by tools/check_bindings.py, which nothing in this repository called except two
-    # CI workflows whose trigger workflow has never run on GitHub. A gate that only runs in CI is a
+    # CI workflows whose trigger workflow had never run on GitHub. A gate that only runs in CI is a
     # gate that has never been observed to run, so it is wired here.
+    #
+    # 2026-10-27: that trigger chain has since run green (docs/STABILITY.md section 0.1, run 39877724768),
+    # so "never run" is history. The reasoning above is why this entry stays: a gate should not depend on
+    # CI having been observed to run at all.
     #
     # No flags on purpose: with no --nupkg/--wheel/--tag this is the repository-side subset (frozen
     # lists, header hygiene, XML comments, workflow/artifact wiring, single version source, dialect
@@ -583,14 +594,14 @@ if(Python3_Interpreter_FOUND)
         LABELS "abi"
         TIMEOUT 300)
 
-    # `CMakeLists.txt` no longer globs its sources (audit round 2 G31), so something has to prove the
+    # `CMakeLists.txt` no longer globs its sources, so something has to prove the
     # written-down list still equals the tree. No flags, no build tree, no fixtures.
     add_test(NAME SourceList
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/check_source_list.py)
     set_tests_properties(SourceList PROPERTIES
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} LABELS "docs" TIMEOUT 120)
 
-    # The four gates that had NO entry point anywhere in CI or CTest (2026-10-20, audit round 2 §12.7): a
+    # The four gates that had NO entry point anywhere in CI or CTest: a
     # gate reachable only by remembering to type `tools/run_all_gates.py` is a gate that, in practice, only
     # the person who wrote it runs. They are cheap (no build, no network) and each is wired with the flags
     # its own docs prescribe:
@@ -659,8 +670,8 @@ if(Python3_Interpreter_FOUND)
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/check_links.py --self-test)
 
     # The references a reader actually follows from CODE. Every documentation gate above reads the
-    # documents; none read the citations a public header makes into them. Measured 2026-10-20 (audit
-    # round 2, G15/G16/G17): `Types.h` cited a CONTRACT section that does not exist, `ManTone.h` cited
+    # documents; none read the citations a public header makes into them. Measured 2026-10-20:
+    # `Types.h` cited a CONTRACT section that does not exist, `ManTone.h` cited
     # a TEST_RECORD section that had been archived, and `include/` + `src/` carried ~70 uses of
     # decision numbers like `(S7)`/`(D4)` whose ledgers were retired. DocRefsGate enforces three
     # things: a section reference resolves, every decision number is registered in
@@ -681,7 +692,7 @@ if(Python3_Interpreter_FOUND)
         TIMEOUT 120)
 
     # A tracked fixture that names its own provenance, and the provenance was never checked. Measured
-    # 2026-10-20 (audit round 2, G24): `conformance/cases.json` said `generated_by_commit: 03b28db`, a commit
+    # 2026-10-20: `conformance/cases.json` said `generated_by_commit: 03b28db`, a commit
     # `git cat-file -e` cannot resolve in this repository AT ALL -- and every gate stayed green, because they
     # all read the fixture's CASES and none read the field that says what tree those cases came from. The R9
     # repair was a human running `git cat-file -t` by hand; this entry is what makes the repair stick.

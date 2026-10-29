@@ -12,9 +12,13 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <filesystem>
+#include <fstream>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "dict/DictManifest.h"
 #include "dict/PhraseIndex.h"
 
 namespace
@@ -80,6 +84,77 @@ int main() {
     }
     if (!sawTwo || !sawThree)
         return fail("a whole key went missing from its bucket");
+
+    // 256 keys behind ONE first character. The gate packs the bucket count into 8 bits (desc >> 8 &
+    // 0xFF) and the start into 16, so the 256th entry would wrap the count into the start field and
+    // corrupt both numbers with nothing to show for it -- which is exactly what the guard in
+    // buildPhraseIndex refuses. The guard used to test 0xFFFF, the width of the counts ELEMENT rather
+    // than of the field it is packed into, and nothing pinned that: a regression to the
+    // old value would have restored the silent corruption without a single test going red. 255 keys
+    // must still index, so this checks both sides of the boundary rather than only the refusal.
+    {
+        std::unordered_map<uint64_t, std::vector<std::u16string>> crowded;
+        const char16_t first = u'一';
+        for (uint16_t i = 0; i < 255; ++i) {
+            const char16_t pair[2] = {first, static_cast<char16_t>(0x4E00 + i)};
+            crowded[keyOf(pair, 2)] = {u"yi1"};
+        }
+        std::vector<PhraseGate> crowdedGates;
+        std::vector<uint64_t> crowdedKeys;
+        std::vector<const std::vector<std::u16string> *> crowdedValues;
+        if (!cpp_pinyin::v2::detail::buildPhraseIndex(crowded, crowdedGates, crowdedKeys, crowdedValues))
+            return fail("a bucket of exactly 255 must still be indexable");
+        if (crowdedKeys.size() != 255)
+            return fail("a full bucket must hold all 255 keys");
+        if (((crowdedGates[static_cast<uint16_t>(first)].desc >> 8) & 0xFF) != 255)
+            return fail("a full bucket must report its count as 255");
+
+        const char16_t extra[2] = {first, static_cast<char16_t>(0x4E00 + 255)};
+        crowded[keyOf(extra, 2)] = {u"yi1"};
+        if (cpp_pinyin::v2::detail::buildPhraseIndex(crowded, crowdedGates, crowdedKeys, crowdedValues))
+            return fail("256 keys in one bucket must be refused, not silently truncated");
+    }
+
+    // THE MANIFEST CHECK'S TWO UNREACHABLE-FROM-OUTSIDE GUARDS. Both were added to catch a real defect
+    // and neither could be tested through `Engine::open`: the zero-byte table rule
+    // because the shipped data never has one, and the library-version rule because the
+    // version string comes from the library's own build, so a test can only hand it a broken one here.
+    {
+        namespace fs = std::filesystem;
+        const fs::path scratch = fs::temp_directory_path() / "cpp-pinyin2-selfcheck-manifest";
+        std::error_code ec;
+        fs::remove_all(scratch, ec);
+        fs::create_directories(scratch / "mandarin", ec);
+        std::ofstream(scratch / "mandarin" / "format.txt") << "1\n";
+
+        // 1. zero-byte word.txt: the marker says the generation is complete, so an empty table is
+        //    truncation. A directory with NO word.txt at all is a different case and is not refused
+        //    here (the table layer reports it), so this checks the distinction rather than the absence.
+        std::ofstream(scratch / "mandarin" / "word.txt", std::ios::binary | std::ios::trunc);
+        auto empty = cpp_pinyin::v2::detail::checkDictManifest(scratch, "mandarin", 1, "2.0.0");
+        if (empty.code != cpp_pinyin::v2::Code::Load || empty.detail.find("zero-byte") == std::string::npos)
+            return fail("a zero-byte word.txt must be refused, naming the empty table");
+
+        // 2. a library version that is not a version. An EMPTY one still skips (documented: a build that
+        //    did not define it does not guess), a NON-empty broken one must not skip the comparison.
+        std::ofstream(scratch / "mandarin" / "word.txt") << u8"一:yi1\n";
+        std::ofstream(scratch / "mandarin" / "dialect.json")
+            << "{\n    \"id\":  \"mandarin\",\n    \"min_library\":  \"2.0.0\"\n}\n";
+        const auto skipped = cpp_pinyin::v2::detail::checkDictManifest(scratch, "mandarin", 1, "");
+        if (!skipped.detail.empty())
+            return fail("an undefined library version must skip the floor check, not fail it");
+        const auto broken = cpp_pinyin::v2::detail::checkDictManifest(scratch, "mandarin", 1, "2.0.0-rc1");
+        if (broken.code != cpp_pinyin::v2::Code::Load || broken.detail.find("not a version") == std::string::npos)
+            return fail("a library version that is not a version must be refused, not skipped");
+        const auto newer = cpp_pinyin::v2::detail::checkDictManifest(scratch, "mandarin", 1, "1.9.0");
+        if (newer.code != cpp_pinyin::v2::Code::DictIncompatible)
+            return fail("a floor above this library must be its own code, not a load failure");
+        const auto fine = cpp_pinyin::v2::detail::checkDictManifest(scratch, "mandarin", 1, "2.0.0");
+        if (!fine.detail.empty())
+            return fail("a manifest this library satisfies must be accepted");
+
+        fs::remove_all(scratch, ec);
+    }
 
     std::puts("DictSelfCheck OK");
     return 0;

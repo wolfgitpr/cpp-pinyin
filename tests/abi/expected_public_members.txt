@@ -3,7 +3,7 @@
 # `2.0.0` is a PROVENANCE anchor (when this freeze was cut), NOT a copy of the current
 # PROJECT_VERSION: bumping the version must NOT bump it, or the sentence stops being true about
 # the release it describes. Deliberate, and the reason the version gate does not police this
-# line (audit round 3, H26). The declarations below are what it is checked for.
+# line. The declarations below are what it is checked for.
 #
 # Regenerate with `python tools/check_public_surface.py --freeze` and READ the diff: every
 # changed line here is a change to the surface a C++ consumer compiles against.

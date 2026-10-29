@@ -1,8 +1,7 @@
 // Proof that the tone model survives a dialect with MORE tones than either built-in has.
 //
-// Section 4 of the retired four-domain audit (deleted 2026-10-23) argued from code that the tone pipeline
-// sub-section 4.3.1 admitted the claim had never been executed: nothing in the suite registers a dialect with a
-// tone domain wider than Cantonese's six. This file is that execution.
+// A claim that had been argued from the code but never executed: nothing in the suite registered a dialect
+// with a tone domain wider than Cantonese's six. This file is that execution.
 //
 // WHAT IS SYNTHESISED, and why here rather than under tests/data:
 //   * a dialect whose converter accepts tones 1..7 and declares two styles (normal, and "digit" as its default);

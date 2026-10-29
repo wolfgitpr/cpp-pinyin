@@ -48,8 +48,8 @@ int main(int argc, char **argv) {
         return cppp_emit_conformance(argv[1], argv[3], argc > 4 ? argv[4] : NULL);
 
     /* An unusually shaped mode, kept in this binary because it already links the library: print the
-       registered dialect ids, one per line, and nothing else on stdout. tests/dialect_set/
-       check_dialect_set.cmake compares this list with res/dict/ and with its frozen expected file, so
+       registered dialect ids, one per line, and nothing else on stdout. tests/data/dialect_set/
+       check_dialect_set.cmake compares this list with data/dialects/ and with its frozen expected file, so
        a third language (data or code) fails the build instead of passing silently. */
     if (argc > 2 && strcmp(argv[2], "--print-dialect-ids") == 0) {
         char **ids = NULL;

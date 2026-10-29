@@ -460,6 +460,35 @@ TEST_CASE("C ABI: errors are reported, never swallowed", "[c_api][error]") {
         cppp2_string_free(err.detail);
     }
 
+    // CPPP2_ERR_INTERNAL had no test at all: its only production site is a catch-all, and nothing in the
+    // suite ever made the library throw. The one portable way to reach it is a dialect CREATOR that
+    // throws -- `Registry::resolve` calls the caller's own code, and src/Engine.cpp:156-158 promises the
+    // exception "propagates to the caller unchanged, and the C boundary turns it into Code::Internal".
+    // Both catch arms are pinned here: a std::exception carries its `what()`, anything else still gets a
+    // sentence instead of an empty detail.
+    SECTION("a dialect creator that throws is INTERNAL, and the message survives") {
+        cpp_pinyin::v2::Registry mine;
+        REQUIRE(mine.add(
+            "throws_std", []() -> std::shared_ptr<const cpp_pinyin::v2::Dialect>
+            { throw std::runtime_error("creator boom"); }, true));
+        REQUIRE(mine.add("throws_other", []() -> std::shared_ptr<const cpp_pinyin::v2::Dialect> { throw 42; }, true));
+        const cppp2_registry *handle = reinterpret_cast<const cppp2_registry *>(&mine);
+
+        cppp2_error err{};
+        CHECK(cppp2_open(handle, "throws_std", dir.string().c_str(), &err) == nullptr);
+        CHECK(err.code == CPPP2_ERR_INTERNAL);
+        REQUIRE(err.detail != nullptr);
+        CHECK(std::string(err.detail).find("creator boom") != std::string::npos);
+        cppp2_string_free(err.detail);
+
+        err = cppp2_error{};
+        CHECK(cppp2_open(handle, "throws_other", dir.string().c_str(), &err) == nullptr);
+        CHECK(err.code == CPPP2_ERR_INTERNAL);
+        REQUIRE(err.detail != nullptr);
+        CHECK(std::string(err.detail).find("unknown exception") != std::string::npos);
+        cppp2_string_free(err.detail);
+    }
+
     SECTION("dict_dir is mandatory -- no implicit path") {
         cppp2_error err{};
         CHECK(cppp2_open(nullptr, "mandarin", nullptr, &err) == nullptr);
@@ -536,7 +565,7 @@ TEST_CASE("C ABI: errors are reported, never swallowed", "[c_api][error]") {
         const std::string missing = (dir / "not-a-file.txt").string();
         CHECK(cppp2_load_user_dict(h, missing.c_str(), 1) == CPPP2_ERR_LOAD);
 
-        // The `_ex` spelling returns the SAME code and additionally says WHY (2026-10-20, audit H04). Two
+        // The `_ex` spelling returns the SAME code and additionally says WHY. Two
         // properties matter and neither is visible from the header alone: the code must not differ between the
         // spellings (a host migrating must not have to change its branches), and `detail` must be a caller-owned
         // string that actually arrives -- NULL there would make the whole entry point pointless.
@@ -928,7 +957,7 @@ TEST_CASE("C ABI: a result outlives the handle that produced it", "[c_api][engin
     cppp2_result_free(r);
 }
 
-// H05 (2026-10-20, audit round 3): the install-location question had a C face and both shells and NO C++
+// H05: the install-location question had a C face and both shells and NO C++
 // face -- while its intended readers are exactly the hosts without a CMake package or a .pc file. The two
 // spellings now sit on one cache, so this case is what keeps them from drifting: whatever the anchor is in
 // this build (empty under CPP_PINYIN2_STATIC, a real path in a shared build), the two must agree.

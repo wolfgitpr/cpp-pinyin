@@ -15,10 +15,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include "dialect_fixtures.h"
 
-// Accuracy v2: the verified corpus (tests/verified/) with strict, per-position judging. It replaces
+// Accuracy v2: the verified corpus (tests/data/verified/) with strict, per-position judging. It replaces
 // test_batch_accuracy.cpp (deleted 2026-09-29), whose legacy sets were never verified sentence by sentence --
-// their numbers mixed engine quality with annotation quality (the retired T-03/T-04/T-05 caveats, summarised in
-// docs/HISTORY.md) -- and whose Cantonese sets were judged with std::find over the whole row, which
+// their numbers mixed engine quality with annotation quality (the retired T-03/T-04/T-05 caveats, recorded in a
+// ledger that is not in this tree) -- and whose Cantonese sets were judged with std::find over the whole row, which
 // overstates accuracy (T-01, T-02/T-11). Every row carries its own judging rule and a status marker; a position counts
 // as verified only if two independent reviewers decided it (adjudicated when they differed) or the character has
 // exactly ONE reading.
@@ -52,7 +52,7 @@ namespace
     // Aggregates cannot see a compensating change -- one row that starts passing while another starts failing leaves
     // every number in kFrozen[] untouched -- so the digest pins the VECTOR: for every data row, in file order, the
     // bytes "<id>:<STATUS>:<P|F|X>\n" (P = every position matched, F = not, X = the row takes part in no statistic).
-    // tools/corpus/check_corpus.py computes the same bytes independently from the probe dump against one shared
+    // tests/data/corpus/check_corpus.py computes the same bytes independently from the probe dump against one shared
     // definition; the frozen values came from the Python side and are verified here, so drift on either side fails.
     constexpr uint64_t kFnvOffset = 14695981039346656037ull;
     constexpr uint64_t kFnvPrime = 1099511628211ull;
@@ -90,24 +90,24 @@ namespace
         return "?";
     }
 
-    // Frozen from .tmp/corpus/check_corpus.py: exact values on purpose, because a threshold would let a regression
-    // hide under it, and the counts may only go down -- rows that moved pass -> DICT_GAP/ENGINE_BUG were wrong in the
-    // CORPUS (itemised in the ledgers), not regressions. Two independent routes reproduce every row: this test's live
-    // run and tools/corpus/check_corpus.py --with-probe (identity=True for all four). The Mandarin rows come from a
-    // regenerated dictionary; every reading change had to gain somewhere with no loss
-    // anywhere across all four frozen corpora, so where no subset can do that the trade is PRICED, not avoided -- the
-    // untone rows are spent deliberately, and SET_FIRST_READING changes only the preference ORDER within an
-    // asserted-unchanged set. Rows, never wrong-position counts, are the judged unit (position totals can improve while
-    // rows are lost), Cantonese stays byte-identical every round (the control), and the phrase table is deliberately
-    // NOT frozen because clip_long_phrase() depends on default_pinyin[ch][0].
-    // POLYPHONE ACCURACY -- the project's standard accuracy figure, the two languages never combined (different
-    // dictionaries, corpora and syllable inventories: a merged number would average unrelated things). POLYPHONE =
-    // the engine's own isPolyphonic(): a single-reading character is not a polyphone even when wrong. EXACT = the
-    // reading equals the gold cell or a member of an "a/b" cell; SYLLABLE = the same after dropping a trailing tone
-    // digit -- both are reported because they differ by thousands of positions on Mandarin, so a figure that does not
-    // say which rule it used could not be reproduced. A gold cell holding hanzi means the CORPUS did not decide that
-    // position: excluded here, while the row metric above counts it as never correct. Chosen over the strict row
-    // figure because a row passes only if EVERY position matches, so one hard character counts the same as five.
+    // Frozen from tests/data/corpus/check_corpus.py: exact values on purpose, because a threshold would let a
+    // regression hide under it, and the counts may only go down -- rows that moved pass -> DICT_GAP/ENGINE_BUG were
+    // wrong in the CORPUS (itemised in the ledgers), not regressions. Two independent routes reproduce every row: this
+    // test's live run and tests/data/corpus/check_corpus.py --with-probe (identity=True for all four). The Mandarin
+    // rows come from a regenerated dictionary; every reading change had to gain somewhere with no loss anywhere across
+    // all four frozen corpora, so where no subset can do that the trade is PRICED, not avoided -- the untone rows are
+    // spent deliberately, and SET_FIRST_READING changes only the preference ORDER within an asserted-unchanged set.
+    // Rows, never wrong-position counts, are the judged unit (position totals can improve while rows are lost),
+    // Cantonese stays byte-identical every round (the control), and the phrase table is deliberately NOT frozen because
+    // clip_long_phrase() depends on default_pinyin[ch][0]. POLYPHONE ACCURACY -- the project's standard accuracy
+    // figure, the two languages never combined (different dictionaries, corpora and syllable inventories: a merged
+    // number would average unrelated things). POLYPHONE = the engine's own isPolyphonic(): a single-reading character
+    // is not a polyphone even when wrong. EXACT = the reading equals the gold cell or a member of an "a/b" cell;
+    // SYLLABLE = the same after dropping a trailing tone digit -- both are reported because they differ by thousands of
+    // positions on Mandarin, so a figure that does not say which rule it used could not be reproduced. A gold cell
+    // holding hanzi means the CORPUS did not decide that position: excluded here, while the row metric above counts it
+    // as never correct. Chosen over the strict row figure because a row passes only if EVERY position matches, so one
+    // hard character counts the same as five.
     struct PolyFrozen {
         const char *id;  // the language, without the _tone suffix: "mandarin" / "cantonese"
         size_t total;  // positions whose character the dictionary reports as polyphonic
@@ -121,7 +121,7 @@ namespace
         {"cantonese", 40639, 39710, 40366},
     };
 
-    // Re-frozen after the Mandarin phrase work (round 12): PHRASE_OVERRIDES_MANDARIN (86 corrected entries) plus
+    // Re-frozen after the Mandarin phrase work: PHRASE_OVERRIDES_MANDARIN (86 corrected entries) plus
     // APPEND_NEW_READINGS (the 6 readings those corrections removed). A phrase entry decides the reading of EVERY
     // character it spans, so it can hold an error no single-character change reaches -- `勃艮第` alone cost 168
     // polyphone positions. The 107230 denominator is unchanged on purpose: the corrections had left six characters
