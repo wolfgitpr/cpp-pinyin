@@ -17,10 +17,10 @@ name: All tests
 # only in ci.yml, branches only -- meant a tag ran no CI at all. That is exactly how a release could have
 # shipped with a tag that disagreed with CMakeLists.txt and nothing would have said a word.
 #
-# NOT WIRED YET, and deliberately stated rather than implied: this file's runner wiring is unverified
-# until it runs on GitHub (see the header of test_csharp.yml for how the individual commands were
-# verified locally), and no publishing lives here -- a PyPI or NuGet upload must be a separate,
-# manually dispatched workflow.
+# NOT WIRED YET -- THAT SENTENCE EXPIRED (2026-10-27). It was true when written; this chain ran on
+# 2026-10-23 (commit f5c44bd, run 39877724768) and every job in it succeeded -- docs/STABILITY.md
+# section 0.1 holds the run and the job list. What is still true: no publishing lives here, and a PyPI
+# or NuGet upload must be a separate, manually dispatched workflow.
 
 on:
   push:

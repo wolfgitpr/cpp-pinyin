@@ -1,43 +1,30 @@
 name: Python shell
 
-# WHY THIS FILE EXISTS. The Python shell is a consumer of the conformance fixture and of the C ABI, but
-# nothing in CI built a wheel or installed it. This is the protobuf-skeleton reusable workflow the plan
-# asks for (doc section 6.7.7); the scheduler (test_runner.yml) owns the path filters and the single
-# required check.
+# WHY THIS FILE EXISTS. The Python shell consumes the conformance fixture and the C ABI, but nothing in CI
+# built a wheel or installed one. This is the reusable workflow the plan asks for (doc section 6.7.7); the
+# scheduler (test_runner.yml) owns the path filters and the single required check.
 #
-# WHAT IS VERIFIED AND WHERE. Every command below was run on the development machine during the P3a/P3b
-# work, and each one is traceable:
-#   * build_native.py --build-dir/--config: the shell's own native build (writes _version.py, builds the
-#     shared library, stages _native/ and data/dict/). Measured again on 2026-10-01.
-#   * python -m pytest tests -q: 91/91, 0 skipped (P3a-2b-2c).
-#   * the wheel recipe in pyproject.toml: python -m pip wheel . --no-build-isolation --no-deps -w dist.
-#   * check_wheel.py <wheel>: compares the packaged member set against the source tree (P3a-2b-2a).
-#   * the clean-room install and python/tools/smoke_installed.py: a fresh venv, --no-index --no-deps, no
-#     compiler, then the assertions. Measured on 2026-10-01 against the wheel built from commit b614d9a.
-#   * tools/check_bindings.py --wheel <wheel>: the same artifact asked the questions the C# job was already
-#     asking its package -- the version chain's last place, the dialect set, and the C ABI, header and
-#     packaged-dictionary contract the wheel's library was built from. Measured on 2026-10-02.
+# WHAT THE JOBS ASSERT: `build_native.py --build-dir/--config` builds the shell's native side (writes
+# _version.py, builds the shared library, stages _native/ and data/dict/); `pytest tests -q` runs the shell
+# suite; `pip wheel .` plus `check_wheel.py` compares the packaged member set against the source tree; the
+# clean-room install with `python/tools/smoke_installed.py` uses a fresh venv with --no-index --no-deps and
+# no compiler; `tools/check_bindings.py --wheel` asks the same contract questions of the wheel that the C#
+# job asks of its package (version chain, dialect set, C ABI, header and packaged dictionary).
 #
-# WHAT IS NOT VERIFIED, deliberately stated: the runner wiring, and the rest of the wider wheel matrix. The
-# runner wiring is unverified for every job in this file until it runs on GitHub. Of the four wheels the plan
-# asks for (section 6.7.10), the linux aarch64 leg now exists as the container job below -- every command it
-# runs was measured on a real aarch64 board on 2026-10-02, its runner label was not. musllinux is out of scope
-# by decision (2026-10-02), and macOS is whatever architecture the runner happens to be. The declared Python
-# floor and the oldest interpreter in the matrix below are now the SAME number (3.9, user decision
-# 2026-10-10: the floor was raised from 3.8, which no environment could exercise any more); a green run here
-# must not be read as covering anything outside cp39-cp313 on linux x86_64.
+# VERIFIED SO FAR: the test_runner chain ran green on 2026-10-23 (commit f5c44bd, run 39877724768) and its
+# job list includes the Python legs on ubuntu/macos/windows, `python_versions` 3.9-3.13 and the manylinux
+# aarch64 wheel container (docs/STABILITY.md section 0.1 holds the run). Of the four wheels the plan asks
+# for (section 6.7.10), the linux aarch64 leg exists as the container job below -- its commands were
+# measured on a real aarch64 board (wheel accepted, installed into a compiler-less index-less venv, SMOKE
+# OK, check_bindings exit 0, auditwheel stamped and re-accepted; the shell suite passed on cp39-cp313).
 #
-# MULTI-VERSION (2026-10-09): the `python_versions` job below installs the ONE linux wheel into cp39, cp310,
-# cp311, cp312 and cp313 and smoke-tests each. That is the CI half of what the board measured on 2026-10-02;
-# until this job existed, every job in this file ran a single modern interpreter per operating system.
+# NOT COVERED: musllinux is out of scope by decision (2026-10-02); macOS is whatever architecture the runner
+# has, and universal2 is not built (see `python/tools/ci_macos_verify.sh`); a green run must not be read as
+# covering anything outside cp39-cp313 on linux x86_64. The declared Python floor and the oldest
+# interpreter in the matrix are the same number (3.9, user decision 2026-10-10).
 #
-# BOARD-MEASURED (2026-10-02, round 1-3 of the compatibility sweep): the aarch64 leg and the two items this
-# header used to list as never measured on Linux were run on the real board -- ci_manylinux_aarch64.sh
-# reported RESULT: OK (wheel accepted, installed into a compiler-less, index-less venv, SMOKE OK,
-# check_bindings.py --wheel exit 0, auditwheel stamped and the stamped artifact re-accepted), the shell
-# suite reported 91 passed on each of cp39/cp310/cp311/cp312/cp313 (the image ships no cp38), and that
-# same wheel installed and smoke-tested OK in all five. Still unmeasured: the runner label itself, and
-# the declared 3.9 floor as a floor. See the ledger V110 for the numbers.
+# MULTI-VERSION: the `python_versions` job installs the ONE linux wheel into cp39, cp310, cp311, cp312 and
+# cp313 and smoke-tests each.
 
 on:
   workflow_call:
@@ -203,9 +190,12 @@ jobs:
   # a real aarch64 board on 2026-10-02, including auditwheel's stamp and the acceptance of the stamped
   # artifact, so the board and this runner execute the same bytes.
   #
-  # UNVERIFIED, deliberately: the runner label, the image pull, and the runner's Docker. ci.yml's MinGW and
-  # 32-bit jobs carry the same note for the same reason -- treat this job's first failure as information
-  # about the wiring, not as a regression.
+  # WAS UNVERIFIED, and deliberately stated so: the runner label, the image pull, and the runner's
+  # Docker. IT HAS SINCE RUN (2026-10-27 correction): the manylinux aarch64 wheel container is one of
+  # the 19 jobs in the 2026-10-23 green run (f5c44bd, run 39877724768, docs/STABILITY.md section 0.1), so
+  # the label resolved, the image pulled and the container started. What that run does NOT prove is the
+  # board-only parts; the note about treating a first failure as information about the wiring still
+  # applies to any NEW wiring in this file.
   python_aarch64:
     name: Python wheel (linux aarch64, manylinux container)
     runs-on: ubuntu-24.04-arm
