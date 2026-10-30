@@ -15,9 +15,12 @@ name: Release prep
 #                                             manylinux tag -- only auditwheel grants it)
 #   win_amd64                              -> on the runner with MinGW + Ninja
 #
-# C# is built here too and pooled (user decision, 2026-10-10): one nupkg per runtime identifier from the
-# legs, then `csharp/tools/merge_nupkgs.py` merges them into ONE package carrying all three rids (win-x64 /
-# linux-x64 / osx-arm64). Publishing N packages instead would ask every consumer to pick one by hand.
+# C# is built here too: one nupkg per runtime identifier from the legs, then `csharp/tools/merge_nupkgs.py`
+# can merge them into ONE package carrying all three rids (win-x64 / linux-x64 / osx-arm64). Publishing N
+# packages instead asks every consumer to pick one by hand -- which is why the merge was the plan (user
+# decision, 2026-10-10). 2026-10-30: that plan is SUSPENDED, not reversed -- the merge is refused by
+# measurement (the `pool` input below records the three causes), so 2.0.0 ships the three single-rid
+# packages and the pooled job is off unless it is explicitly asked for.
 #
 # Both Linux legs run the SAME SCRIPT (`python/tools/ci_manylinux_aarch64.sh`, which reads the architecture
 # from `uname -m`; the name still says aarch64 because that is the leg it was first measured on). Nothing
@@ -54,6 +57,24 @@ on:
         # usable artifacts whose one unverified property was exactly the thing a release is about.
         description: "Tag the version chain is checked against, e.g. v2.0.0 (v2.0.0 and 2.0.0 both accepted)"
         required: true
+      pool:
+        # OFF, AND THE DEFAULT IS THE HONEST ONE UNTIL THE THREE LEGS AGREE BYTE FOR BYTE.
+        # Measured on this workflow's first real run (40997899480, 2026-10-30, ref v2.0.0): the merge
+        # refused with three independent classes of difference, and the artifacts were unpacked and
+        # compared to find out which:
+        #   * README.md, THIRD_PARTY_NOTICES.md, CppPinyin.nuspec -- identical line by line, different
+        #     bytes: the Windows runner checks the tree out and the packer writes CRLF (linux and
+        #     osx-arm64 agree with each other exactly);
+        #   * lib|ref/<tfm>/CppPinyin2.xml -- same cause, written by the Windows compiler (53351 vs
+        #     52565 bytes, the difference being the added CRs);
+        #   * lib/<tfm>/CppPinyin2.dll -- differs on ALL THREE legs at an identical 24576 bytes, i.e. the
+        #     managed assembly is not byte-reproducible across runners (SDK patch and/or MVID).
+        # So 2.0.0 ships the three single-rid packages, which are each built and gated in their own leg
+        # and which RELEASE_CHECKLIST section 7.2 explicitly offers as one of the two valid routes.
+        # The merge tool is NOT what to relax here: it refused precisely the thing it exists to refuse.
+        description: "Also merge the three single-rid nupkgs into one package (off: the legs differ byte for byte, see the comment in this file)"
+        type: boolean
+        default: false
 
 # Least privilege: this workflow reads the repository and uploads artifacts. No publishing, so no
 # `id-token: write`, no registry credentials, and nothing here may be turned into an upload later
@@ -118,8 +139,13 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Install Ninja
-        run: pip install ninja
+      - name: Install Ninja and the shell suite's test dependencies
+        # pytest is NOT preinstalled on this image. Measured on this job's first ever run
+        # (40997899480, 2026-10-30): it died at "The shell suite" with `No module named pytest`, after the
+        # native library had already been built and staged. `test_python.yml:69` installs the same three
+        # for the same reason; setuptools and wheel are here because the wheel is built below with
+        # `--no-build-isolation`, so nothing is fetched at that point.
+        run: python -m pip install --quiet --disable-pip-version-check pytest setuptools wheel ninja
 
       - name: Stage the package (writes _version.py, builds the library, copies the dictionaries)
         run: python python/tools/build_native.py --build-dir build-python --config Release
@@ -282,6 +308,10 @@ jobs:
   csharp_pool:
     name: C# pooled nupkg (all rids)
     needs: csharp
+    # OPT-IN SINCE 2026-10-30 (`pool`, false by default): the merge is refused today for three measured
+    # reasons, listed once at the `pool` input above. 2.0.0 therefore ships the three single-rid
+    # packages, and this job runs only when the legs are made byte-identical and someone asks for it.
+    if: ${{ inputs.pool }}
     # Unzips three packages, merges, and runs the gate -- minutes, not hours.
     #
     # IF THIS JOB DIES WITH "the inputs disagree on members that must be identical", the three csharp legs
