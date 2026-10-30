@@ -43,13 +43,19 @@
     <PackageReleaseNotes>https://github.com/wolfgitpr/cpp-pinyin/blob/v2/CHANGELOG.md</PackageReleaseNotes>
     <Description>C# binding for cpp-pinyin2 (Mandarin and Cantonese) over its C ABI. The native library is loaded from the package's runtimes/&lt;rid&gt;/native/ directory.</Description>
     <!-- The package ships THREE licences' worth of material and must say so (2026-10-21, user decision C):
-         the code is Apache-2.0 (LICENSE), the Mandarin tables are CC-CEDICT under CC BY-SA 4.0 and the Cantonese
-         tables are CC-Canto under CC BY-SA 3.0: each dialect's own License.txt says which, and they differ.
-         The expression used to name only Apache-2.0 AND CC-BY-SA-4.0, i.e. it understated the Cantonese half;
-         the packaging manifests had the same bug, and it is now checked against the data itself
-         (check_bindings.py, check_package_licence). It also used to say MIT, which matched neither the
-         repository nor the tables. -->
-    <PackageLicenseExpression>Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0</PackageLicenseExpression>
+         the code is Apache-2.0 (LICENSE), the Mandarin tables are CC-CEDICT under CC BY-SA 4.0 and the
+         Cantonese tables are CC-Canto under CC BY-SA 3.0: each dialect's own License.txt says which, and
+         they differ.
+
+         A LICENCE FILE RATHER THAN AN EXPRESSION, since 2026-10-30. The expression used to be
+         "Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0" and nuget.org refused the push outright:
+         "License expression must only contain licenses that are approved by Open Source Initiative or Free
+         Software Foundation. Unsupported licenses: CC-BY-SA-3.0." The Cantonese tables really are 3.0, so
+         the choice was between naming a file and understating the data; this names the file.
+         THIRD_PARTY_NOTICES.md is the one document that says which material falls under which terms, it is
+         already packed at the root, and tools/check_bindings.py demands that it name Apache-2.0 and every
+         version the shipped dictionaries declare -- understating stays a failure in either form. -->
+    <PackageLicenseFile>THIRD_PARTY_NOTICES.md</PackageLicenseFile>
     <RepositoryType>git</RepositoryType>
     <!-- Explicit rather than assumed: the ref/ entry below depends on the compiler emitting a reference
          assembly, and that is not a default worth relying on (measured: the hook errors out with

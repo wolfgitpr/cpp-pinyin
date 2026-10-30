@@ -1454,13 +1454,24 @@ def shipped_cc_versions(root: Path) -> set:
 
 
 def check_package_licence(root: Path, report: Report) -> None:
-    """The nupkg's SPDX expression must cover the code AND every licence the shipped dictionaries carry.
+    """The nupkg must state what the material it installs is licensed under -- as an SPDX expression where the
+    ecosystem accepts one, or as a licence FILE where it does not (2026-10-30).
 
-    WHERE THIS READS FROM: `CppPinyin.csproj`'s `<PackageLicenseExpression>`, which is what the nupkg is built
-    with. It used to read a vcpkg port manifest instead -- that was the only SPDX expression in the tree at the
-    time -- and when the port was removed (2026-10-23) the guarantee came along rather than going with it: the
-    nupkg declares the same three licences, and understating them is invisible to every other check, because
-    the packaging gate looks at members and the version gates at numbers.
+    WHERE THIS READS FROM: `CppPinyin.csproj`'s `<PackageLicenseExpression>` or `<PackageLicenseFile>`, which is
+    what the nupkg is built with. It used to read a vcpkg port manifest instead -- that was the only SPDX
+    expression in the tree at the time -- and when the port was removed (2026-10-23) the guarantee came along
+    rather than going with it: the nupkg declares the same three licences, and understating them is invisible to
+    every other check, because the packaging gate looks at members and the version gates at numbers.
+
+    WHY THE FILE FORM EXISTS: nuget.org refused the 2.0.0 push with
+
+        License expression must only contain licenses that are approved by Open Source Initiative or Free
+        Software Foundation. Unsupported licenses: CC-BY-SA-3.0.
+
+    The Cantonese tables really are 3.0, so the honest options were a licence file or an expression that
+    understates the data. The package names THIRD_PARTY_NOTICES.md, the one document that says which material
+    falls under which terms. Understating is still a failure in this form: the file must name Apache-2.0 and
+    every version the shipped dictionaries declare in their own License.txt.
 
     A MISSING csproj is not a failure here -- `check_csharp_identity` owns that -- so this reports and returns.
     """
@@ -1471,14 +1482,48 @@ def check_package_licence(root: Path, report: Report) -> None:
         report.note("package licence: not applicable here (no csproj in this tree)")
         return
     declared = re.search(r"<PackageLicenseExpression>([^<]+)</PackageLicenseExpression>", source)
+    by_file = re.search(r"<PackageLicenseFile>([^<]+)</PackageLicenseFile>", source)
+    if declared and by_file:
+        report.fail("package licence: the csproj sets both <PackageLicenseExpression> and <PackageLicenseFile>; "
+                    "NuGet refuses a package that claims both")
+        return
+    shipped = shipped_cc_versions(root)
+
+    if by_file:
+        name = by_file.group(1).strip()
+        licence_path = root / name
+        if not licence_path.is_file():
+            report.fail(f"package licence: <PackageLicenseFile>{name}</PackageLicenseFile> names a file this tree "
+                        f"does not have")
+            return
+        if not re.search(r'Include="[^"]*' + re.escape(name) + r'"[^>]*Pack="true"', source):
+            report.fail(f"package licence: {name} is named as the licence file but no Pack=\"true\" item ships it, "
+                        f"so the package would point at a file it does not carry")
+        text = licence_path.read_text(encoding="utf-8", errors="replace")
+        if "Apache-2.0" not in text:
+            report.fail(f"package licence: {name} does not name Apache-2.0, which is what LICENSE grants for the "
+                        f"code")
+        if not shipped:
+            report.note(f"package licence: {name} names Apache-2.0; no dictionary licence text was found to check")
+            return
+        missing = sorted(version for version in shipped
+                         if f"BY-SA {version}" not in text and f"by-sa/{version}" not in text)
+        if missing:
+            report.fail(f"package licence: {name} omits CC-BY-SA-{', CC-BY-SA-'.join(missing)}, which the shipped "
+                        f"dictionary tables declare in their own License.txt: the package would tell a consumer "
+                        f"something its files do not grant")
+        else:
+            report.note(f"package licence: {name} covers the code and every shipped dictionary licence")
+        return
+
     if not declared:
-        report.fail("package licence: the csproj declares no <PackageLicenseExpression>")
+        report.fail("package licence: the csproj declares neither <PackageLicenseExpression> nor "
+                    "<PackageLicenseFile>")
         return
     expression = declared.group(1).strip()
     if "Apache-2.0" not in expression:
         report.fail(f"package licence: {expression!r} does not name Apache-2.0, which is what LICENSE grants for "
                     f"the code")
-    shipped = shipped_cc_versions(root)
     if not shipped:
         report.note("package licence: no dictionary licence text found, so only the code licence was checked")
         return
@@ -2324,6 +2369,48 @@ def self_test() -> int:
     check_package_licence(licence_tree, understated)
     results.append(("a licence expression that omits a shipped dictionary licence fails",
                     not understated.ok and any("omits CC-BY-SA-3.0" in f for f in understated.failures)))
+
+    # 5e-bis. the licence FILE form, which exists because nuget.org refuses CC-BY-SA-3.0 in an expression
+    # (2026-10-30). Four controls: it passes when it is shipped and covers everything, and it fails when it
+    # omits a version, when the package does not actually carry it, and when the csproj claims both forms.
+    (licence_tree / "THIRD_PARTY_NOTICES.md").write_text(
+        "code: Apache-2.0. Mandarin tables: CC BY-SA 4.0. Cantonese tables: CC BY-SA 3.0\n", encoding="utf-8")
+    licence_file_csproj = (
+        '<Project><PropertyGroup><PackageLicenseFile>THIRD_PARTY_NOTICES.md</PackageLicenseFile></PropertyGroup>'
+        '<ItemGroup><None Include="THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="/" /></ItemGroup></Project>\n')
+    (licence_tree / "csharp" / "CppPinyin" / "CppPinyin.csproj").write_text(licence_file_csproj, encoding="utf-8")
+    licence_file_ok = Report()
+    check_package_licence(licence_tree, licence_file_ok)
+    results.append(("a shipped licence file covering code and both dictionaries passes", licence_file_ok.ok))
+
+    (licence_tree / "THIRD_PARTY_NOTICES.md").write_text(
+        "code: Apache-2.0. Mandarin tables: CC BY-SA 4.0.\n", encoding="utf-8")
+    licence_file_short = Report()
+    check_package_licence(licence_tree, licence_file_short)
+    results.append(("a licence file that omits a shipped dictionary licence fails",
+                    not licence_file_short.ok
+                    and any("omits CC-BY-SA-3.0" in f for f in licence_file_short.failures)))
+
+    (licence_tree / "THIRD_PARTY_NOTICES.md").write_text(
+        "code: Apache-2.0. Mandarin tables: CC BY-SA 4.0. Cantonese tables: CC BY-SA 3.0\n", encoding="utf-8")
+    (licence_tree / "csharp" / "CppPinyin" / "CppPinyin.csproj").write_text(
+        '<Project><PropertyGroup><PackageLicenseFile>THIRD_PARTY_NOTICES.md</PackageLicenseFile>'
+        '</PropertyGroup></Project>\n', encoding="utf-8")
+    licence_file_unpacked = Report()
+    check_package_licence(licence_tree, licence_file_unpacked)
+    results.append(("a licence file the package does not ship fails",
+                    not licence_file_unpacked.ok
+                    and any("no Pack=" in f for f in licence_file_unpacked.failures)))
+
+    (licence_tree / "csharp" / "CppPinyin" / "CppPinyin.csproj").write_text(
+        '<Project><PropertyGroup>'
+        '<PackageLicenseExpression>Apache-2.0 AND CC-BY-SA-3.0 AND CC-BY-SA-4.0</PackageLicenseExpression>'
+        '<PackageLicenseFile>THIRD_PARTY_NOTICES.md</PackageLicenseFile>'
+        '</PropertyGroup></Project>\n', encoding="utf-8")
+    both_forms = Report()
+    check_package_licence(licence_tree, both_forms)
+    results.append(("a csproj claiming both a licence expression and a licence file fails",
+                    not both_forms.ok and any("claims both" in f for f in both_forms.failures)))
 
     # 5c. the release surface: a repository URL that names a repository other than the remote is a package
     # pointing at someone else's code, and it is invisible to every other check in this file.
