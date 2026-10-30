@@ -15,12 +15,12 @@ name: Release prep
 #                                             manylinux tag -- only auditwheel grants it)
 #   win_amd64                              -> on the runner with MinGW + Ninja
 #
-# C# is built here too: one nupkg per runtime identifier from the legs, then `csharp/tools/merge_nupkgs.py`
-# can merge them into ONE package carrying all three rids (win-x64 / linux-x64 / osx-arm64). Publishing N
-# packages instead asks every consumer to pick one by hand -- which is why the merge was the plan (user
-# decision, 2026-10-10). 2026-10-30: that plan is SUSPENDED, not reversed -- the merge is refused by
-# measurement (the `pool` input below records the three causes), so 2.0.0 ships the three single-rid
-# packages and the pooled job is off unless it is explicitly asked for.
+# C# is built here too, and ships as ONE package carrying all three rids (win-x64 / linux-x64 / osx-arm64).
+# The legs pack and gate one package each; `csharp_pool` then repacks those same three rids on a single
+# runner and merges the result. Publishing N packages instead would ask every consumer to pick one by hand
+# -- and, because all three would carry one PackageId and one version, nuget.org would refuse all but the
+# first anyway. 2026-10-30: merging what three machines had packed was measured to be impossible (the
+# `pool` input below records the three causes); repacking on one machine is the resolution.
 #
 # Both Linux legs run the SAME SCRIPT (`python/tools/ci_manylinux_aarch64.sh`, which reads the architecture
 # from `uname -m`; the name still says aarch64 because that is the leg it was first measured on). Nothing
@@ -58,10 +58,15 @@ on:
         description: "Tag the version chain is checked against, e.g. v2.0.0 (v2.0.0 and 2.0.0 both accepted)"
         required: true
       pool:
-        # OFF, AND THE DEFAULT IS THE HONEST ONE UNTIL THE THREE LEGS AGREE BYTE FOR BYTE.
-        # Measured on this workflow's first real run (40997899480, 2026-10-30, ref v2.0.0): the merge
-        # refused with three independent classes of difference, and the artifacts were unpacked and
-        # compared to find out which:
+        # ON BY DEFAULT. Not because the three legs agree -- they do not, and that measurement is kept
+        # below -- but because the pooling job no longer asks them to. Each leg still packs and gates its
+        # own package; what changed is that `csharp_pool` REPACKS all three rids on one runner before
+        # merging, so the byte-identity the merge requires comes from same-machine determinism (measured
+        # 2026-10-27: two packs of one commit on one machine are byte-identical) instead of from three
+        # machines happening to agree. Turn this off to get only the three single-rid packages.
+        #
+        # WHY THE 2026-10-10 SHAPE COULD NOT WORK (run 40997899480, 2026-10-30; the artifacts were unpacked
+        # and compared to find out which member disagreed):
         #   * README.md, THIRD_PARTY_NOTICES.md, CppPinyin.nuspec -- identical line by line, different
         #     bytes: the Windows runner checks the tree out and the packer writes CRLF (linux and
         #     osx-arm64 agree with each other exactly);
@@ -69,12 +74,11 @@ on:
         #     52565 bytes, the difference being the added CRs);
         #   * lib/<tfm>/CppPinyin2.dll -- differs on ALL THREE legs at an identical 24576 bytes, i.e. the
         #     managed assembly is not byte-reproducible across runners (SDK patch and/or MVID).
-        # So 2.0.0 ships the three single-rid packages, which are each built and gated in their own leg
-        # and which RELEASE_CHECKLIST section 7.2 explicitly offers as one of the two valid routes.
-        # The merge tool is NOT what to relax here: it refused precisely the thing it exists to refuse.
-        description: "Also merge the three single-rid nupkgs into one package (off: the legs differ byte for byte, see the comment in this file)"
+        # The merge tool was never the problem: it refused precisely the thing it exists to refuse, and it
+        # is unchanged. What changed is where the managed half is built.
+        description: "Ship the three rids as one package (on: the pool job repacks them on a single runner first)"
         type: boolean
-        default: false
+        default: true
 
 # Least privilege: this workflow reads the repository and uploads artifacts. No publishing, so no
 # `id-token: write`, no registry credentials, and nothing here may be turned into an upload later
@@ -316,18 +320,19 @@ jobs:
   csharp_pool:
     name: C# pooled nupkg (all rids)
     needs: csharp
-    # OPT-IN SINCE 2026-10-30 (`pool`, false by default): the merge is refused today for three measured
-    # reasons, listed once at the `pool` input above. 2.0.0 therefore ships the three single-rid
-    # packages, and this job runs only when the legs are made byte-identical and someone asks for it.
-    if: ${{ inputs.pool }}
-    # Unzips three packages, merges, and runs the gate -- minutes, not hours.
+    # ON BY DEFAULT SINCE 2026-10-30 (`pool` input turns it off). It REPACKS the three rids here and then
+    # merges -- the `pool` input above records why merging what three machines had packed could not work.
     #
-    # IF THIS JOB DIES WITH "the inputs disagree on members that must be identical", the three csharp legs
-    # did not build the same thing: the tool compares lib/, ref/, contentFiles/, README.md and the nuspec
-    # byte for byte, and all five come from the same source tree on three machines. The usual cause is a
-    # different SDK patch per leg (see the note at the csharp job's setup-dotnet); the message names the
-    # members, so read it before assuming the merge tool is at fault. 2026-10-27: the same commit packed
-    # twice on one machine is byte-identical, so a difference here is about the environment, not the source.
+    # WHAT THIS JOB ASSERTS, in order: each leg's package carries exactly one rid and that rid's native
+    # library; one `BuildInfo.g.cs` is written and shared by all three packs (the recorded library stem is
+    # the same on every platform, so the managed half stays identical); three packs on this one runner,
+    # same checkout and same SDK, agree byte for byte on the shared members, and `merge_nupkgs` refuses
+    # them if they do not (its own --self-test runs first, proving the refusals still fire); and the
+    # finished package carries all three rids, which the gate below asserts by being run WITHOUT --rid.
+    #
+    # IF IT DIES WITH "the inputs disagree on members that must be identical", the three packs diverged on
+    # THIS machine -- read the members it names before assuming the merge tool is at fault.
+    if: ${{ inputs.pool }}
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
@@ -337,16 +342,55 @@ jobs:
         with:
           python-version: '3.13'
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          # The same floats the `csharp` job uses. One SDK is enough here, and that is the point: this job
+          # produces the managed half for every rid, so there is no cross-machine agreement to reach.
+          dotnet-version: |
+            7.0.x
+            10.0.x
+
       - uses: actions/download-artifact@v4
         with:
           pattern: nupkg-*
-          path: dist
+          path: incoming
+
+      - name: Take each leg's native library out of the package that leg gated
+        run: |
+          set -euo pipefail
+          for pkg in $(find incoming -name '*.nupkg' | sort); do
+            mapfile -t rids < <(unzip -Z1 "$pkg" | sed -n 's|^runtimes/\([^/]*\)/native/.*|\1|p' | sort -u)
+            if [ "${#rids[@]}" -ne 1 ]; then
+              echo "FATAL: $pkg carries ${#rids[@]} rid(s): ${rids[*]:-none}"; exit 1
+            fi
+            rid="${rids[0]}"
+            mkdir -p "native/$rid"
+            unzip -j -o "$pkg" "runtimes/$rid/native/*" -d "native/$rid" > /dev/null
+            echo "$pkg -> native/$rid: $(ls native/$rid | tr '\n' ' ')"
+          done
+          find native -type f | sort
+
+      - name: Write the generated C# build info once, for all three packs
+        run: |
+          set -euo pipefail
+          lib=$(find native -type f -name '*cpp-pinyin2.*' | sort | head -n 1)
+          echo "native library the build info is derived from: $lib"
+          python csharp/tools/emit_build_info.py --native "$lib" --commit "$GITHUB_SHA"
+
+      - name: Pack one package per rid, on this runner
+        run: |
+          set -euo pipefail
+          for rid in win-x64 linux-x64 osx-arm64; do
+            [ -d "native/$rid" ] || { echo "FATAL: no native directory for $rid"; exit 1; }
+            dotnet pack csharp/CppPinyin/CppPinyin.csproj -c Release \
+              -p:CppPinyinRid="$rid" \
+              -p:CppPinyinNativeDir="$(pwd)/native/$rid" \
+              -o "dist/$rid"
+          done
+          find dist -name '*.nupkg' | sort
 
       - name: Prove the merging tool's refusals fire
         run: python csharp/tools/merge_nupkgs.py --self-test
-
-      - name: Show what arrived
-        run: find dist -name '*.nupkg' | sort
 
       - name: Pool the per-rid packages
         run: |
