@@ -153,7 +153,15 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
-    runs-on: ubuntu-latest
+    # PINNED, NOT `ubuntu-latest` (2026-10-30). The label migrated to Ubuntu 26.04, and
+    # `actions/setup-python` publishes no cp39 build for it: the 3.9 leg died with "The version '3.9'
+    # with architecture 'x64' was not found for Ubuntu 26.04", while 3.10-3.13 in the same matrix
+    # stayed green. The same job on 24.04 downloaded python-3.9.25-linux-24.04-x64 and passed (run
+    # 40906016603, 2026-10-29), so this pin restores a measured configuration rather than asserting a
+    # floor nothing can exercise. Unpin when setup-python carries 3.9 for the new image -- which, 3.9
+    # being past end of life, may never happen; the honest alternative then is to raise the floor,
+    # and that is a user decision, not a workflow edit.
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
