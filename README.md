@@ -54,8 +54,7 @@ include(FetchContent)
 FetchContent_Declare(
     cpp-pinyin2
     GIT_REPOSITORY https://github.com/wolfgitpr/cpp-pinyin.git
-    GIT_TAG        <tag-or-commit>   # no release tag exists for this line yet: use a commit hash,
-                                     # or the tag of an older release
+    GIT_TAG        <tag-or-commit>   # use a release tag, or a commit hash
 )
 FetchContent_MakeAvailable(cpp-pinyin2)
 

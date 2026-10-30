@@ -2,8 +2,8 @@
 
 This repository is released under **Apache-2.0** (`LICENSE`). That covers the **code**. Two other
 things travel with the packages and are **not** under Apache-2.0; this file is the single place that
-says what they are and where their terms live. **It now travels inside the packages too** (2026-10-21): the Python wheel carries it in `<dist-info>/`, the NuGet package at its root, and the vcpkg
-manifest states the same three terms in its SPDX expression.
+says what they are and where their terms live. **It now travels inside the packages too** (2026-10-21):
+the Python wheel carries it in `<dist-info>/`, and the NuGet package at its root.
 
 | What | Where it ends up | License | Authority (this file only points) |
 |---|---|---|---|

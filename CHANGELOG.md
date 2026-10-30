@@ -9,9 +9,9 @@ commands that produced them and the honest boundaries ("unverified until CI") li
 `docs/REQUIREMENTS.md` (frozen acceptance). Numbers are quoted there and are deliberately **not** copied here,
 so they cannot drift apart.
 
-## [Unreleased] — 2.0.0（未发布）
+## [2.0.0] — 2026-10-30
 
-> **2.0.0 尚未打 tag** ⇒ 本仓是「待发布」而非「已发布」。
+> **2.0.0 已发布**，tag `v2.0.0`。
 > 下面这一节就是 2.0.0 的完整说明，**发布当天只做一件事：把本节标题改成 `## [2.0.0] - YYYY-MM-DD`**，
 > 不要在这一天之前写上一个日期（2026-10-16 曾提前写死过一天，属记录错误，2026-10-18 改回本形态）。
 > 发布清单（要发一版时该做什么的唯一落点）在 docs/RELEASE_CHECKLIST.md（原 PLUGIN 文档第 6.7.11 节）；本文件的版本标题是其中的**第 ⑦ 处版本投影**，**由 `tools/check_version_tokens.py` 的第 10 轴自动核对**（2026-10-20 起）。
