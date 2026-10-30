@@ -54,7 +54,7 @@
          the choice was between naming a file and understating the data; this names the file.
          THIRD_PARTY_NOTICES.md is the one document that says which material falls under which terms, it is
          already packed at the root, and tools/check_bindings.py demands that it name Apache-2.0 and every
-         version the shipped dictionaries declare -- understating stays a failure in either form. -->
+         version the shipped dictionaries declare; understating stays a failure in either form. -->
     <PackageLicenseFile>THIRD_PARTY_NOTICES.md</PackageLicenseFile>
     <RepositoryType>git</RepositoryType>
     <!-- Explicit rather than assumed: the ref/ entry below depends on the compiler emitting a reference
