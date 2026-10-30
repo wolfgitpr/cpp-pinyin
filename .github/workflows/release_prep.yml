@@ -168,6 +168,14 @@ jobs:
         working-directory: python
         run: python tools/check_wheel.py dist/*.whl
 
+      # Before the binding gate, not after it: `check_bindings.py --wheel` also asks version-chain place 5,
+      # which is `csharp/CppPinyin/version.props` -- generated and gitignored, so a fresh checkout has none.
+      # Measured twice: this job's second run (41000190476, 2026-10-30) died here with "version.props is
+      # missing", and test_python.yml:96-99 records the same failure on 2026-10-22 with the same remedy.
+      # `--version-props-only` writes just that file, so nothing here needs a built native library.
+      - name: Write the generated C# version file the binding gate reads
+        run: python csharp/tools/emit_build_info.py --version-props-only
+
       - name: The wheel's library against the frozen C ABI, header and dialect contract
         shell: bash
         run: python tools/check_bindings.py --wheel python/dist/*.whl ${{ inputs.tag && format('--tag {0}', inputs.tag) || '' }}
