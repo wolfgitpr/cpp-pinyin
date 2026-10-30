@@ -230,6 +230,14 @@
          readme, so a partial checkout still packs. -->
     <None Condition="Exists('$(MSBuildProjectDirectory)\..\..\THIRD_PARTY_NOTICES.md')"
           Include="$(MSBuildProjectDirectory)\..\..\THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="\" />
+    <!-- LICENSE travels too (2026-10-30). README.md and THIRD_PARTY_NOTICES.md both tell the reader to "see
+         LICENSE", but the first package built for 2.0.0 shipped no LICENSE at all -- the pointer was dangling
+         inside files that do ship. NuGet itself does not require the text: a <PackageLicenseExpression> is
+         machine-readable on its own, so this is the prose telling the truth rather than a compliance fix. Same
+         Exists() guard as the other two, so a partial checkout still packs. The wheel has carried both texts
+         since 2026-10-21; this closes the asymmetry. -->
+    <None Condition="Exists('$(MSBuildProjectDirectory)\..\..\LICENSE')"
+          Include="$(MSBuildProjectDirectory)\..\..\LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

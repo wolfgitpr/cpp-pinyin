@@ -234,7 +234,7 @@ names below have **zero** hits under `include/` and `src/` on this branch.
 | `hanziToPinyin(hans, style, error, candidates, v_to_u, neutral_tone_with_five)` → `PinyinResVector` | `query(text, cfg)` → `Outcome<Result>` | `cfg` carries style/`includeCandidates`/`vToU`/`markNeutralAs5`; a failure is an `Outcome` with no value plus `error().code`/`detail` |
 | row fields `character` / `reading` / `failed` | `Segment::text` / `rendered` / `failure_kind` | the mapping is recorded in `core/Types.h` (the `Segment` block header) |
 | `ManTone::Style` / `CanTone::Style` | `MandarinStyle` / `CantoneseStyle` | **the numbers are unchanged** (`NORMAL=0`, `TONE=1`, `TONE2=2`, `TONE3=8`, …) — only the enum's name and namespace moved |
-| `include/cpp-pinyin2/Pinyin.h` etc. | `include/cpp-pinyin2/core/…`, `ext/…`, `dialects/…` | 14 public headers, frozen list in `tests/abi/expected_public_headers.txt` |
+| `include/cpp-pinyin2/Pinyin.h` etc. | `include/cpp-pinyin2/core/…`, `ext/…`, `dialects/…` | 15 public headers, frozen list in `tests/abi/expected_public_headers.txt` |
 | tone sandhi as a side effect of a style | `cpp_pinyin::v2::applyMandarinToneSandhi(result, opts)` | an explicit post-pass (`core/ToneSandhi.h`) |
 
 **If you were consuming the Python shell of an earlier 2.0 revision** (`Segment.failed` /
