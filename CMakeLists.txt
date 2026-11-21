@@ -653,12 +653,19 @@ endif ()
 if (CPP_PINYIN2_INSTALL)
     set(version ${PROJECT_VERSION})
 
-    # Cflags has to say what the CMake target says (2026-10-20 audit, G11). Two gaps were measured:
-    # `CPP_PINYIN2_STATIC` is a PUBLIC compile definition (it selects the no-dllimport branch of
-    # PinyinGlobal.h), so a pkg-config consumer of a STATIC install that does not get it compiles
-    # against the dllimport branch -- harmless on ELF where both spell the same, wrong on MSVC/MinGW;
-    # and the library needs C++17, which pkg-config consumers were never told. Neither is inherited
-    # from the .pc the way they are from the CMake target, so both are written out here.
+    # Cflags has to say what the CMake target says, with ONE exception that an outside report got right
+    # (issue #13, 2026-11-21). `CPP_PINYIN2_STATIC` is a PUBLIC compile definition (it selects the
+    # no-dllimport branch of PinyinGlobal.h), so a pkg-config consumer of a STATIC install that does not get
+    # it compiles against the dllimport branch -- harmless on ELF where both spell the same, wrong on
+    # MSVC/MinGW. That one stays in Cflags.
+    #
+    # THE C++17 REQUIREMENT DOES NOT. `Cflags` reaches whatever compiler the consumer runs, and this package
+    # serves a C header as well (`ext/c_api.h`): clang rejects a C++ standard option outright in C mode and
+    # gcc only warns, so a C consumer's fate depended on which compiler it used. Nor can pkg-config express
+    # "at least 17" -- a consumer that chose C++20 would have the option appended after its own `-std=` and
+    # be dropped back to 17, because the last one wins. The requirement is exported as the `cxx_std` variable
+    # in cpp-pinyin2.pc.in instead (ask for it with `pkg-config --variable=cxx_std`), while the CMake target
+    # keeps stating it properly as `cxx_std_17`, which means "at least" and is what the headers need.
     set(CPP_PINYIN2_PC_EXTRA_CFLAGS "")
     if (NOT BUILD_SHARED_LIBS)
         set(CPP_PINYIN2_PC_EXTRA_CFLAGS " -DCPP_PINYIN2_STATIC")

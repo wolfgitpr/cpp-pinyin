@@ -191,6 +191,25 @@ add_custom_command(TARGET your_app POST_BUILD
 The package refuses a **cross-major** request on purpose (`COMPATIBILITY SameMajorVersion`), so a
 1.x `find_package(cpp-pinyin2 1.x)` does not silently resolve to a 2.x install.
 
+**pkg-config.** The install also carries `lib/pkgconfig/cpp-pinyin2.pc`, for consumers that do not use CMake:
+
+```sh
+pkg-config --cflags --libs cpp-pinyin2     # -I…/include   -L…/lib -lcpp-pinyin2
+pkg-config --variable=dictdir cpp-pinyin2  # where this install put the dictionaries
+pkg-config --variable=cxx_std cpp-pinyin2  # the C++ mode these headers need (-std=c++17)
+```
+
+`cxx_std` is a **variable and not a `Cflags` entry** on purpose (issue #13): `Cflags` reaches whatever
+compiler you run — this package also installs a C header (`include/cpp-pinyin2/ext/c_api.h`), and clang
+refuses a C++ standard option in C mode — and pkg-config cannot say "at least 17", so an entry there would
+override your own `-std=c++20` with `-std=c++17` (the last one on the command line wins). Apply the variable
+yourself only if your compiler defaults to something older than C++17:
+
+```sh
+g++ $(pkg-config --cflags cpp-pinyin2) $(pkg-config --variable=cxx_std cpp-pinyin2) \
+    your_app.cpp $(pkg-config --libs cpp-pinyin2)
+```
+
 **Per-character alignment.** Downstream morphology/TTS code usually needs "which reading belongs to
 which input character". One row of a `Result` covers **one input span**, and the spans are a
 partition of your input — the contract is that **concatenating every row's `text` in order reproduces
