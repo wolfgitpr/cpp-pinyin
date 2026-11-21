@@ -225,11 +225,15 @@ C_EOF
   # libstdc++: driving it with `gcc` failed with "undefined reference to std::__cxx11::basic_string<...>" and
   # "operator new" (measured here, manylinux aarch64, 2026-10-29). Adding -lstdc++ to the .pc would encode one
   # platform's runtime into a file that also ships for MSVC and Apple, so the link uses `g++` instead -- the
-  # same thing any consumer of a C++ library does, and `Cflags` already says `-std=c++17`.
+  # same thing any consumer of a C++ library does.
   # Word-splitting is the point here: the flags have to reach the compiler as separate arguments.
   # shellcheck disable=SC2046
   gcc -c /tmp/static-consumer.c -o /tmp/static-consumer.o \
       $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --cflags cpp-pinyin2) >> /tmp/static.txt 2>&1
+  static_compile_rc=$?
+  echo "C consumer compile exit: $static_compile_rc"
+  check "a C consumer compiles through pkg-config's Cflags" \
+        "$([ "$static_compile_rc" = 0 ] && echo 1 || echo 0)" "see /tmp/static.txt"
   # shellcheck disable=SC2046
   g++ /tmp/static-consumer.o -o /tmp/static-consumer \
       $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --libs cpp-pinyin2) >> /tmp/static.txt 2>&1
@@ -241,6 +245,42 @@ C_EOF
     tail -n 25 /tmp/static.txt
   else
     /tmp/static-consumer
+  fi
+  # THE TWO DEFECTS THE OLD `Cflags` CAUSED, measured instead of argued (issue #13, 2026-11-21). The .pc used
+  # to name a C++ standard mode; each check below is exactly one of the two complaints it produced, and both
+  # compile with the same flags `pkg-config --cflags` prints.
+  #
+  # 1. A consumer that asked for C++20 FIRST and the package's flags SECOND. That order used to lose, because
+  #    the last `-std=` on a command line wins. The TU asserts the mode itself instead of trusting some later
+  #    construct to fail, so a regression reads as this #error and not as unrelated C++20 syntax.
+  cat > /tmp/static-consumer-cxx20.cpp <<'CPP_EOF'
+#if __cplusplus < 202002L
+#error "not in C++20 mode: something appended a language standard after the consumer's own choice"
+#endif
+int main() { return 0; }
+CPP_EOF
+  # shellcheck disable=SC2046
+  g++ -std=c++20 -c /tmp/static-consumer-cxx20.cpp -o /tmp/static-consumer-cxx20.o \
+      $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --cflags cpp-pinyin2) >> /tmp/static.txt 2>&1
+  cxx20_rc=$?
+  echo "C++20 consumer compile exit: $cxx20_rc"
+  check "the .pc's flags do not drop a C++20 consumer back to an older mode" \
+        "$([ "$cxx20_rc" = 0 ] && echo 1 || echo 0)" "see /tmp/static.txt"
+  # 2. The C header compiled by a compiler that is STRICT about language modes. The gcc compile above cannot
+  #    prove this -- gcc only warns. clang errors ("invalid argument ... not allowed with 'C'"), and clang is
+  #    what a macOS or Android consumer of the C ABI builds with. When the image ships no clang the half stays
+  #    unmeasured and says so out loud; that is not a failure, because an image not carrying clang is not a
+  #    defect in this tree (the same distinction the ninja probe above draws).
+  if command -v clang >/dev/null 2>&1; then
+    # shellcheck disable=SC2046
+    clang -c /tmp/static-consumer.c -o /tmp/static-consumer-clang.o \
+        $(PKG_CONFIG_PATH="$pc_dir" pkg-config --static --cflags cpp-pinyin2) >> /tmp/static.txt 2>&1
+    clang_rc=$?
+    echo "clang C consumer compile exit: $clang_rc"
+    check "a clang C consumer accepts the .pc's Cflags" \
+          "$([ "$clang_rc" = 0 ] && echo 1 || echo 0)" "see /tmp/static.txt"
+  else
+    echo "NOT MEASURED: this image has no clang, so the strict-C-compiler half of issue #13 is unmeasured here"
   fi
 else
   # NOT A SILENT SKIP (the reasoning check_format's `--require` spells out): this step exists only to

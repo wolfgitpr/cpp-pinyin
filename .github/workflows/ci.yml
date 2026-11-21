@@ -264,8 +264,10 @@ jobs:
       # never wired on Apple" would answer neither question. Turn the tests on as its own change, once this
       # leg has run green at least once.
       #
-      # UNVERIFIED when written: no macOS toolchain on the machine this was written on, and nothing had run
-      # it when the change landed. Do not read it as coverage until a run says so.
+      # UNVERIFIED WHEN WRITTEN; IT HAS SINCE RUN (2026-11-21): the leg's first push was run 44859037261
+      # (commit 9938d3d, the merge of #15) and step 10 of this job is green there -- as it is in #15's own
+      # run 44858155866. That is also the first independent confirmation that #14 is what fixed Apple's
+      # archive step: this build reaches that step and passes no `D`.
       - name: Build the static configuration (Apple's ar has no `D` modifier -- see PR #14)
         run: |
           cmake -S . -B build-static \
