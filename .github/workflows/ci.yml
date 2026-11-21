@@ -248,6 +248,32 @@ jobs:
       - name: Verify the wheel's binary surface
         run: bash python/tools/ci_macos_verify.sh python/dist/cpp_pinyin2-*.whl
 
+      # THE STATIC CONFIGURATION, and the only leg in this file that builds it on Apple.
+      #
+      # WHY IT EXISTS (2026-11-21): every other leg of every job builds the DEFAULT configuration, and the
+      # default here is `BUILD_SHARED_LIBS=ON` -- a shared build never runs `ar`, so the archive rules in
+      # `CMakeLists.txt`'s reproducible-build block were exercised on Linux and MinGW only. They are set for
+      # `GNU|Clang`, which AppleClang matches, and they spell `ar qcD` / `qD`; CMAKE_AR on macOS is cctools
+      # `ar`, whose option parser accepts only `abcdilLmopqrSsTtuVvx6`, so `D` reached `usage()` and exited 1
+      # and EVERY static build on macOS failed at the archive step with nothing in this file to see it.
+      # vcpkg is what found it (its macOS triplets are `VCPKG_LIBRARY_LINKAGE static`); PR #14 moved the two
+      # rules into the existing `if (NOT APPLE)`, merged 2026-11-21. This leg is what keeps them there.
+      #
+      # BUILD-ONLY on purpose, for the same reason the floor leg above is: static + the full CTest suite has
+      # never run on macOS, and a first run that mixed "the archive rule broke again" with "static tests were
+      # never wired on Apple" would answer neither question. Turn the tests on as its own change, once this
+      # leg has run green at least once.
+      #
+      # UNVERIFIED when written: no macOS toolchain on the machine this was written on, and nothing had run
+      # it when the change landed. Do not read it as coverage until a run says so.
+      - name: Build the static configuration (Apple's ar has no `D` modifier -- see PR #14)
+        run: |
+          cmake -S . -B build-static \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DCPP_PINYIN2_BUILD_TESTS=OFF
+          cmake --build build-static --config Release -j $(sysctl -n hw.logicalcpu)
+
   # Windows Job
   windows:
     runs-on: windows-latest
