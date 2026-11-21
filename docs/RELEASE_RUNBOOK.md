@@ -128,7 +128,8 @@ vcpkg 的"接受任意哈希"，端口在那个状态下是不能发布的。
 | 步骤 | 命令 | 判据 |
 |---|---|---|
 | 4.1 安装到临时前缀 | `cmake --install .tmp/build-default --prefix .tmp/prefix` | 生成 `lib/pkgconfig/cpp-pinyin2.pc` |
-| 4.2 读 `.pc` | `$env:PKG_CONFIG_PATH=".tmp/prefix/lib/pkgconfig"; pkg-config --cflags --libs cpp-pinyin2` | 输出含 `-I…/include`、`-L…/lib`、`-lcpp-pinyin2` |
+| 4.2 读 `.pc` | `$env:PKG_CONFIG_PATH=".tmp/prefix/lib/pkgconfig"; pkg-config --cflags --libs cpp-pinyin2` | 输出含 `-I…/include`、`-L…/lib`、`-lcpp-pinyin2`，**且 `Cflags` 里不得出现 `-std=`**（2026-11-21 起，判词见 issue #13） |
+| 4.2b 读语言模式要求 | `pkg-config --variable=cxx_std cpp-pinyin2` | 输出 `-std=c++17`。这是"C++17 要求"的唯一可读出口，它**不进 `Cflags`**：pkg-config 没有 per-language 通道（本包同时装 C 头 `ext/c_api.h`，clang 在 C 模式下直接拒绝 C++ 标准选项），也无法表达"至少 17"，进了 `Cflags` 就会覆盖消费方自己的 `-std=c++20` |
 | 4.3 消费者冒烟 | `ctest --preset default -R InstallConsumerSmoke` | PASS（这条 ctest 每次构建都在跑） |
 
 ---

@@ -137,10 +137,21 @@ message(STATUS "pkg-config dictdir points at the installed data: ${_pc_dict_dir}
 if (NOT _pc MATCHES "Version: ${VERSION}")
     message(FATAL_ERROR "cpp-pinyin2.pc does not carry Version: ${VERSION}.\n--- pc file ---\n${_pc}")
 endif ()
-# The Cflags line must say what the CMake target says (2026-10-20 audit, G11): the library requires
-# C++17 and, in a static install, the consumer needs `CPP_PINYIN2_STATIC` too (it selects the
-# no-dllimport branch of core/PinyinGlobal.h). Neither is inherited through the .pc the way it is
-# through the exported CMake target, so a consumer that only uses pkg-config is the one who finds out.
+# The Cflags line must say what the CMake target says, with ONE exception that an outside report got right
+# (issue #13, 2026-11-21). `CPP_PINYIN2_STATIC` is a PUBLIC compile definition and, in a static install, a
+# pkg-config consumer that does not get it compiles against the dllimport branch of core/PinyinGlobal.h
+# (harmless on ELF where both spell the same, wrong on MSVC/MinGW). It is not inherited through the .pc the
+# way it is through the exported CMake target, so a consumer that only uses pkg-config is the one who finds
+# out -- and this gate keeps asserting it.
+#
+# A LANGUAGE MODE IS NOT ON THAT LIST, and asserting one here is what this gate used to do. `Cflags` reaches
+# whatever compiler the consumer runs, and this package serves a C header too (`ext/c_api.h`): clang rejects
+# a C++ standard option outright in C mode while gcc only warns, so a C consumer's fate depended on which
+# compiler it used. A consumer that chose C++20 was silently dropped back to 17 as well, because the last
+# `-std=` on the command line wins. The requirement moved to the `cxx_std` variable, which nothing applies
+# unless the consumer asks for it -- so this gate now asserts BOTH halves: no standard mode in Cflags, and
+# the requirement still readable from this file alone.
+#
 # `BUILD_SHARED` is what tests/CMakeLists.txt passes; `BUILD_SHARED_LIBS` is unset inside a `-P` script
 # (a `-P` run has no cache), so testing the latter read as "static" in every configuration. Absent means
 # "not told", and the shared expectation is the lenient one: this leg must not invent a failure.
@@ -148,8 +159,15 @@ set(_pc_expect_static OFF)
 if (DEFINED BUILD_SHARED AND NOT BUILD_SHARED)
     set(_pc_expect_static ON)
 endif ()
-if (NOT _pc MATCHES "Cflags:.*-std=c\\+\\+17")
-    message(FATAL_ERROR "cpp-pinyin2.pc's Cflags does not name -std=c++17.\n--- pc file ---\n${_pc}")
+if (_pc MATCHES "Cflags:[^\r\n]*-std=")
+    message(FATAL_ERROR
+            "cpp-pinyin2.pc's Cflags names a language standard mode. pkg-config cannot scope that to C++, and "
+            "appended after a consumer's own choice it overrides it.\n--- pc file ---\n${_pc}")
+endif ()
+if (NOT _pc MATCHES "cxx_std=-std=c\\+\\+17")
+    message(FATAL_ERROR
+            "cpp-pinyin2.pc does not export cxx_std with the C++17 requirement, so a consumer that reads only "
+            "this file cannot learn it.\n--- pc file ---\n${_pc}")
 endif ()
 if (_pc_expect_static AND NOT _pc MATCHES "Cflags:.*-DCPP_PINYIN2_STATIC")
     message(FATAL_ERROR

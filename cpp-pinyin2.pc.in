@@ -15,13 +15,25 @@ includedir=${prefix}/include
 # "dict" subdirectory), and libdir/includedir must agree with CMAKE_INSTALL_LIBDIR/INCLUDEDIR.
 dictdir=${prefix}/@CMAKE_INSTALL_DATADIR@/cpp-pinyin2/dict
 
+# THE C++ STANDARD, OFFERED AND NOT IMPOSED (2026-11-21, issue #13). These headers need C++17, but `Cflags`
+# is the wrong channel to say so in, for two reasons that were each measured:
+#   * pkg-config has no per-language flag channel, so anything put there reaches a C compiler too -- and this
+#     package serves a C header (`ext/c_api.h`). clang rejects a C++ standard option outright in C mode
+#     ("invalid argument ... not allowed with 'C'") while gcc only warns, so a C consumer's fate depended on
+#     which compiler it used;
+#   * pkg-config cannot say "at least 17": a consumer that chose C++20 would get the option appended after
+#     its own and be dropped back to 17, because the last one on the command line wins.
+# So the requirement is exported as a variable instead. `pkg-config --variable=cxx_std cpp-pinyin2` answers
+# with the flag, and nothing applies it unless the consumer copies it onto its own command line.
+cxx_std=-std=c++17
+
 Name: cpp-pinyin2
 Description: A lightweight Chinese/Cantonese to Pinyin library.
 Version: @version@
 Requires:
 Conflicts:
 
-Cflags: -I${includedir} -std=c++17@CPP_PINYIN2_PC_EXTRA_CFLAGS@
+Cflags: -I${includedir}@CPP_PINYIN2_PC_EXTRA_CFLAGS@
 Libs: -L${libdir} -lcpp-pinyin2
 # Read by `pkg-config --static` only. `dl` is part of libc from glibc 2.34, so a static consumer on an
 # older glibc is the case this line exists for; CMakeLists.txt computes it from ${CMAKE_DL_LIBS}, which is
